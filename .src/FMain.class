@@ -1,0 +1,432 @@
+' Gambas class file
+
+Private win As New Window
+Private $res As Result
+Private cl As Client
+Private co As Commande
+
+Private $datejour As DateChooser
+Private $dte As Date
+
+
+Public Sub Form_Open()
+
+  Connect.Connection
+  connect.connect_laurux
+  
+  co = New Commande(0)
+  GridView1.Columns.count = 8
+  GridView1.Columns[0].Title = "N° Cient" 
+  GridView1.Columns[1].Title = "Nom"
+  GridView1.Columns[2].Title = "Adresse"
+  GridView1.Columns[3].Title = "Ville"
+  GridView1.Columns[4].Title = "Date"
+  GridView1.Columns[5].Title = "En cours"
+  GridView1.Columns[6].Title = "N° tournée"
+  GridView1.Columns[7].Title = "idcom"
+  GridView1.Columns[0].Width = 150
+  GridView1.Columns[1].Width = 220
+  GridView1.Columns[2].Width = 220
+  GridView1.Columns[3].Width = 220
+  GridView1.Columns[4].Width = 100
+  GridView1.Columns[5].Width = 100
+  GridView1.Columns[6].Width = 100
+  GridView1.Columns[7].Width = 0
+  GridView1.Header = GridView.Horizontal
+  GridView1.Mode = Select.Single
+  GridView1.ScrollBar = Scroll.Both
+  
+  affiche
+  affrenseignement(0)
+End
+
+Public Sub Textnom_Activate()
+  
+  $res = Utils.RecCom("nom", Radiocomliv.Value, Textnom.Text)
+  GridView1.Rows.Count = $res.count
+  GridView1.Row = 0
+  
+End
+
+Public Sub Textnum_Activate()
+  
+  $res = Utils.RecCom("num", Radiocomliv.Value, Textnum.Text)
+  GridView1.Rows.Count = $res.count
+  GridView1.Row = 0
+
+End
+
+Public Sub Texttinf_Activate()
+  
+  $res = Utils.RecCom("tou", Radiocomliv.Value, Texttinf.Text, Texttsup.Text)
+  GridView1.Rows.Count = $res.count
+  GridView1.Row = 0
+
+  
+End
+
+Public Sub Texttsup_Activate()
+  
+  $res = Utils.RecCom("tou", Radiocomliv.Value, Texttinf.Text, Texttsup.Text)
+  GridView1.Rows.Count = $res.count
+  GridView1.Row = 0
+  
+End
+
+'                                         Gestion du gridview 
+
+Public Sub GridView1_Data(Row As Integer, Column As Integer)
+  
+  Dim fent As Float
+  
+  fent = row / 2
+  If fent = Int(row / 2) Then GridView1.Data.Background = Color.Background - 50
+  
+  $res.MoveTo(row)
+  Select Case Column
+    Case 0
+       GridView1.Data.Text = $res!numclient
+    Case 1
+       GridView1.Data.Text = $res!nom
+    Case 2
+       GridView1.Data.Text = $res!adresse
+     Case 3
+      GridView1.Data.Text = $res!ville
+    Case 4
+       GridView1.Data.Text = Format($res!datedecommande, "dd.mm.yyyy")
+    Case 5 
+      GridView1.Data.Text = $res!comencours
+    Case 6
+      GridView1.Data.Text = $res!numtourne
+    Case 7
+       GridView1.Data.Text = $res!idcom
+    End Select
+  
+End
+'                             Fenetre de gestion des commandes
+Public Sub GridView1_Activate()
+  Dim win As Window
+  Dim pan As Panel
+  Dim cl As Client
+  
+  win = New Window
+  win.AutoResize = True
+  win.Arrangement = Arrange.Horizontal
+  pan = New Panel(win)
+  pan.AutoResize = True
+  pan.Border = Border.Raised
+  pan.Arrangement = Arrange.Horizontal
+  
+  cl = New Client(CLong(GridView1[GridView1.Row, 7].Text), win)
+
+  win.Show
+  affiche
+  
+End
+'                       Affichage des renseignements commande selectionnée
+Public Sub GridView1_Click()
+
+  affrenseignement(GridView1.row)
+
+End
+
+Public Sub GridView1_KeyPress()
+  '                   Met a jour le n° d'index du gridview suivant la touche de déplacement appuyée 
+  
+  If Key.Code = Key.Down And GridView1.row < GridView1.Rows.Max Then
+    affrenseignement(GridView1.row + 1)
+  Endif
+  If Key.Code = Key.Up And GridView1.Row > 0 Then
+    affrenseignement(GridView1.Row - 1)
+  Endif
+End
+
+Public Sub GridView1_MouseDrag()
+  
+  Dim ctr As String
+  
+ GridView1.Mouse = Mouse.Pointing
+ 
+        'envoie le n° du camion à 0 et le n° de la commande à glisser
+  ctr = "0" & "/" & GridView1[GridView1.row, 7].text
+  GridView1.Drag(ctr)
+  
+End
+
+Public Sub GridView1_MouseUp()
+  
+    GridView1.Mouse = Mouse.Default
+  
+End
+
+
+Private Sub affrenseignement(numcolonne As Integer)
+
+  Dim res As Result
+  Dim sa As Saisie
+  Dim i As Integer
+  
+  '                 Affichage du commentaire principal de cette commande
+  If Not $res.Available Then Return
+  $res.MoveTo(numcolonne)
+  TextArea1.Text = $res!commentaire
+  '                   Suppression des dates de livraison souhaitées dans le scrolview
+ 
+   ScrollView1.Children.Clear
+
+  '                   'Affichage des dates de livraison souhaitées dans le scrolview
+  res = Utils.RecCom("datelivraison", True, CLong(GridView1[numcolonne, 7].Text))
+  If res.Available Then
+    res.MoveFirst
+    For i = 0 To res.Max
+      sa = New Saisie("ouvrir", res!datelivr, res!idlivraison, ScrollView1, ScrollView1)
+      sa.Enabled = False
+      res.MoveNext
+    Next
+  Endif
+End
+
+
+'                               Gestion des bouttons 
+Public Sub Butcreer_Click()
+Dim win As New Window
+
+  cl = New Client(0, win)
+  
+  win.Center
+  win.Width = 1016
+  win.Height = 384
+  win.AutoResize = True
+
+  win.Arrangement = Arrange.vertical
+  win.ShowModal
+  affiche
+End
+
+
+Public Sub Butmod_Click()
+
+  GridView1_Activate
+
+End
+
+Public Sub Butsup_Click()
+
+  co.SupCom(GridView1[GridView1.Row, 7].Text)
+  Textnom_Activate
+  
+End
+
+Public Sub Button4_Click()
+
+  connect.ccon.Close
+  Quit
+
+End
+
+'                                               Prepaqration des tournées---------------------
+'                       choix de la date de tournée
+
+Public Sub Butprepa_Click()
+  
+  win = New Window
+  $datejour = New DateChooser(win) As "dte"
+  win.Arrangement = Arrange.Horizontal
+  win.Height = 400
+  win.Width = 500
+  $datejour.Expand = True
+  win.ShowModal
+
+End
+
+Public Sub dte_Activate()
+  
+  Dim scrolcam As ScrollView
+  Dim moncamion As Camion
+  
+  Dim res As Result
+  Dim i As Integer
+  Dim pan As Panel
+  Dim but As Button
+  
+  win.Close
+  Panel1.Hide
+  $dte = $datejour.Value
+  '                       recherche et affichage des camions existants à cette date et test si ils ne sont pas déja affiché
+  scrolcam = New ScrollView(Panel2)
+
+  scrolcam.Arrangement = Arrange.Horizontal
+  scrolcam.Height = 245
+  res = Utils.RecCom("date", True, $datejour.Value)
+  $dte = $datejour.Value
+  If res.Available Then
+    res.MoveFirst
+    For i = 0 To res.Max
+     moncamion = New Camion("ouvrir", 0, scrolcam, res!idncomcam)  ' CLong(GridView1[GridView1.Row, 7].Text)
+     moncamion.Tag = res!idncomcam
+     res.MoveNext
+    Next
+  Endif
+  
+''                                       Creation d'un nouveau menu/boutons dans 1 panel pan --- Gestion des tournées
+  pan = New Panel(Panel2)
+  pan.Arrangement = Arrange.Horizontal
+  pan.Height = 32
+  pan.AutoResize = True
+  pan.Expand = True
+'                                   bouton valide
+  but = New Button(pan) As "val"
+  but.Height = 32
+  but.AutoResize = True
+  but.Expand = True
+  but.Text = "Validation des tournées"
+  but.Picture = Picture["icon:/medium/apply"]
+  
+  '                                       bouton ajou d'un camion
+  but = New Button(pan) As "ajo"
+  but.Height = 32
+  but.AutoResize = True
+  but.Expand = True
+  but.Text = "Ajou d'un camion"
+  but.Picture = Picture["icon:/medium/add"]
+                                              'imprime les tournées pour les chauffeurs => pas fait
+                                              'suivant besoin imprimer 1 commande par feuille ou plusieur/transformer en bl / recape des articles à charcher ect ...
+                                              
+  but = New Button(pan) As "imp"
+  but.Height = 32
+  but.AutoResize = True
+  but.Expand = True
+  but.Text = "Impression des tournées"
+  but.Picture = Picture["icon:/medium/print"]
+
+                                        ''facturation des commandes => a faire avec votre base de donnée
+  but = New Button(pan) As "fac"
+  but.Height = 32
+  but.AutoResize = True
+  but.Expand = True
+  but.Text = "Facturation des tournées"
+  but.Picture = Picture["icon:/medium/exec"] 
+  '                                       boutton abandon
+  but = New Button(pan) As "aba"
+  but.Height = 32
+  but.AutoResize = True
+  but.Expand = True
+  but.Text = "Retour"
+  but.Picture = Picture["icon:/medium/cancel"]
+ 
+End
+
+Public Sub fac_Click()
+
+  Dim c As Variant
+  Dim fac As Facturation
+  
+  c = Panel2.Children             'recupere les camions dans le scrolview
+  c = c[c.count - 2].Children               '
+  If c.count = 0 Then Return
+  fac = New Facturation(c)
+  fac.ShowModal
+  aba_Click
+  
+End
+
+Public Sub val_Click()
+  
+            'Validation des commandes ==> est-il possible d'envoyer 1 sms aux clients pour les avertir de leur livraison
+
+  Dim c As Variant
+  Dim i, j As Integer
+  Dim res, rescom As Result
+     
+  c = Panel2.Children             'recupere les camions dans le scrolview
+  c = c[c.count - 2].Children               '
+  If c.count = 0 Then Return
+  Connect.ccon.Begin
+                                      'lit les commandes de chaque camion et passe comencours a vrais pour indiquer que la commande est en cours de livraison
+  For i = 0 To c.count - 1
+      res = Connect.ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcpc=&1", c[i].tag)
+      If res.Available Then
+        res.MoveFirst
+        
+        For j = 0 To res.Max
+          rescom = connect.ccon.Edit("commande", "idcom=&1", res!idcomcl)
+          rescom!comencours = True
+          rescom.Update
+          res.MoveNext
+        Next
+      Endif
+  Next
+ 
+  connect.ccon.Commit
+
+  aba_Click
+ 
+End
+
+Public Sub ajo_Click()
+  
+  Dim cam As Camion
+  Dim c As Variant
+  
+  c = Panel2.Children
+  cam = New Camion("creer", 0, c[c.count - 2], 0, $dte)
+  
+End
+
+Public Sub aba_Click()
+  
+  Dim c As Variant
+  
+  c = Panel2.Children
+  c[c.count - 1].delete
+  c[c.count - 1].delete
+  Panel1.Show
+  
+End
+
+Public Sub imp_click()
+
+  Dim c As Variant
+  Dim impr As Edittourn
+  Dim i As Integer
+  
+  c = Panel2.Children             'recupere les camions dans le scrolview
+  c = c[c.count - 2].Children               '
+  If c.count = 0 Then Return
+  Connect.ccon.Begin
+                                      'lit les commandes de chaque camion et passe comencours a vrais pour indiquer que la commande est en cours de livraison
+  For i = 0 To c.count - 1
+    impr = New Edittourn(c[i], $dte) 
+    impr.Preview
+  Next
+
+End
+
+Private Sub affiche()
+  
+  $res = Utils.RecCom("all", False)
+  GridView1.Rows.Count = $res.Count
+  GridView1.Row = 0
+  GridView1.Refresh
+  Wait 0.01
+  
+End
+
+
+Public Sub bases_Click()
+
+  base.Show
+
+End
+
+Public Sub chauffeur_Click()
+
+  Fchauffeur.Show
+
+End
+
+Public Sub camion_Click()
+
+  Fcamion.ShowModal
+
+End

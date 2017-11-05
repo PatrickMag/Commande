@@ -1,0 +1,91 @@
+' Gambas class file
+
+Private $bCreer As Boolean
+Private $lNumcom As Long
+Private $ccon As New Connection
+Private $scrolcam As Container
+Private $resdte As Result
+
+
+
+Public Sub _new(sChoix As String, dte As Date, lNumcom As Long, cam As Container)
+                    Dim st As ResultField
+  $scrolcam = cam
+  $lNumcom = lNumcom
+  ouvreconnection
+                                   'combobox peut venir d'un fichier 
+  ComboBox1.Add("AM")
+  ComboBox1.Add("PM")
+  ComboBox1.Add("JO")
+       
+  Select Case sChoix
+    Case "ouvrir"
+      $resdte = $ccon.edit("datedelivraison", "idlivraison=&1 AND datelivr=&2", lNumcom, dte)
+      DateBox1.Value = dte
+ '     ComboBox1.Text = $resdte!mataprem
+                                 
+ '                                  Print $resdte.Fields.Count   ' st.Name, st.Result
+  '                                    Print ComboBox1.Text
+      TextArea1.Text = $resdte!datecommentaire
+      $bCreer = False
+     
+      
+    Case "creer"
+      $ccon.Begin
+      $resdte = $ccon.Create("datedelivraison")
+      $resdte!idlivraison = $lNumcom
+      $resdte!datelivr = dte
+      DateBox1.Value = dte
+      $bCreer = True
+      Butsup.Enabled = False
+      Butcam.Enabled = False
+      
+  End Select
+End
+
+Private Sub ouvreconnection()                  'ouvre la connection $ccon
+  $ccon = Connect.ccon
+  
+End
+
+Public Sub Butval_Click()
+  
+  $resdte!mataprem = ComboBox1.Current.Text
+  $resdte!datecommentaire = TextArea1.Text
+  $resdte.Update
+  $ccon.Commit
+  $resdte = $ccon.edit("datedelivraison", "idlivraison=&1 AND datelivr=&2", $lNumcom, DateBox1.Value)
+  If $bCreer Then
+    Butsup.Enabled = True
+    Butcam.Enabled = True
+    $bCreer = False
+  Endif
+  
+End
+
+Public Sub Butsup_Click()
+  Dim qst As Integer
+  
+  qst = Message.Delete("Etes-vous sur de vouloir supprimer cette date ?", "OUI", "NON")
+  If qst = 1 Then
+    $ccon.Rollback
+    $ccon.Delete("datedelivraison", "idlivraison=&1 AND datelivr=&2", $lNumcom, DateBox1.Value)
+    $ccon.Commit
+    
+    Me.Close
+'   
+  Endif
+  
+End
+
+Public Sub Butcam_Click()
+  
+  Dim cam As Camion
+  
+  cam = New Camion("creer", $lNumcom, $scrolcam, 0, DateBox1.Value, $resdte!mataprem)
+  cam.Tag = $lNumcom
+  
+  
+End
+
+

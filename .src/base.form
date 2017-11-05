@@ -1,0 +1,67 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,53)
+  Text = ("Base")
+  { Label1 Label
+    MoveScaled(3,7,16,3)
+    Text = ("Nom de la base : ")
+  }
+  { nom TextBox
+    MoveScaled(21,7,20,3)
+  }
+  { Label2 Label
+    MoveScaled(3,12,12,3)
+    Text = ("Utilisateur :")
+  }
+  { utilis TextBox
+    MoveScaled(21,12,20,3)
+  }
+  { Label3 Label
+    MoveScaled(3,16,13,3)
+    Text = ("Mot de passe :")
+  }
+  { mdp TextBox
+    MoveScaled(21,16,20,3)
+    Password = True
+  }
+  { Label4 Label
+    MoveScaled(3,21,15,3)
+    Text = ("Serveur :")
+  }
+  { serveur TextBox
+    MoveScaled(21,21,20,3)
+    Text = ("localhost")
+  }
+  { Label5 Label
+    MoveScaled(3,26,12,3)
+    Text = ("Port :")
+  }
+  { port TextBox
+    MoveScaled(21,26,20,3)
+    Text = ("3306")
+  }
+  { Button1 Button
+    MoveScaled(6,45,14,5)
+    Text = ("Valider")
+    Picture = Picture["icon:/32/apply"]
+  }
+  { Button2 Button
+    MoveScaled(44,45,14,5)
+    Text = ("Quitter")
+    Picture = Picture["icon:/32/close"]
+  }
+  { pp CheckBox
+    MoveScaled(6,37,21,3)
+    Text = ("Produits petroliers")
+  }
+  { bois CheckBox
+    MoveScaled(45,37,13,2)
+    Text = ("Boissons")
+  }
+  { Button3 Button
+    MoveScaled(25,45,14,5)
+    Text = ("Création")
+    Picture = Picture["icon:/32/add"]
+  }
+}

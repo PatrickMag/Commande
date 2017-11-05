@@ -1,0 +1,322 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,127,70)
+  Border = False
+  Arrangement = Arrange.Row
+  AutoResize = True
+  { Panel1 Panel
+    MoveScaled(2,2,124,50)
+    Expand = True
+    Arrangement = Arrange.Horizontal
+    AutoResize = True
+    { Panel2 Panel
+      MoveScaled(0,0,52,49)
+      Drop = True
+      Arrangement = Arrange.Vertical
+      AutoResize = True
+      Border = Border.Plain
+      { Label2 Label
+        MoveScaled(13,0,25,3)
+        Font = Font["Bold,+1"]
+        AutoResize = True
+        Text = ("Recherche d'un client")
+        Alignment = Align.Center
+      }
+      { Panel3 Panel
+        MoveScaled(1,4,53,5)
+        Arrangement = Arrange.Horizontal
+        AutoResize = True
+        { Label1 Label
+          MoveScaled(1,1,13,3)
+          Text = ("N° Client  :")
+        }
+        { !TextNumcl TextBox
+          MoveScaled(17,1,11,3)
+          #Public = True
+          MaxLength = 8
+        }
+        { ButRech Button
+          MoveScaled(40,1,13,3)
+          NoTabFocus = True
+          Text = ("Recherche")
+          Picture = Picture["icon:/small/filter"]
+        }
+      }
+      { !TabStrip1 TabStrip
+        MoveScaled(1,10,47,21)
+        #Public = True
+        Arrangement = Arrange.Vertical
+        Count = 2
+        Index = 0
+        Text = ("")
+        { Panel4 Panel
+          MoveScaled(0,0,53,5)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          { Label3 Label
+            MoveScaled(1,1,13,3)
+            Text = ("Nom :")
+          }
+          { !TextNom TextBox
+            MoveScaled(17,1,32,3)
+            #Public = True
+            MaxLength = 30
+          }
+        }
+        { Panel5 Panel
+          MoveScaled(0,3,53,5)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          { Label4 Label
+            MoveScaled(1,1,13,3)
+            Text = ("Adresse :")
+          }
+          { !TextAdr TextBox
+            MoveScaled(17,1,33,3)
+            #Public = True
+            MaxLength = 30
+          }
+        }
+        { Panel10 Panel
+          MoveScaled(0,8,46,4)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          { Label12 Label
+            MoveScaled(0,0,13,3)
+            Text = ("Adresse :")
+          }
+          { !TextAdr11 TextBox
+            MoveScaled(16,0,33,3)
+            #Public = True
+            MaxLength = 30
+          }
+        }
+        { Panel6 Panel
+          MoveScaled(0,12,53,4)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          { Label5 Label
+            MoveScaled(1,1,13,3)
+            Text = ("C P:")
+          }
+          { !TextCp TextBox
+            MoveScaled(17,0,10,3)
+            #Public = True
+            MaxLength = 5
+          }
+        }
+        { Panel7 Panel
+          MoveScaled(0,14,53,4)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          { Label6 Label
+            MoveScaled(1,1,13,3)
+            Text = ("Ville :")
+          }
+          { !TextVil TextBox
+            MoveScaled(17,1,32,3)
+            #Public = True
+            MaxLength = 30
+          }
+        }
+        Index = 1
+        Text = ("")
+        { Panel12 Panel
+          MoveScaled(0,0,53,4)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          { Label15 Label
+            MoveScaled(1,1,13,3)
+            Text = ("Nom :")
+          }
+          { !TextNom2 TextBox
+            MoveScaled(17,1,32,3)
+            #Public = True
+            MaxLength = 30
+          }
+        }
+        { Panel13 Panel
+          MoveScaled(0,3,53,4)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          { Label16 Label
+            MoveScaled(1,1,13,3)
+            Text = ("Adresse :")
+          }
+          { TextAdr2 TextBox
+            MoveScaled(17,1,33,3)
+            MaxLength = 30
+          }
+        }
+        { Panel16 Panel
+          MoveScaled(0,7,46,4)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          { Label19 Label
+            MoveScaled(0,0,13,3)
+            Text = ("Adresse :")
+          }
+          { !TextAdr21 TextBox
+            MoveScaled(16,0,33,3)
+            #Public = True
+            MaxLength = 30
+          }
+        }
+        { Panel14 Panel
+          MoveScaled(0,11,53,4)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          { Label17 Label
+            MoveScaled(1,1,13,3)
+            Text = ("C P:")
+          }
+          { !TextCp2 TextBox
+            MoveScaled(17,1,10,3)
+            #Public = True
+            MaxLength = 5
+          }
+        }
+        { Panel15 Panel
+          MoveScaled(0,13,53,4)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          { Label18 Label
+            MoveScaled(1,1,13,3)
+            Text = ("Ville :")
+          }
+          { !TextVil2 TextBox
+            MoveScaled(17,1,32,3)
+            #Public = True
+            MaxLength = 30
+          }
+        }
+        Index = 0
+      }
+      { Panel9 Panel
+        MoveScaled(0,31,53,3)
+        Arrangement = Arrange.Horizontal
+        AutoResize = True
+        { Label7 Label
+          MoveScaled(1,0,13,3)
+          Text = ("N° tournée :")
+        }
+        { !TextTou TextBox
+          MoveScaled(12,0,12,3)
+          #Public = True
+          MaxLength = 15
+        }
+        { Label20 Label
+          MoveScaled(26,0,9,3)
+          Visible = False
+          Text = ("      Tipp :  ")
+        }
+        { Texttipp TextBox
+          MoveScaled(36,0,12,3)
+        }
+      }
+      { RadioButton1 RadioButton
+        MoveScaled(1,34,21,3)
+        Text = ("En cours de livraison")
+      }
+      { Panel18 Panel
+        MoveScaled(0,37,51,4)
+        { Label21 Label
+          MoveScaled(0,1,6,2)
+          Text = ("Fixe : ")
+        }
+        { Label22 Label
+          MoveScaled(24,1,9,2)
+          Text = ("Portable :")
+        }
+        { Textfixe TextBox
+          MoveScaled(7,0,14,3)
+        }
+        { Textport TextBox
+          MoveScaled(35,0,14,3)
+        }
+      }
+      { Panel19 Panel
+        MoveScaled(-2,43,54,5)
+        Arrangement = Arrange.Horizontal
+        AutoResize = True
+        { ButVal Button
+          MoveScaled(0,0,12,3)
+          Expand = True
+          AutoResize = True
+          Text = ("Valider")
+          Picture = Picture["icon:/medium/apply"]
+        }
+        { Butart Button
+          MoveScaled(14,-1,17,4)
+          Expand = True
+          AutoResize = True
+          Text = ("Articles")
+          Picture = Picture["icon:/medium/open"]
+        }
+        { Butext Button
+          MoveScaled(16,1,18.75,3)
+          Text = ("Extrait de compte")
+          Picture = Picture["icon:/medium/archive"]
+        }
+        { Buttonqte Button
+          MoveScaled(33,0,19,3)
+          Expand = True
+          AutoResize = True
+          Text = ("Quitter")
+          Picture = Picture["icon:/medium/quit"]
+        }
+      }
+    }
+    { Panel11 Panel
+      MoveScaled(53,0,35,27)
+      Arrangement = Arrange.Vertical
+      AutoResize = True
+      Border = Border.Plain
+      { Label13 Label
+        MoveScaled(0,1,35,2)
+        AutoResize = True
+        Text = ("COMMENTAIRE")
+        Alignment = Align.Center
+        Border = Border.Plain
+      }
+      { !TextAcom TextArea
+        MoveScaled(0,4,35,23)
+        #Public = True
+        Drop = True
+        Expand = True
+      }
+    }
+    { Panel8 Panel
+      MoveScaled(89,0,35,37)
+      Enabled = False
+      Arrangement = Arrange.Vertical
+      AutoResize = True
+      Border = Border.Plain
+      { !DateCom DateBox
+        MoveScaled(7,0,19,4)
+        #Public = True
+      }
+      { Label8 Label
+        MoveScaled(3,4,30,6)
+        Text = ("Nb de camion sur la tournée")
+      }
+      { Label9 Label
+        MoveScaled(2,11,30,4)
+        Text = ("Nb de commande sur la tournée")
+      }
+      { Label10 Label
+        MoveScaled(1,16,30,5)
+        Text = ("Nb de commande total")
+      }
+      { Label11 Label
+        MoveScaled(3,22,28,5)
+        Text = ("Nb de commande pour ce client :")
+      }
+      { Label14 Label
+        MoveScaled(3,30,29,3)
+        Text = ("Solde du compte :")
+      }
+    }
+  }
+}

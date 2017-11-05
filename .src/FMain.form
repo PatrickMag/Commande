@@ -1,0 +1,125 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,136,76)
+  Icon = Picture["logo.png"]
+  Arrangement = Arrange.Row
+  AutoResize = True
+  { Fichier Menu
+    Text = ("Fichier")
+    { chauffeur Menu
+      Text = ("Fiche chauffeur")
+    }
+    { camion Menu
+      Text = ("Fiche camion")
+    }
+    { bases Menu
+      Text = ("Base")
+    }
+  }
+  { Panel2 Panel
+    MoveScaled(1,1,150,76)
+    Arrangement = Arrange.Vertical
+    AutoResize = True
+    { Panel3 Panel
+      MoveScaled(3,1,141,55)
+      Arrangement = Arrange.Vertical
+      AutoResize = True
+      { Frame2 Frame
+        MoveScaled(6,0,55,13)
+        Expand = True
+        AutoResize = True
+        Text = ("Critéres de recherche")
+        { Label6 Label
+          MoveScaled(1,2,7,3)
+          Text = ("N° :")
+        }
+        { Textnum TextBox
+          MoveScaled(9,2,16,3)
+        }
+        { Label5 Label
+          MoveScaled(29,2,7,3)
+          Text = ("Nom :")
+        }
+        { Textnom TextBox
+          MoveScaled(35,2,20,3)
+        }
+        { Label7 Label
+          MoveScaled(1,5,7,3)
+          Text = ("Tournée ")
+        }
+        { !Texttinf TextBox
+          MoveScaled(10,5,10,3)
+          #Public = True
+        }
+        { Label8 Label
+          MoveScaled(1,9,3,3)
+          Text = ("à")
+        }
+        { Texttsup TextBox
+          MoveScaled(10,9,10,3)
+        }
+        { Radiocomliv RadioButton
+          MoveScaled(28,8,14,3)
+          Text = ("Déja livré ")
+        }
+      }
+      { GridView1 GridView
+        MoveScaled(0,14,138,41)
+      }
+      { Panelvue Panel
+        MoveScaled(61,0,71,14)
+        Ignore = True
+        Arrangement = Arrange.Vertical
+        { TextArea1 TextArea
+          MoveScaled(0,0,64,6)
+          Enabled = False
+        }
+        { ScrollView1 ScrollView
+          MoveScaled(0,6,64,8)
+          Arrangement = Arrange.Vertical
+        }
+      }
+    }
+    { Panel1 Panel
+      MoveScaled(3,57,104,8)
+      Arrangement = Arrange.Horizontal
+      AutoResize = True
+      { Butcreer Button
+        MoveScaled(2,2,19,5)
+        ToolTip = ("Créer une commande")
+        Expand = True
+        AutoResize = True
+        Picture = Picture["icon:/medium/add"]
+      }
+      { Butmod Button
+        MoveScaled(28,3,15,4)
+        ToolTip = ("Modifier une commande")
+        Expand = True
+        AutoResize = True
+        Picture = Picture["icon:/medium/edit"]
+      }
+      { Butsup Button
+        MoveScaled(44,3,21,4)
+        ToolTip = ("Supprimer une commande")
+        Expand = True
+        AutoResize = True
+        Picture = Picture["icon:/medium/delete"]
+      }
+      { Butprepa Button
+        MoveScaled(67,2,12,4)
+        ToolTip = ("Preparation des tournées")
+        Expand = True
+        AutoResize = True
+        Picture = Picture["icon:/medium/calendar"]
+      }
+      { Button4 Button
+        MoveScaled(81,2,16,6)
+        ToolTip = ("Quitter")
+        Expand = True
+        AutoResize = True
+        Picture = Picture["icon:/medium/quit"]
+      }
+    }
+  }
+}

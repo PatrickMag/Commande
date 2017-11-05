@@ -1,0 +1,290 @@
+' Gambas class file
+
+Private ligne As Lignearticle
+Private $rescli As Result
+
+Public Sub _new(nbcam As Variant)
+Dim i, j As Integer
+Dim ca As Camion
+Dim res, rescam, rescom As Result
+
+  If nbcam.count = 0 Then Return
+  For i = 0 To nbcam.count - 1
+    ca = nbcam[i]
+    
+    rescam = connect.ccon.Exec("SELECT * FROM commandeparcamion WHERE idncomcam=&1", ca.Tag)
+    TreeView1.Add("C" & Str(ca.Tag), rescam!comnumcam)
+    rescom = connect.ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcpc=&1", ca.Tag)
+    rescom.MoveFirst
+    For j = 0 To rescom.Max
+     res = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", rescom!idcomcl)
+     TreeView1.Add(Str(rescom!idcomcl), res!nom,, "C" & Str(ca.Tag))
+     rescom.MoveNext
+    Next
+  Next
+  TreeView1["C" & Str(ca.Tag)].Selected = True
+End
+
+
+Public Sub TreeView1_Activate()
+  Dim rescom, resligne, rescli As Result
+  Dim i, j As Integer
+  Dim cle As String
+  
+  gestionligne.icompteur = 0
+  If Left(TreeView1.Current.Key, 1) = "C" Then Return
+  butfac.Enabled = True
+  rescom = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", Val(TreeView1.Current.Key))
+  $rescli = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_code=&1", Val(rescom!numclient))
+  ScrollView1.Children.Clear
+  If $rescli.Available Then
+    resligne = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", Val(TreeView1.Current.Key))
+    If resligne.Available Then
+      resligne.MoveFirst
+      For i = 0 To resligne.Max
+        ligne = New Lignearticle(Me, "ouvrir", Val(TreeView1.Current.Key), $rescli, gestionligne.couleur(i), ScrollView1, i) As "ligne"
+        ligne.Tag = i
+        Inc gestionligne.icompteur
+        resligne.MoveNext
+      Next
+      creerligne(Val(TreeView1.Current.Key))
+    Else
+     ligne = New Lignearticle(Me, "creer", Val(TreeView1.Current.Key), $rescli, Color.Background - 100, ScrollView1) As "ligne"
+     ligne.Tag = 0
+     Inc gestionligne.icompteur
+    Endif
+  Endif
+ 
+End
+
+Public Sub ligne_up(nm As Integer)
+
+  ligne = gestionligne.up(nm, ligne, ScrollView1)
+
+End
+Public Sub ligne_ValideLigne()
+
+  ligne_down(ligne.Tag)
+
+End
+Public Sub ligne_GotF(nm As Integer)
+
+  ligne = gestionligne.GotF(nm, ligne, ScrollView1)
+
+End
+Public Sub ligne_down(nm As Integer)
+
+  ligne = gestionligne.Down(nm, ligne, ScrollView1)
+  If nm = gestionligne.icompteur - 1 Then
+      creerligne(Val(TreeView1.Current.Key))
+  Endif
+End
+
+Public Sub ligne_supprime(nm As Integer)
+  
+  ligne = gestionligne.supprime(nm, ligne, ScrollView1)
+  
+End
+
+Public Sub ScrollView1_Scroll()
+  
+  gestionligne.Scroll(ScrollView1)
+  
+End
+
+
+Public Sub creerligne($lnumcom As Long)
+  
+  If ligne.numart Then
+    ligne.couleur = gestionligne.couleur(ligne.Tag)
+    ligne = New Lignearticle(Me, "creer", $lnumcom, $rescli, Color.Background - 100, ScrollView1) As "ligne"
+    ligne.Tag = gestionligne.icompteur
+    Inc gestionligne.icompteur
+  Endif
+  
+End
+
+Public Sub Button3_Click()
+
+  Me.Close
+
+End
+
+Public Sub butfac_Click()
+
+  Dim resent, reslig, resart, res, respart As Result
+  Dim rescom, rescli, resech As Result
+  Dim i, ipoid As Integer
+  Dim dnbon, numlig As Integer
+  Dim mht, pxht, remise As Float
+  Dim totmht, totremise, totmarge, totttc As Float
+  Dim tab As Variant
+  Dim bck As String
+  Dim dt As String
+  
+  If Not DateBox1.Value Then
+    Message.Error("Entrez la date de livraison ", "OK")
+    DateBox1.SetFocus
+    Return
+  Endif
+  ligne_ValideLigne
+  Try connect.cconlaurux.Exec("LOCK TABLE Fiches_Parametres WRITE")
+  If Error Then
+    Message.Error("Table paramètre utilisée par un autre pose", "OK")
+    Me.Close
+  Endif
+  connect.cconlaurux.Begin
+  respart = connect.cconlaurux.Edit("Fiches_Parametres")
+  dnbon = Val(respart!dnbon) + 1
+  respart!dnbon = Format(dnbon, "000000")
+  respart.Update
+  connect.cconlaurux.Commit
+  Try connect.cconlaurux.Exec("UNLOCK TABLE")
+  connect.cconlaurux.Begin
+  
+  rescom = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", Val(TreeView1.Current.Key))
+  tab = ScrollView1.Children
+  numlig = 0
+  For i = 0 To tab.count - 2
+    ligne = tab[i]
+    resart = connect.cconlaurux.Edit("Fiches_Art", "art_code=&1", ligne.numart)
+    res = connect.cconlaurux.Create("Fiches_Ligbl")
+    totmht += ligne.montantht
+    totremise += ligne.montrem
+    totttc += ligne.montantttc
+    ipoid += ligne.poid
+    
+     res!num_ligbl = Format(dnbon, "000000")
+     numlig += 1
+     res!numlig_ligbl = Format(numlig, "000000")
+     res!code_ligbl = ligne.numart
+     res!libel_ligbl = ligne.lib
+     res!fam_ligbl = resart!art_fam
+     res!pu_ligbl = Utils.CDec(resart!art_nbd, Utils.cpoint(ligne.prixht))
+     res!dec_ligbl = resart!art_dec
+     res!qte_ligbl = ligne.qte
+     res!brut_ligbl = Format(ligne.montantht + ligne.montrem, "0.00")
+     res!rem_ligbl = ligne.montrem
+     res!netht_ligbl = Format(ligne.montantht, "0.00")
+     res!tx_ligbl = resart!art_tva
+     res!nettc_ligbl = Format(ligne.montantttc, "0.00")
+     res!typel_ligbl = "A"
+     res!block_ligbl = res!numlig_ligbl & ligne.numart & Round(Rnd(1000, 9999))
+     bck = res!block_ligbl
+     res!mrgart_ligbl = ligne.margeart
+     totmarge += res!mrgart_ligbl
+     res!four_ligbl = resart!art_four
+     res!tour_ligbl = rescom!numtourne
+     Try res!tipp_ligbl = rescom!tipp
+     resart!art_qte -= ligne.qte
+     res.Update
+     resart.Update
+       'cas de commentaire sur article
+     If resart!art_impcar Then
+       res = connect.cconlaurux.Create("Fiches_Ligbl")
+         
+       res!num_ligbl = respart!dnbon
+       numlig += 1
+       res!numlig_ligbl = Format(numlig, "000000")
+       res!typel_ligbl = "R"
+       res!com_ligbl = resart!art_crst
+       res!block_ligbl = bck
+       res.Update
+     Endif
+
+  Next
+     'creation de l'entete de bl
+'  rescom = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", Val(TreeView1.Current.Key))
+  $rescli = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_code=&1", Val(rescom!numclient))
+  res = connect.cconlaurux.Create("Fiches_Bl")
+  res!numbl = respart!dnbon
+  res!type = "B"
+  res!cdclibl = rescom!numclient
+  Try res!cvclibl = rescli!cli_rs_soc
+  Try res!nmclibl = rescom!nom
+'     res!pnmclibl = rescli!cli_pnm
+  Try res!adr1bl = rescom!adresse
+  Try res!adr2bl = rescom!adresse1
+  Try res!cpbl = rescom!cp
+  Try res!villebl = rescom!ville
+  res!gestbl = rescom!fraisfac
+  res!tvar = 0
+  res!datebl = DateBox1.Value
+  res!remartbl = Round(totremise, -2)
+  res!marge_art = totmarge
+  res!totalht = Round(totmht, -2)
+  res!imp = 0
+  resech = connect.cconlaurux.Exec("SELECT * FROM Fiches_Echeances WHERE num=&1", $rescli!cli_cdech)
+   If resech.Available Then
+     dt = Utils.Calcech(resech!duree, resech!jours, resech!finmois, Format(DateBox1.Value, "dd.mm.yyyy"))
+     res!ech = Date(Right(dt, 4), Val(Mid(dt, 4, 2)), Val(Left(dt, 2)))
+   Endif
+      
+   res!totalttc = Round(totttc, -2)
+   res.Update
+   respart.Update
+   
+    'Supression de la commande dans les camions et maj de la commande => mis en livrée
+  connect.ccon.Begin
+                    'lire les camions qui contiennent cette commande
+  res = connect.ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcomcl=&1", Val(TreeView1.Current.Key))
+  If res.Available Then
+    connect.ccon.Delete("lignecomparcamion", "idcomcl=&1", Val(TreeView1.Current.Key))
+    res.MoveFirst
+    For i = 0 To res.Max
+                      'lire et supprimer la tournée si c'est la derniere qui exixte sur un camion et ce sur chaque camion contenant cette commande
+      reslig = connect.ccon.Exec("SELECT * FROM commande,lignecomparcamion WHERE idcpc=&1 AND idcom=idcomcl AND numtourne=&2", res!idcpc, rescom!numtourne)
+      If reslig.Count = 1 Then
+        connect.ccon.Delete("lignetournepcam", "idcpc=&1 AND idnumtourne=&2", res!idcpc, rescom!numtourne)
+      Endif
+      res.MoveNext
+    Next
+    
+    connect.ccon.Delete("lignedecommande", "idligne=&1", Val(TreeView1.Current.Key))
+    connect.ccon.Delete("datedelivraison", "idlivraison=&1", Val(TreeView1.Current.Key))
+    res = connect.ccon.Exec("SELECT * FROM commandeparcamion WHERE idncomcam=&1", Right(TreeView1.Current.ParentKey, -1))
+    rescom = connect.ccon.Edit("commande", "idcom=&1", Val(TreeView1.Current.Key))
+    rescom!comlivre = True
+    rescom!siprobleme = TextArea1.Text
+    rescom!datedelivraison = DateBox1.Value
+    rescom!numcam = res!comnumcam
+    rescom!numchauf = res!cnumchauf
+    rescom.Update
+    connect.ccon.Commit
+    connect.cconlaurux.Commit
+    TreeView1.Current.Delete
+  Endif
+  butfac.Enabled = False
+End
+
+Public Sub Butrlc_Click()
+
+  Dim res As Result
+  
+  connect.ccon.Begin
+  res = connect.ccon.Edit("commande", "idcom=&1", Val(TreeView1.Current.Key))
+  res!comencours = False
+  res.Update
+  connect.ccon.Commit
+  TreeView1.Current.Delete
+
+End
+
+Public Sub Butsupcam_Click()
+
+  Dim qst As Integer
+  Dim clf As Integer
+  
+  qst = Message.Delete("ATTENTION : Supression de ce camion " & Chr$(10) & " Etes vous sur ?", "OUI ", " NON ")
+  If qst = 2 Then Return
+  If TreeView1.MoveParent() Then clf = Val(Right(TreeView1.Current.Key, -1)) Else clf = Val(Right(TreeView1.Item.Key, -1))
+  
+  connect.ccon.Begin
+  connect.ccon.Delete("commandeparcamion", "idncomcam = &1 ", clf)
+  connect.ccon.Delete("lignecomparcamion", "idcpc = &1 ", clf)
+  connect.ccon.Delete("lignetournepcam", "idcpc = &1 ", clf)
+  connect.ccon.Commit
+  Try TreeView1.Item.Delete
+  Try TreeView1.Current.Delete
+  
+End

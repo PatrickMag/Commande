@@ -1,0 +1,340 @@
+' Gambas class file
+
+Private $res As Result
+Public $resrech As Result
+Private $soujesuis As String
+Private $icleliv As Integer
+
+Event trouver(numcli As Integer, numadr As Integer)
+
+Public Sub _new($snum As String)
+
+  If Not $snum Then $snum = "0"
+  
+  Textnum.Text = $snum
+  $soujesuis = "num"
+
+  GridView1.Columns.count = 6
+  GridView1.Columns[0].Title = "N° Cient" 
+  GridView1.Columns[1].Title = "Nom"
+  GridView1.Columns[2].Title = "Adresse 1"
+  GridView1.Columns[3].Title = "Adresse 2"
+  GridView1.Columns[4].Title = "C.Postal"
+  GridView1.Columns[5].Title = "Ville"
+  GridView1.Columns[0].Width = 100
+  GridView1.Columns[1].Width = 250
+  GridView1.Columns[2].Width = 250
+  GridView1.Columns[3].Width = 250
+  GridView1.Columns[4].Width = 60
+  GridView1.Columns[5].Width = 250
+  GridView1.Header = GridView.Horizontal
+  GridView1.Mode = Select.Single
+  GridView1.ScrollBar = Scroll.Both
+    
+'  Valuenum_GotFocus
+'  Valuenum_Change
+   Radiofac.Value = True
+End 
+
+'                                   Recherche par numero
+Public Sub textnum_GotFocus()
+
+  razdesvaleurs(1)
+  GridView1.Rows.Count = 0
+  $soujesuis = "num"
+
+End
+
+Public Sub textnum_Change()
+  
+  If Radiofac.Value Then
+    $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_code LIKE &1", "%" & textnum.Text & "%")
+  Else
+    $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE code LIKE &1", "%" & textnum.Text & "%")
+  Endif
+   
+  GridView1.Rows.Count = $res.Count 
+  
+End
+
+'                   Recherche par nom
+Public Sub Textnom_GotFocus()
+
+  razdesvaleurs(2)
+  GridView1.Rows.Count = 0
+  $soujesuis = "nom"
+
+End
+
+Public Sub Textnom_Change()
+
+  Dim squestion, sdonne As String
+  
+  sdonne = "%" & Textnom.Text & "%"
+  If Radiofac.Value Then
+    squestion = "SELECT * FROM Fiches_Cli WHERE cli_nom LIKE &1"
+  Else
+    squestion = "SELECT * FROM Fiches_AdrlivC WHERE nom LIKE &1"
+  Endif
+  
+  $res = connect.cconlaurux.Exec(squestion, sdonne)
+  GridView1.Rows.Count = $res.Count
+
+End
+'             recherche adresse1 
+Public Sub Textad1_GotFocus()
+
+  razdesvaleurs(3)
+  GridView1.Rows.Count = 0
+  $soujesuis = "adr1"
+
+End
+
+Public Sub Textad1_Change()
+
+  Dim squestion, sdonne As String
+  
+  sdonne = "%" & Textad1.Text & "%"
+  If Radiofac.Value Then
+    squestion = "SELECT * FROM Fiches_Cli WHERE cli_adr1 LIKE &1"
+  Else
+    squestion = "SELECT * FROM Fiches_AdrlivC WHERE adr1 LIKE &1"
+  Endif
+  
+  $res = connect.cconlaurux.Exec(squestion, sdonne)
+  GridView1.Rows.Count = $res.Count
+
+End
+
+'                                                 recherche sur adr2
+Public Sub Textad2_GotFocus()
+
+  razdesvaleurs(4)
+  GridView1.Rows.Count = 0
+  $soujesuis = "adr2"
+
+End
+
+Public Sub Textad2_Change()
+
+  Dim squestion, sdonne As String
+  
+  sdonne = "%" & Textad2.Text & "%"
+  If Radiofac.Value Then
+   squestion = "SELECT * FROM Fiches_Cli WHERE cli_adr2 LIKE &1"
+  Else
+    squestion = "SELECT * FROM Fiches_AdrlivC WHERE adr2 LIKE &1"
+  Endif
+  
+  $res = connect.cconlaurux.Exec(squestion, sdonne)
+  GridView1.Rows.Count = $res.Count
+
+End
+
+
+'                                           recherche sur cp
+Public Sub Textcp_GotFocus()
+
+  razdesvaleurs(5)
+  GridView1.Rows.Count = 0
+  $soujesuis = "cp"
+
+End
+
+'                                       recherche adresse2
+Public Sub Textcp_Change()
+
+  Dim sreq As String
+  
+  sreq = "%" & Textcp.Text & "%"
+  If Radiofac.Value Then
+    $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_cd_ptl LIKE &1", sreq)
+  Else
+    $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE cd_ptl LIKE &1", sreq)
+  Endif
+  
+  GridView1.Rows.Count = $res.Count
+
+End
+
+'                                         recherche sur ville
+Public Sub Textville_GotFocus()
+
+  razdesvaleurs(6)
+  GridView1.Rows.Count = 0
+  $soujesuis = "ville"
+
+End
+
+Public Sub Textville_Change()
+
+  Dim sreq As String
+  
+  sreq = "%" & Textville.Text & "%"
+  If Radiofac.Value Then
+    $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_ville LIKE &1", sreq)
+  Else
+    $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE ville LIKE &1", sreq)
+  Endif
+  
+  GridView1.Rows.Count = $res.Count
+
+End
+
+'                               Recherche sur nom+adr1+adr2
+Public Sub Texttous_GotFocus()
+
+  razdesvaleurs(7)
+  GridView1.Rows.Count = 0
+  $soujesuis = "tous"
+
+End
+
+Public Sub Texttous_Change()
+
+  Dim sreq As String
+  
+  sreq = "%" & Texttous.Text & "%"
+  If Radiofac.Value Then
+    $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_nom LIKE &1 OR cli_adr1 LIKE &2 OR cli_adr2 LIKE &3", sreq, sreq, sreq)
+  Else
+    $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE nom LIKE &1 OR adr1 LIKE &2 OR adr2 LIKE &3", sreq, sreq, sreq)
+  Endif
+  
+  GridView1.Rows.Count = $res.Count
+
+End
+
+Public Sub Radiofac_Click()
+
+  changeaffichage
+
+End
+
+Public Sub Radioliv_Click()
+  
+  changeaffichage
+  
+End
+
+Private Sub changeaffichage()
+  
+  GridView1.Rows.Count = 0
+  Select Case $soujesuis
+    Case "num"
+      textnum_Change
+    Case "nom"
+      Textnom_Change
+    Case "adr1"
+      Textad1_Change
+    Case "adr2"
+      Textad2_Change
+    Case "cp"
+      Textcp_Change
+    Case "ville"
+      Textville_Change
+    Case "tous"
+      Texttous_Change
+  End Select
+  
+End
+
+'                                   raz des champs de recherche 
+Private Sub razdesvaleurs(iv As Integer)
+  
+  If iv <> 1 Then textnum.Clear
+  If iv <> 2 Then Textnom.Clear
+  If iv <> 3 Then Textad1.Clear
+  If iv <> 4 Then Textad2.Clear
+  If iv <> 5 Then Textcp.Clear
+  If iv <> 6 Then Textville.Clear
+  If iv <> 7 Then Texttous.Clear
+  
+End
+
+Public Sub GridView1_Data(r As Integer, c As Integer)
+  
+  Dim fent As Float
+  
+  $res.MoveTo(r)
+  fent = r / 2
+  If fent = Int(r / 2) Then GridView1.Data.Background = Color.Background - 50
+  
+  Select Case c
+    Case 0
+      If Radiofac.Value Then
+        GridView1.Data.Text = Str($res!cli_code)
+      Else
+        GridView1.Data.Text = Str($res!code)
+      Endif
+    Case 1
+      If Radiofac.Value Then
+        GridView1.Data.richText = $res!cli_nom
+      Else
+        GridView1.Data.richText = $res!nom
+      Endif
+    Case 2
+      If Radiofac.Value Then
+        GridView1.Data.richText = $res!cli_adr1
+      Else
+        GridView1.Data.richText = $res!adr1
+      Endif
+    Case 3
+       If Radiofac.Value Then
+        GridView1.Data.richText = $res!cli_adr2
+      Else
+        GridView1.Data.Text = Str($res!num)
+        GridView1.Data.Foreground = Color.Background
+      Endif
+      Case 4
+         If Radiofac.Value Then
+        GridView1.Data.Text = $res!cli_cd_ptl
+      Else
+        GridView1.Data.Text = $res!cd_ptl
+      Endif
+    Case 5
+      If Radiofac.Value Then
+        GridView1.Data.richText = $res!cli_ville
+      Else
+        GridView1.Data.richText = $res!ville
+      Endif
+  End Select
+
+End
+
+Public Sub GridView1_Activate()
+
+'   $icle = Val(GridView1[GridView1.Row, 0].Text)
+   If Radiofac.Value Then
+    $icleliv = -1
+    Else
+      $icleliv = Val(GridView1[GridView1.Row, 3].Text)
+   Endif
+   Raise trouver(Val(GridView1[GridView1.Row, 0].Text), $icleliv)
+   Me.Close
+'GridView1[1, 1].Border.Color = Color.Red
+End
+
+Public Sub Button1_Click()
+
+   Me.Close
+
+End
+
+'Private Function cleffaclaurux_Read() As Integer
+
+ ' Return $icle
+
+'End
+
+'Private Function cleflivlaurux_Read() As Integer
+
+ ' Return $icleliv
+
+'End
+
+Public Sub GridView1_Click()
+
+  
+
+End

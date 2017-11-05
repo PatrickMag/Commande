@@ -1,0 +1,179 @@
+' Gambas class file
+
+Private $bok As Boolean
+
+Public Sub Form_Open()
+
+  Try nom.Text = Settings["/base/nom"]
+  Try utilis.Text = Settings["/base/utilis"]
+  Try mdp.Text = hexdblKey.Crypt("de", Settings["/base/mdp"], "commande")
+  Try serveur.Text = Settings["/base/serveur"]
+  Try port.Text = Settings["/base/port"]
+  If Not serveur.Text Then serveur.text = "localhost"
+  If Not port.Text Then port.Text = "3306"
+  If Not nom.Text Then nom.Text = "Laurux01"
+  
+  Try pp.Value = Settings["opt/pp"]
+  Try bois.Value = Settings["opt/bois"]
+
+End
+
+Public Sub Button2_Click()
+
+  Quit
+
+End
+
+Public Sub Button1_Click()
+
+  Dim con As New Connection
+  
+  'ouverture de Laurux
+  con.Name = nom.Text
+  con.Login = utilis.Text
+  con.Password = mdp.Text
+  con.Host = serveur.Text
+  con.Port = port.Text
+  con.Type = "MySQL"
+  con.Open
+  con.Close
+  'ouverture commande
+  con.Name = "commande"
+  con.Login = utilis.Text
+  con.Password = mdp.Text
+  con.Host = serveur.Text
+  con.Port = port.Text
+  con.Type = "MySQL"
+  con.Open
+  con.Close
+  
+  Try Settings["/base/nom"] = nom.Text
+  Try Settings["/base/utilis"] = utilis.Text
+  Try Settings["/base/mdp"] = hexdblKey.Crypt("en", mdp.Text, "commande")
+  Try Settings["/base/serveur"] = serveur.Text
+  Try Settings["/base/port"] = port.Text
+  
+  Try Settings["opt/pp"] = pp.Value
+  Try Settings["opt/bois"] = bois.Value
+  Settings.Save
+  Me.Close
+  
+  Catch
+    Message.Error(Error.Text, "OK")
+    
+End
+
+Public Sub Button3_Click()
+
+  Dim con As New Connection
+  
+  Me.Mouse = Mouse.Wait
+  con.Login = utilis.Text
+  con.Password = mdp.Text
+  con.Host = serveur.Text
+  con.Port = port.Text
+  con.Type = "MySQL"
+  con.Open
+  
+  con.Databases.Add("commande")
+  con.Close
+  con.Name = "commande"
+  con.Open
+  'table des camions
+  Try con.EXEC("CREATE TABLE camion" &
+    " (idimat Char(10) NOT NULL," &     'immat du camion
+    "nomducamion VARCHAR(20)," &        'son nom ou marque ds l'entreprise
+    "capacitem3 DECIMAL(6,2)," &        'sa capacité en M3 pour les p.petroliers
+    "chargutil INTEGER," &               'sa charge utile (maxi)
+    "nbclient INTEGER," &               'estimation du nombre de client maxi à livrer par raport au w du camion
+    "ageducamion DATE," &                 'date de mise en circulation du camion
+    "PRIMARY KEY (idimat))" & "ENGINE = InnoDB")
+    Print Error.text
+    'table des chauffeurs
+  Try con.Exec("CREATE TABLE chauffeur" &
+    " (idchauffeur CHAR(3) NOT NULL," &
+    "nom VARCHAR(30)," &
+    "prenom VARCHAR(30)," &
+    "PRIMARY KEY (idchauffeur)) ENGINE=InnoDB")
+     Print Error.Text
+  'table entete de commande
+  Try con.Exec("CREATE TABLE commande" &
+  " (idcom int NOT NULL AUTO_INCREMENT," &
+  "datedecommande DATE," & 
+  "comencours BOOLEAN DEFAULT FALSE," &               'vrais si la com est en cours de livraison
+  "numclient char(8)," &
+  "nom VARCHAR(30)," &
+  "adresse VARCHAR(30)," &
+  "adresse1 VARCHAR(30)," &
+  "cp char(5)," &
+  "ville VARCHAR(40)," &
+  "numtourne char(15)," &
+  "telfixe VARCHAR(15)," &
+  "telport VARCHAR(15)," &
+  "noml VARCHAR(40)," &
+  "adressel VARCHAR(30)," &
+  "adressel1 VARCHAR(30)," &
+  "cpl char(5)," &
+  "villel VARCHAR(30)," &
+  "comlivre BOOLEAN DEFAULT FALSE," &             'vrais si la commande est déjà livrée
+  "numcam char(10)," &
+  "numchauf char(3)," &
+  "datedelivraison DATE," &
+  "commentaire TEXT," &
+  "siprobleme TEXT," &
+  "fraisfac DECIMAL(5,2)," &
+  "poid INTEGER," &                 'poid de la commande
+  "volume DECIMAL(6,2)," &          'volume m3 de la commande
+  "tipp char(2)," &
+  "PRIMARY KEY (idcom)) ENGINE=InnoDB")
+  Print Error.Text
+  'liste des camions a livrer
+  Try con.Exec("CREATE TABLE commandeparcamion" &
+    " (idncomcam int NOT NULL AUTO_INCREMENT," &
+    "datecam DATE," &
+    "comnumcam CHAR(10)," &
+    "mataprem CHAR(2)," &
+    "cnumchauf CHAR(3)," &
+    "PRIMARY KEY (idncomcam)) ENGINE=InnoDB")
+     Print Error.Text
+  'préférences de livraison
+  Try con.Exec("CREATE TABLE datedelivraison" &
+    " (idlivraison INTEGER," &
+    "datelivr DATE," &
+    "mataprem char(2)," &
+    "datecommentaire TEXT," &
+    "PRIMARY KEY (idlivraison,datelivr))")
+     Print Error.Text
+  'correspondance des commandes et des camions
+  Try con.Exec("CREATE TABLE lignecomparcamion" &
+    " (idcpc INTEGER," &
+    "idcomcl INTEGER," &
+    "PRIMARY KEY (idcpc,idcomcl))")
+     Print Error.Text
+  'correspondance des tourées et des cammions
+  Try con.Exec("CREATE TABLE lignetournepcam" &
+    " (idcpc INTEGER," &
+    "idnumtourne char(15)," &
+    "PRIMARY KEY (idcpc,idnumtourne))")
+     Print Error.Text
+  'ligne article
+  Try con.Exec("CREATE TABLE lignedecommande" &
+    " (idligne INTEGER," &
+    "numligne INTEGER," &
+    "numarticle CHAR(15)," &
+    "libarticle VARCHAR(25)," &
+    "coli INTEGER," &
+    "palette INTEGER," &
+    "qte DECIMAL(9,3)," &
+    "prix DECIMAL(8,3)," &
+    "txtva DECIMAL(5,2)," &
+    "remise DECIMAL(8,2)," &
+    "pxamp DECIMAL(9,3)," &
+    "PRIMARY KEY (idligne,numligne))")
+    Print Error.Text
+    Me.Mouse = Mouse.Default
+    
+  Catch
+    Message.Error(Error.Text, "OK")
+    
+End

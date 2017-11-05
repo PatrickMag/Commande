@@ -1,0 +1,159 @@
+' Gambas class file
+
+Private $rescom As Result
+Private $reslco As Result
+Private $rescmd As Result
+Private $dtel As Date
+
+Public Sub _new(cam As Camion, dte As Date)
+
+  Dim res As Result
+  Dim i, j As Integer
+  
+  $dtel = dte
+  res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", Left(cam.ca.cnumchauf, 3)) 
+  entete.Text = "TOURNÉE DU CAMION N° " & cam.ca.comnumcam & " EN DATE DU " & Format(cam.ca.datecam, "dd.mm.yyyy") & " CHAUFFEUR " & res!nom
+  
+  $rescom = connect.ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcpc=&1", cam.Tag)
+  If $rescom.Available Then
+    ReportPclient.DataCount = $rescom.Count
+'    $rescom.MoveFirst
+'    For i = 0 To $rescom.Max
+'      $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
+  '    If $rescmd.Available Then
+        
+'        For j = 0 To $rescmd.Max
+          
+'          $reslco = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", $rescmd!idcom)
+'          If $reslco.Available Then Reportart.DataCount = $reslco.Count Else Reportart.DataCount = 0
+'            Reportart.DataCount = $reslco.Count
+'            $reslco.MoveFirst
+'            Repeat
+' '             Print reslco!libarticle
+'            Until $reslco.MoveNext()
+'          Endif
+       ' Until $rescmd.MoveNext()
+'        Next
+ '     Endif
+ '   $rescom.MoveNext
+ '   Next
+  Endif
+ ' $reslco = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", $rescom!idcomcl)
+  'If $reslco.Available Then Reportart.DataCount = $reslco.Count Else Reportart.DataCount = 0
+End
+
+
+Public Sub nom_Data(Index As Integer)
+Print Index
+  $rescom.MoveTo(Index)
+  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
+  Last.data = $rescmd!numclient & " " & $rescmd!nom & "  "
+ 
+ 
+End
+
+Public Sub tfixe_Data(Index As Integer)
+
+  $rescom.MoveTo(Index)
+  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
+  Last.data = $rescmd!telfixe
+
+End
+
+Public Sub tport_Data(Index As Integer)
+
+  $rescom.MoveTo(Index)
+  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
+  Last.data = $rescmd!telport
+ 
+End
+
+Public Sub adr1_Data(Index As Integer)
+
+  $rescom.MoveTo(Index)
+  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
+  Last.data = $rescmd!adressel
+
+End
+
+Public Sub adr2_Data(Index As Integer)
+
+  $rescom.MoveTo(Index)
+  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
+  Last.data = $rescmd!adressel1
+
+End
+
+Public Sub cp_Data(Index As Integer)
+
+  $rescom.MoveTo(Index)
+  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
+  Last.data = $rescmd!cpl
+
+End
+
+Public Sub ville_Data(Index As Integer)
+
+  $rescom.MoveTo(Index)
+  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
+  Last.Data = $rescmd!villel
+  
+  
+End
+
+Public Sub comgen_Data(Index As Integer)
+
+  $rescom.MoveTo(Index)
+  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
+  Last.data = $rescmd!commentaire
+
+End
+
+Public Sub comjou_Data(Index As Integer)
+
+  Dim res As Result
+  
+  $rescom.MoveTo(Index)
+  res = connect.ccon.Exec("SELECT * FROM datedelivraison WHERE idlivraison=&1 AND datelivr=&2", $rescom!idcomcl, $dtel)
+  If res.Available Then Last.data = res!datecommentaire Else Last.data = ""
+
+End
+
+Public Sub Reportqte_Data(Index As Integer)
+
+  $rescom.MoveTo(Index)
+  $reslco = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", $rescom!idcomcl)
+  $reslco.MoveTo(Reportart.DataIndex)
+  Last.data = $reslco!qte
+Print "/" & Index
+End
+
+Public Sub Reportcode_Data(Index As Integer)
+
+  $reslco.MoveTo(Index)
+  Last.data = $reslco!numarticle
+
+End
+
+Public Sub Reportlib_Data(Index As Integer)
+
+  $reslco.MoveTo(Index)
+  Last.data = $reslco!libarticle
+  
+
+End
+
+Public Sub Reportpu_Data(Index As Integer)
+
+  $reslco.MoveTo(Index)
+  Last.data = $reslco!prix
+
+End
+
+Public Sub Reportart_AfterData()
+
+  $rescom.MoveTo(ReportPclient.dataIndex)
+  $reslco = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", $rescom!idcomcl)
+  If $reslco.Available Then Reportart.DataCount = $reslco.Count Else Reportart.DataCount = 0
+
+End

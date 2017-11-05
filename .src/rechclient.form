@@ -1,0 +1,81 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,149,64)
+  Ignore = True
+  Text = ("Recherche d'un client")
+  Border = False
+  Arrangement = Arrange.Vertical
+  { Panel1 Panel
+    MoveScaled(1,0,146,17)
+    { Label1 Label
+      MoveScaled(1,1,10,2)
+      Text = ("Numéro :")
+    }
+    { Label2 Label
+      MoveScaled(44,1,9,2)
+      Text = ("Nom :")
+    }
+    { Textnom TextBox
+      MoveScaled(56,0,32,3)
+    }
+    { Label3 Label
+      MoveScaled(1,4,12,2)
+      Text = ("Adresse 1 :")
+    }
+    { Textad1 TextBox
+      MoveScaled(15,3,50,3)
+    }
+    { Label6 Label
+      MoveScaled(1,7,11,2)
+      Text = ("Adresse 2 :")
+    }
+    { Textad2 TextBox
+      MoveScaled(15,6,50,3)
+    }
+    { Label4 Label
+      MoveScaled(1,9,6,3)
+      Text = ("Cp :")
+    }
+    { Textcp TextBox
+      MoveScaled(15,9,14,3)
+    }
+    { Label5 Label
+      MoveScaled(44,9,7,3)
+      Text = ("Ville :")
+    }
+    { Label7 Label
+      MoveScaled(3,13,28,3)
+      Text = ("Recherche dans tous les champs :")
+    }
+    { Panel2 Panel
+      MoveScaled(115,3,28,7)
+      Background = Color.LightBackground
+      { Radioliv RadioButton
+        MoveScaled(2,0,23,3)
+        Text = ("Adresse de livraison")
+      }
+      { Radiofac RadioButton
+        MoveScaled(2,3,24,3)
+        Text = ("Adresse de facturation")
+      }
+    }
+    { Textville TextBox
+      MoveScaled(52,9,36,3)
+    }
+    { Texttous TextBox
+      MoveScaled(33,13,55,3)
+    }
+    { Button1 Button
+      MoveScaled(88,4,12,4)
+      Text = ("Sortie")
+      Picture = Picture["icon:/medium/cancel"]
+    }
+    { Textnum TextBox
+      MoveScaled(15,0,20,3)
+    }
+  }
+  { GridView1 GridView
+    MoveScaled(1,18,147,46)
+  }
+}

@@ -1,0 +1,112 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,32,30)
+  ToolTip = ("Click droit pour menu")
+  PopupMenu = "Menu1"
+  Border = False
+  Transparent = True
+  AutoResize = True
+  { Menu1 Menu
+    Text = ("Menu1")
+    Visible = False
+    { modif Menu
+      Text = ("Modifier le camion")
+    }
+    { masquer Menu
+      Text = ("Masquer le camion")
+    }
+    { sup Menu
+      Text = ("Supprimer le camion")
+    }
+  }
+  { Panel1 Panel
+    MoveScaled(0,0,31,30)
+    Arrangement = Arrange.Vertical
+    AutoResize = True
+    Border = Border.Raised
+    { Panel7 Panel
+      MoveScaled(1,1,30,6)
+      { Panel8 Panel
+        MoveScaled(0,0,28,3)
+        Foreground = &H6F7A7F&
+        Expand = True
+        Border = Border.Plain
+        { Labelmatam Label
+          MoveScaled(2,0,8,3)
+          Text = ("mat/am")
+        }
+        { Datecom DateBox
+          MoveScaled(12,0,14,3)
+          Enabled = False
+        }
+      }
+      { Labelcam Label
+        MoveScaled(0,4,14,2)
+        AutoResize = True
+      }
+      { Labelchauf Label
+        MoveScaled(14,4,14,2)
+        AutoResize = True
+      }
+    }
+    { Panel2 Panel
+      MoveScaled(1,7,30,18)
+      Arrangement = Arrange.Horizontal
+      { Panel4 Panel
+        MoveScaled(1,1,19,16)
+        Arrangement = Arrange.Horizontal
+        { ListBox1 ListBox
+          MoveScaled(0,0,12,15.875)
+          Drop = True
+          ScrollBar = Scroll.Both
+        }
+        { ListBox2 ListBox
+          MoveScaled(12,0,7,15.875)
+          Enabled = False
+        }
+      }
+      { Panel5 Panel
+        MoveScaled(20,1,10,17)
+        { Label1 Label
+          MoveScaled(0,1,9,3)
+          Expand = True
+          Text = ("Nb clients")
+        }
+        { Valuenbc ValueBox
+          MoveScaled(1,4,6,2)
+          Enabled = False
+        }
+        { Label2 Label
+          MoveScaled(0,6,10,3)
+          Drop = True
+          Expand = True
+          Text = ("Nb tournée")
+        }
+        { Valuenbt ValueBox
+          MoveScaled(1,9,6,2)
+          Enabled = False
+        }
+        { Panelcouleur Panel
+          MoveScaled(0,11,9,6)
+          Background = &H7FFF00&
+        }
+      }
+    }
+    { Panel3 Panel
+      MoveScaled(1,25,30,4)
+      Expand = True
+      AutoResize = True
+      { Butplus Button
+        MoveScaled(0,0,15,4)
+        Expand = True
+        Picture = Picture["icon:/medium/add"]
+      }
+      { Butmoins Button
+        MoveScaled(15,0,14,4)
+        Expand = True
+        Picture = Picture["icon:/medium/delete"]
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+# Gambas Connection File 3.0
+[Connection]
+Type="mysql"
+Host="localhost"
+Port="3306"
+User="maguer"
+RememberPassword=False
+IgnoreCharset=False
+DisplayMetadata=False
+RememberTemplate=False
+Database="commande"
+Requests=["truncate lignetournepcam\n\n\n"]
+

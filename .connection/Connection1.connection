@@ -1,0 +1,11 @@
+# Gambas Connection File 3.0
+[Connection]
+Type="mysql"
+User="maguer"
+RememberPassword=False
+IgnoreCharset=False
+DisplayMetadata=False
+RememberTemplate=False
+Database="Laurux02"
+Requests=["SELECT * FROM Fiches_HistoFac JOIN Fiches_HistoLigfac ON  numfac=num_ligfac WHERE datefac='20160731' AND cdclifac='4110350';\n"]
+

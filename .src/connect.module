@@ -1,0 +1,45 @@
+' Gambas module file
+
+Public ccon As New Connection
+Public cconlaurux As Connection
+
+Public Sub Connection()
+  
+   ccon = New Connection
+  
+  ccon.Host = Settings["/base/serveur"]
+  ccon.Type = "MySQL"
+  ccon.Name = "commande"
+  ccon.Login = Settings["/base/utilis"]
+  ccon.Password = hexdblKey.Crypt("de", Settings["/base/mdp"], "commande")
+  ccon.Port = Settings["/base/port"]
+  
+  ccon.Open
+  
+  Catch
+    Message.Error(Error.Text, "OK")
+    base.ShowModal
+    Connection()
+    
+End
+
+Public Sub connect_laurux()
+  
+  cconlaurux = New Connection
+  cconlaurux.Host = Settings["/base/serveur"]
+  cconlaurux.Type = "MySQL" 
+  cconlaurux.Name = Settings["/base/nom"]
+  cconlaurux.Login = Settings["/base/utilis"]
+  cconlaurux.Password = hexdblKey.Crypt("de", Settings["/base/mdp"], "commande")
+  cconlaurux.Port = Settings["/base/port"]
+  
+  cconlaurux.Open
+  
+  Catch
+    Message.Error(Error.Text, "OK")
+    base.ShowModal
+    connect_laurux()
+    
+End
+
+

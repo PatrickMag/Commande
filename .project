@@ -1,0 +1,18 @@
+# Gambas Project File 3.0
+# Compiled with Gambas 3.10.0
+Title=Gestion des commandes
+Startup=FMain
+Version=0.0.3
+Component=gb.image
+Component=gb.gui.qt
+Component=gb.form
+Component=gb.data
+Component=gb.db
+Component=gb.db.form
+Component=gb.db.mysql
+Component=gb.settings
+Component=gb.mysql
+Component=gb.report2
+TabSize=2
+Language=fr
+Packager=1

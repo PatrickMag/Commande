@@ -1,0 +1,189 @@
+' Gambas module file
+
+
+Public Function CDec(nbdec As String, Decm As String) As String
+  
+  If nbdec = "0" Then
+    Try Decm = Format$(Val(Utils.cpoint(Decm)), "0")
+  Else
+    If nbdec = "2" Then
+      Try decm = Format$(Val(Utils.cpoint(decm)), "0.00")
+    Else
+      If nbdec = "3" Then
+        Try Decm = Format$(Val(Utils.cpoint(Decm)), "0.000")
+      Endif
+    Endif
+  Endif
+  Return Decm
+  
+End
+
+Public Function cpoint(mtt As String) As String
+  
+  Return (Replace$(LTrim$(mtt), ".", ","))
+  
+End
+
+'***********************************
+'*  calcul de la date d'échéance   *
+'***********************************
+Public Function Calcech(dureech As String, jours As String, finmois As Boolean, datef As String) As String
+  
+  Dim mois As String
+  Dim mois2 As String
+  Dim Dppc As Date
+  Dim Dr As Integer
+  Dim dateech As String
+  Dim Jrs As String
+  Dim b As Integer = 0
+  
+  If IsNull(jours) Then jours = "00"
+  Jrs = Left$(datef, 2)
+  If Jrs = "31" Then Jrs = "30"
+  If finmois = True And jours = "00" Or If finmois = False And jours <> "00" Or If finmois = False And jours = "00" Then
+    Dr = Val(dureech) / 30
+  Else
+    Dr = Val(dureech) / 30 + 1
+  Endif
+  If Val(Jrs) <> 30 And jours <> "00" Then
+    If Val(Jrs) >= Val(Jours) Then Dr = Val(dureech) / 30 + 1
+  Endif
+  If dureech = "45" Then
+    If Val(Jrs) > 25 Then Jrs = "30"
+    If Jrs = "30" Then
+      Jours = Val(dureech) - 30 + Val(Jrs)
+      Dr = (Val(Jrs) + Val(dureech)) - 30
+      If Val(Jours) > 30 Then
+        Dr = Val(dureech) / 30 + 1
+        Jours = Val(Jours) - 30
+      Else
+        Dr = Val(dureech) / 30
+      Endif
+    Else
+      Jours = Val(dureech) - 30 + Val(Jrs)
+      If Val(Jours) > 30 Then
+        Jours = Val(Jours) - 30
+        Dr = Val(dureech) / 30 + 1
+      Else
+        Dr = Val(dureech) / 30
+      Endif
+    Endif
+  Endif
+  Jours = Format$(Jours, "00")
+  Mois = Str(Mid$(datef, 4, 2) + Dr)
+  If Len(Mois) = 1 Then Mois = "0" & Mois
+  Mois2 = Mois
+  If Val(Mois) > 12 Then
+    mois = Val(mois) - 12
+    If Len(Mois) = 1 Then Mois = "0" & Mois
+    b = 1
+  Endif
+  
+  If dureech = "00" And jours = "00" Or If finmois = False And dureech <> "45" Then dateech = Datef
+  If dureech <> "00" And jours <> "00" Or If dureech = "00" And jours <> "00" Or If finmois = False And jours = "00" Then
+    If finmois = False And jours = "00" Then
+      Jours = Left$(dateech, 2)
+      If Val(dureech) < 30 Then 
+        Dppc = Date(Right$(datef, 4), Val(Mois), Jours)
+        dppc = DateAdd(Dppc, gb.Day, Val(dureech))
+        mois = Format(Month(dppc), "00")
+      Else
+       Try Dppc = Date(Right$(datef, 4), Val(Mois), Jours)
+       If Error Then Try Dppc = Date(Right$(datef, 4), Val(Mois), Val(Jours) - 1)
+       If Error Then Dppc = Date(Right$(datef, 4), Val(Mois), 28)
+      Endif
+      Jours = Left$(Str(Dppc), 2)
+    Endif
+    '    IF finmois = FALSE THEN Mois = Val(Mois) - 1
+    If Val(Mois) = 0 Then Mois = "01"
+    If Len(Mois) = 1 Then Mois = "0" & Mois
+    If b = 0 Then
+      dateech = jours & "." & Mois & "." & Right$(datef, 4)
+    Else
+      dateech = jours & "." & Mois & "." & Str(Val(Right$(datef, 4)) + 1)
+    Endif
+  Endif
+  
+  If dureech <> "00" And jours = "00" Then
+    '   IF finmois = FALSE THEN Mois = Val(Mois) - 1
+    If Val(Mois) = 0 Then Mois = "01"
+    If Len(Mois) = 1 Then Mois = "0" & Mois
+    ' Determine le dernier jour du mois
+    If b = 0 Then
+      Try Dppc = Date(Right$(datef, 4), Val(Mois) + 1, Jrs)
+      If Error Then Try Dppc = Date(Right$(datef, 4), Val(Mois), Val(Jrs) - 1)
+      If Error Then Dppc = Date(Right$(datef, 4), Val(Mois), 28)
+    Else
+      Try Dppc = Date(Str(Val(Right$(datef, 4)) + 1), Val(Mois), Jrs)
+      If Error Then Try Dppc = Date(Right$(datef, 4), Val(Mois), Val(Jrs - 1))
+      If Error Then Dppc = Date(Str(Val(Right$(datef, 4)) + 1), Val(Mois), 28)
+    Endif
+    If b = 0 Then
+      Try dateech = Day(Date(Year(dppc), Month(dppc), 1) - 1) & "." & Mois & "." & Right$(datef, 4)
+      If Error Then dateech = "31" & "." & Mois & "." & Right$(datef, 4)
+      If mois = "12" Then dateech = "31" & "." & "12" & "." & Right$(datef, 4)
+      If mois = "02" Then dateech = Day(Date(Year(dppc), Month(dppc) + 1, 1) - 1) & "." & Mois & "." & Right$(datef, 4)
+    Else
+      dateech = Day(Date(Year(dppc), Month(dppc), 1) - 1) & "." & Mois & "." & Str(Val(Right$(datef, 4)) + 1)
+      If mois = "02" Then dateech = Day(Date(Year(dppc), Month(dppc), 1) - 1) & "." & Mois & "." & Str(Val(Right$(datef, 4)) + 1)
+    Endif
+    dateech = Left$(dateech, 3) & Mois & Right$(dateech, 5)
+  Endif
+  'On regarde si l'année est bissectile
+  If Mois = "02" And finmois = True And Jours = "00" Or If Mois = "02" And Val(Jours) > 25 And finmois = True Then
+    If (Val(Right$(dateech, 4)) Mod 4 = 0) And (Val(Right$(dateech, 4)) Mod 100 > 0) Or If (Val(Right$(dateech, 4)) Mod 400 = 0) Then
+      dateech = "29." & Mois & Right$(dateech, 5)
+    Else
+      dateech = "28." & Mois & Right$(dateech, 5)
+    Endif
+  Endif
+  'If finmois = True And mois = "03" Then dateech = "31." & Mois & Right$(dateech, 5) 'bug pour mars ?
+  Return dateech
+  
+End
+
+Public Function RecCom(sTri As String, bCom As Boolean, Optional vVal1 As Variant, sVal2 As String) As Result
+  
+  '                                 sTri selection, si bCom = true commande deja livrée, vVal1 & vVals cest suivant
+  Dim res As Result
+  
+  Select Case sTri
+    Case "nom"                  'recherche des commandes par nom
+      vVal1 = "%" & vVal1 & "%"
+      res = connect.ccon.Exec("SELECT * FROM commande WHERE nom LIKE &1 AND comlivre=&2", vVal1, bCom)
+    Case "num"                    'recherche des commandes par numéro
+      res = connect.ccon.Exec("SELECT * FROM commande WHERE numclient=&1 AND comlivre=&2", vVal1, bCom)
+    Case "tou"                    'recherche des commandes par numéro de tournée
+      If sVal2 < vVal1 Then sVal2 = vVal1
+      res = connect.ccon.Exec("SELECT * FROM commande WHERE numtourne>= &1 and numtourne<=&2 AND comlivre=&3", vVal1, sVal2, bCom)
+  Case "all"                      'recherche de toutes les commandes 
+    res = connect.ccon.Exec("SELECT * FROM commande WHERE comlivre=&1", bCom)
+                                    'gere les camions par date
+  Case "date"
+    res = connect.ccon.Exec("SELECT * FROM commandeparcamion WHERE datecam=&1", vVal1)
+                                    'renvoi les dates souhaitées de livraison
+  Case "datelivraison"
+    res = connect.ccon.Exec("SELECT * FROM datedelivraison WHERE idlivraison=&1", vVal1)
+                                    'test l'exitence d'une date souhaitée de livraison
+  Case "dtexist"
+    res = connect.ccon.Exec("SELECT * FROM datedelivraison WHERE  idlivraison=&1 AND datelivr=&2", Val(sVal2), vVal1)
+  End Select
+  
+  Return res
+  
+End
+
+Public Function totobs(txt As String) As Float
+
+  Dim somme As Float
+  
+    If Not IsNull(txt) Then
+      txt = Replace(txt, ".", ",")
+      If IsNumber(txt) Then
+        somme += Val(txt)
+      Endif
+    Endif
+  
+  Return somme
+  
+End

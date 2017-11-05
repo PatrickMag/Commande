@@ -1,0 +1,114 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,133,84)
+  Text = ("Validation des commandes en facture")
+  { TreeView1 TreeView
+    MoveScaled(3,0,44,37)
+  }
+  { TextArea1 TextArea
+    MoveScaled(9,75,118,8)
+  }
+  { Label1 Label
+    MoveScaled(1,71,133,4)
+    Text = ("Incidents de livraison")
+    Alignment = Align.Center
+  }
+  { Butrlc Button
+    MoveScaled(68,14,35,5)
+    Text = ("Remise de la livraison en commande")
+    Picture = Picture["icon:/medium/clear"]
+  }
+  { butfac Button
+    MoveScaled(68,19,35,5)
+    Enabled = False
+    Text = ("Facturation de la commande")
+    Picture = Picture["icon:/medium/exec"]
+  }
+  { Button3 Button
+    MoveScaled(68,32,35,5)
+    Text = ("Sortie")
+    Picture = Picture["icon:/medium/quit"]
+  }
+  { Butsupcam Button
+    MoveScaled(68,24,35,5)
+    Text = ("Suppression du camion")
+    Picture = Picture["icon:/medium/delete"]
+  }
+  { Label2 Label
+    MoveScaled(67,4,7,3)
+    Text = ("Date :")
+  }
+  { DateBox1 DateBox
+    MoveScaled(85,4,21,3)
+  }
+  { TabStrip1 TabStrip
+    MoveScaled(0,38,134,33)
+    Index = 0
+    Text = ("Détail")
+    { Panel2 Panel
+      MoveScaled(0,0,132,3)
+      Background = &HF5FFFF&
+      Arrangement = Arrange.Horizontal
+      { Label8 Label
+        MoveScaled(0,0,13,3)
+        Text = ("N° Article")
+        Alignment = Align.Center
+      }
+      { Label9 Label
+        MoveScaled(15,0,35,3)
+        Expand = True
+        Text = ("Libellé")
+        Alignment = Align.Center
+      }
+      { Panel1 Panel
+        MoveScaled(46,0,19,3)
+        Visible = False
+        { Label18 Label
+          MoveScaled(0,0,6,3)
+          Text = ("Palette")
+          Alignment = Align.Center
+        }
+        { Label3 Label
+          MoveScaled(8,0,10,3)
+          Text = ("Coli")
+        }
+      }
+      { Label13 Label
+        MoveScaled(66,0,9,3)
+        Text = ("Qte")
+        Alignment = Align.Center
+      }
+      { Label14 Label
+        MoveScaled(74,0,10,3)
+        Text = ("Px H.T")
+        Alignment = Align.Center
+      }
+      { Label15 Label
+        MoveScaled(85,0,10,3)
+        Text = ("Px TTC")
+        Alignment = Align.Center
+      }
+      { Label19 Label
+        MoveScaled(97,0,9,3)
+        Text = ("Remise")
+        Alignment = Align.Center
+      }
+      { Label16 Label
+        MoveScaled(109,0,11,3)
+        Text = ("Montant HT")
+        Alignment = Align.Center
+      }
+      { Label17 Label
+        MoveScaled(121,0,11,3)
+        Text = ("Montant TTC")
+        Alignment = Align.Center
+      }
+    }
+    { ScrollView1 ScrollView
+      MoveScaled(0,3,132,26)
+      Arrangement = Arrange.Vertical
+    }
+    Index = 0
+  }
+}

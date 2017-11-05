@@ -1,0 +1,253 @@
+' Gambas class file
+
+
+Private $rescomande As Result
+Private $ccon As New Connection
+Public bCreer As Boolean
+
+Property Read Nbcamionpartourne As Integer
+Property Read Nbclientpartourne As Integer
+Property Read Nbcommandeancienne As Integer
+Property Read Nbtotaldecommande As Integer
+
+''-----------------------lexture/ecriture des champs du fichier --- la Struct peut vous servire à écrire les champs provenants de votre propre base
+
+
+Public Struct Comencour
+  
+  datedecommande As Date
+  encours As Boolean
+  numclient As String
+  nom As String
+  adresse As String
+  adresse1 As String
+  cp As String
+  ville As String
+  numtourne As String
+  telfixe As String
+  telport As String
+  noml As String
+  adressel As String
+  adressel1 As String
+  cpl As String
+  villel As String
+  ntipp As String
+  fraisfac As Float
+  commentaire As String
+  poid As Integer
+  volume As Float
+  tipp As String
+  
+End Struct
+
+Public com As New Comencour
+
+
+Public Sub _new(lid As Long)
+  
+  ouvreconnection
+ 
+  $ccon.Begin
+  If lid > 0 Then
+    LitCom(lid)
+  Else
+    $rescomande = $ccon.Create("commande")
+    bCreer = True
+  Endif
+  
+End
+
+Private Function Nbcamionpartourne_read() As Integer
+  
+  Dim nb As Integer
+  Dim res As Result
+  
+  res = $ccon.Exec("SELECT * FROM lignetournepcam WHERE idnumtourne=&1 GROUP BY idcpc", com.numtourne)
+  nb = res.Count
+  Return nb
+  
+End
+
+Private Function Nbclientpartourne_read() As Integer
+  
+  Dim nb As Integer
+  Dim res As Result
+  
+  res = $ccon.Exec("SELECT * FROM commande WHERE numtourne=&1 AND NOT comlivre", com.numtourne)
+  nb = res.Count
+  Return nb
+   
+End
+
+Private Function Nbcommandeancienne_read() As Integer
+  
+  Dim nb As Integer
+  Dim res As Result
+  
+  res = $ccon.Exec("SELECT * FROM commande WHERE numclient=&1 AND comlivre", com.nom)
+  nb = res.Count
+  Return nb
+  
+End
+
+Private Function Nbtotaldecommande_read() As Integer
+  
+  Dim nb As Integer
+  Dim res As Result
+  
+  res = $ccon.Exec("SELECT * FROM commande WHERE NOT comlivre")
+  nb = res.Count
+  Return nb
+  
+End
+
+
+Private Sub ouvreconnection()                  'ouvre la connection $ccon
+  $ccon = Connect.ccon
+  
+End
+
+
+Public Function AddCom() As Long               'fonction ajout de commande et initialisation 
+  
+  Dim res As Result
+  
+  affectres
+  $rescomande.Update
+  $ccon.Commit
+  
+  res = $ccon.Exec("SELECT * FROM commande WHERE numclient=&1 AND comlivre='FALSE'", com.numclient)
+  If res.Count > 1 Then
+    Message.Info("Vous avez " & res.max & " commande(s) en cours pour ce client ")
+    res.MoveLast
+  Endif
+  
+  $ccon.Begin
+  $rescomande = $ccon.Edit("commande", "idcom=&1 FOR UPDATE", res!idcom)
+   
+  bCreer = False
+  Return $rescomande!idcom
+  
+End
+
+Public Sub LitCom(id As Long)
+  bCreer = False
+  $ccon.Rollback
+  $ccon.Begin
+  $rescomande = $ccon.Edit("commande", "idcom = &1", id)
+
+  affecstruc
+  
+End
+
+Public Sub ModCom(id As Long)
+  
+  affectres
+  $rescomande.Update
+  $ccon.Commit
+  
+  $ccon.Begin
+  $rescomande = $ccon.Edit("commande", "idcom = &1", id)
+
+End
+
+
+Public Function RecCom1() As Result
+  
+  
+  Dim res As Result
+                                    ' renvoie les id des camions ayant 1 tournée = a celle de cette commande
+  res = $ccon.Exec("SELECT * FROM lignetournepcam WHERE idnumtourne=&1 GROUP BY idcpc", com.numtourne) 
+  
+  Return res
+  
+End
+
+Public Sub SupCom(id As Long)
+  Dim qst As Integer
+  Dim res, rescpc, resligc As Result
+  Dim I, j As Integer
+  
+  qst = Message.Delete("ATTENTION : Voulez-vous vraiment supprimer cette commande", "OUI", "NON")
+  If qst = 2 Then Return
+                      'lire la commande à supprimer
+  $rescomande = $ccon.Exec("SELECT * FROM commande WHERE idcom=&1", id)
+  
+  $ccon.Begin
+                    'lire les camions qui contiennent cette commande
+  res = $ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcomcl=&1", id)
+  If res.Available Then
+    $ccon.Delete("lignecomparcamion", "idcomcl=&1", id)
+    res.MoveFirst
+    For i = 0 To res.Max
+                      'lire et supprimer la tournée si c'est la derniere qui exixte sur un camion et ce sur chaque camion contenant cette commande
+      rescpc = $ccon.Exec("SELECT * FROM commande,lignecomparcamion WHERE idcpc=&1 AND idcom=idcomcl AND numtourne=&2", res!idcpc, $rescomande!numtourne)
+      If rescpc.Count = 1 Then
+        $ccon.Delete("lignetournepcam", "idcpc=&1 AND idnumtourne=&2", res!idcpc, $rescomande!numtourne)
+      Endif
+      res.MoveNext
+    Next
+  Endif
+  $ccon.Delete("lignedecommande", "idligne=&1", id)
+  $ccon.Delete("datedelivraison", "idlivraison=&1", id)
+  $ccon.Delete("commande", "idcom=&1", id)
+  $ccon.Commit
+    
+  
+End
+
+
+Private Sub affectres()
+  
+  $rescomande!datedecommande = Com.datedecommande
+  '---------------------------------------------------info pouvant venir de votre fichier client
+  $rescomande!numclient = com.numclient
+  $rescomande!nom = com.nom
+  $rescomande!adresse = com.adresse
+  $rescomande!adresse1 = com.adresse1
+  $rescomande!cp = com.cp
+  $rescomande!ville = com.ville
+  $rescomande!numtourne = com.numtourne
+  $rescomande!noml = com.noml
+  $rescomande!adressel = com.adressel
+  $rescomande!adressel1 = com.adressel1
+  $rescomande!cpl = com.cpl
+  $rescomande!villel = com.villel
+  $rescomande!numtourne = com.numtourne
+  $rescomande!telfixe = com.telfixe
+  $rescomande!telport = com.telport
+  Try $rescomande!tipp = com.tipp
+  $rescomande!fraisfac = com.fraisfac
+  $rescomande!poid = com.poid
+  $rescomande!volume = com.volume
+  '----------------------------------------------------------------------
+  $rescomande!commentaire = com.commentaire
+  $rescomande!comencours = com.encours
+  
+End
+
+Private Sub affecstruc()
+  
+  com.adresse = $rescomande!adresse
+  com.adresse1 = $rescomande!adresse1
+  com.adressel1 = $rescomande!adressel1
+  com.telfixe = $rescomande!telfixe
+  com.telport = $rescomande!telport
+  com.fraisfac = $rescomande!fraisfac
+  com.poid = $rescomande!poid
+  com.volume = $rescomande!volume
+  Try com.tipp = $rescomande.tipp
+  com.commentaire = $rescomande!commentaire
+  com.cp = $rescomande!cp
+  com.datedecommande = $rescomande!datedecommande
+  com.nom = $rescomande!nom
+  com.numclient = $rescomande!numclient
+  com.numtourne = $rescomande!numtourne
+  com.ville = $rescomande!ville
+  com.encours = $rescomande!comencours
+  com.noml = $rescomande!noml
+  com.adressel = $rescomande!adressel
+  com.cpl = $rescomande!cpl
+  com.villel = $rescomande!villel
+  
+End

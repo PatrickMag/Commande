@@ -1,0 +1,543 @@
+' Gambas class file
+
+Public co As Commande
+
+Private $lNumcom As Long            'id commande
+Private $bDch As Boolean = True  'Affiche ou non les fenetres camions et date apres click sur validation 
+Private $cli As Rechclient        'recherche client
+Private $sncli As String
+Private $vancval As Variant
+Private $obs As Observer
+
+Private pan As Panel        'pour afficher les commentaires de la fiche client
+Private but As Button
+Private txt As TextArea
+Private $win As Window
+
+Private DateChooser1 As DateChooser
+                                          'scrolview pour affichage des camions et des dates de livraison souhaitées
+Private scrolcam As New ScrollView(Me)
+Private scroldate As New ScrollView(Me)
+
+Public Sub _new(id As Long)
+  
+  co = New Commande(id)
+  textnumcl.SetFocus
+  If Not co.bCreer Then
+    $lNumcom = id
+    affichenb
+    afficheclient
+    Panel3.Enabled = False
+  Endif
+  If Settings["/opt/pp"] Then
+    Label20.Visible = True
+    Texttipp.Visible = True
+  Endif
+
+  TabStrip1[0].Text = "Facturation"
+  TabStrip1[1].Text = "Livraison"
+  Butart.Enabled = False
+  'tabstrip 0
+  $obs = New Observer(textNom) As "saisie"
+  $obs = New Observer(textAdr) As "saisie"
+  $obs = New Observer(textAdr11) As "saisie"
+  $obs = New Observer(textCp) As "saisie"
+  $obs = New Observer(TextVil) As "saisie"
+  textNom.tag = [textnom, textAdr]
+  textAdr.Tag = [textnom, textAdr11]
+  textAdr11.Tag = [textAdr, textcp]
+  textcp.Tag = [textAdr11, TextVil]
+  TextVil.Tag = [textcp, textTou]
+  'tabstrip 1
+  $obs = New Observer(textNom2) As "saisie"
+  $obs = New Observer(textadr2) As "saisie"
+  $obs = New Observer(textadr21) As "saisie"
+  $obs = New Observer(textNom2) As "saisie"
+  $obs = New Observer(textcp2) As "saisie"
+  $obs = New Observer(TextVil2) As "saisie"
+  textNom2.tag = [textnom2, textAdr2]
+  textAdr2.Tag = [textnom2, textAdr21]
+  textAdr21.Tag = [textAdr2, textcp2]
+  textcp2.Tag = [textAdr21, TextVil2]
+  TextVil2.Tag = [textcp2, textTou]
+  'tronc comun
+  $obs = New Observer(textTou) As "saisie"
+  $obs = New Observer(Texttipp) As "saisie"
+  $obs = New Observer(RadioButton1) As "saisie"
+  $obs = New Observer(Textfixe) As "saisie"
+  $obs = New Observer(Textport) As "saisie"
+  textTou.Tag = [textTou, Texttipp]
+  Texttipp.Tag = [textTou, RadioButton1]
+  RadioButton1.Tag = [Texttipp, Textfixe]
+  Textfixe.Tag = [RadioButton1, Textport]
+  Textport.Tag = [Textfixe, butval]
+  
+End
+
+Public Sub form_Close()
+
+  Try $win.Close
+
+End
+
+Public Sub saisie_keypress()
+
+  If Key.code = Key.Enter Or Key.code = Key.Return Or Key.code = Key.Tab Or Key.Code = Key.Down Then
+    Last.tag[1].SetFocus
+    Try Last.tag[1].Select
+  Endif
+  If Key.code = Key.Up Then
+    Last.tag[0].SetFocus
+    Try Last.tag[0].Select
+  Endif
+  If Key.Code = Key.Esc Then
+    Try Last.text = $vancval
+    Try Last.value = $vancval
+  Endif
+  
+End
+
+Public Sub saisie_gotfocus()
+
+  Try $vancval = Last.text
+  Try $vancval = Last.Value
+
+End
+Public Sub textnumcl_GotFocus() 
+  
+  $sncli = textnumcl.Text
+
+End
+
+Public Sub textnumcl_LostFocus()
+
+  If textnumcl.Text Then 
+    afflaurux(Val(textnumcl.Text), -1)
+  Endif
+  
+End
+
+Public Sub ButVal_Click()
+
+  Dim lab As New Label(Panel8)
+  
+  Butart.Enabled = True
+  If co.bCreer Then DateCom.Value = Now
+
+  co.com.adresse = textAdr.Text
+  co.com.adresse1 = textAdr11.Text
+  co.com.adressel = textAdr2.Text
+  co.com.adressel1 = textAdr21.Text
+  co.com.numclient = textnumcl.Text
+  co.com.commentaire = textAcom.Text
+  co.com.cp = textCp.Text
+  co.com.cpl = textCp2.Text
+  co.com.ville = TextVil.Text
+  co.com.villel = TextVil2.Text
+  co.com.nom = textNom.Text
+  co.com.noml = textNom2.Text
+  co.com.numtourne = textTou.Text
+  co.com.datedecommande = DateCom.Value
+  co.com.encours = RadioButton1.Value
+  co.com.telfixe = Textfixe.Text
+  co.com.telport = Textport.Text
+  co.com.tipp = Texttipp.Text
+  
+  If $bDch Then
+    lab = New Label(panel8)
+    lab.Height = 30
+    lab.Width = 150
+    lab.Alignment = Align.Center
+    lab.Background = Color.Cyan
+    lab.text = "Commande en cours"
+  
+    lab = New Label(panel8)
+    lab.Height = 30
+    lab.Width = 150
+    lab.Alignment = Align.Center
+    lab.Background = Color.Red
+    lab.text = "Commande en livraison"
+  Endif
+    
+  If co.bCreer Then
+    $lNumcom = co.AddCom()
+  Else
+    co.ModCom($lNumcom)
+  Endif
+  
+  affichenb
+  If $bDch Then
+    $bDch = False
+    
+    Me.Width = Screen.AvailableWidth  
+    Me.Height = Screen.AvailableHeight
+    listedescamions($lNumcom)
+    
+    DateChooser1 = New DateChooser(panel1) As "DateChooser1"
+    DateChooser1.Height = 300
+    DateChooser1.Expand = True
+    scroldate = New ScrollView(Me)
+    scroldate.Arrangement = Arrange.Vertical
+    scroldate.Height = 200
+    scroldate.Width = Screen.AvailableWidth
+    listedesdates($lNumcom)
+  
+  Endif
+  Panel3.Enabled = False
+  
+End
+
+Public Sub Butart_Click()
+
+  Dim saisie As Saisiearticle
+  
+  saisie = New Saisiearticle($lNumcom, CLong(textnumcl.text))
+  saisie.ShowModal
+  
+End
+
+Public Sub Buttonqte_Click()
+
+  Me.Parent.Delete
+    
+End
+
+
+Public Sub ButRech_Click()
+
+Dim rcl As Rechclient
+  
+  Try pan.Delete
+  
+  rcl = New Rechclient(textnumcl.Text) As "recherche"
+  rcl.ShowModal
+  $sncli = ""
+  afficheincid
+End
+
+Public Sub recherche_trouver(numcli As Integer, numadr As Integer)
+
+  afflaurux(numcli, numadr)
+  
+End
+
+Private Sub afficheincid()
+  
+  Dim res As Result
+  Dim i As Integer
+  Dim scr As ScrollView
+  Dim pan As Panel
+  Dim lab As Label
+  Dim txt As TextArea
+
+      'recherche et affichage des incidents de livraison
+  res = connect.ccon.Exec("SELECT * FROM commande WHERE siprobleme IS NOT NULL AND numclient=&1", textnumcl.Text)
+  If res.Available And $sncli <> textnumcl.Text Then
+    res.MoveFirst
+    $win = New Window
+    $win.Height = 200
+    $win.Width = 800
+    $win.x = 1
+    $win.y = 1
+    $win.Arrangement = Arrange.Vertical
+    scr = New ScrollView($win)
+    scr.Height = 200
+    scr.Width = 800
+    scr.Arrangement = Arrange.Vertical
+    $win.Text = "Liste des incidents de livraison"
+    For i = 0 To res.Max
+      pan = New Panel(scr)
+      pan.Height = 30
+      pan.Width = 800
+      pan.Arrangement = Arrange.Horizontal
+      pan.Background = &HFF8000
+      lab = New Label(pan)
+      lab.AutoResize = True
+      lab.Expand = True
+      lab.Text = " Date : " & Format(res!datedelivraison, "dd.mm.yyyy")
+      lab = New Label(pan)
+      lab.AutoResize = True
+      lab.Expand = True      
+      lab.Text = "       Chauffeur : " & res!numchauf
+      lab = New Label(pan)
+      lab.AutoResize = True
+      lab.Expand = True      
+      lab.Text = " Camion : " & res!numcam
+      txt = New TextArea(scr)
+      txt.Height = 100
+      txt.Width = 800
+      txt.Enabled = False
+      txt.text = res!siprobleme
+      res.MoveNext
+    Next
+    $win.Show  
+    $sncli = textnumcl.Text
+    
+  Endif
+  
+End
+
+Private Sub afflaurux(cle As Integer, cleliv As Integer)
+  
+  Dim $res, $res1 As Result
+  
+  $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_code=&1", cle)
+  If Not $res.Available Then
+    Message.Error("Client innexistant", "OK")
+    Return
+  Endif
+  
+  textAdr.Text = $res!cli_adr1
+  textCp.Text = $res!cli_cd_ptl
+  textNom.Text = $res!cli_nom
+  textnumcl.Text = Str($res!cli_code)
+  textTou.Text = $res!cli_tour
+  Try Texttipp.Text = $res!cli_tipp
+  TextVil.Text = $res!cli_ville
+  Textfixe.Text = $res!cli_tel_dom
+  Textport.Text = $res!cli_pble
+  
+  If cleliv = -1 Then
+    TextAdr2.Text = $res!cli_adr1
+    textCp2.Text = $res!cli_cd_ptl
+    textNom2.Text = $res!cli_nom
+    TextVil2.Text = $res!cli_ville
+  Else
+    $res1 = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE num=&1", cleliv) 
+    textAdr2.Text = $res1!adr1
+    textCp2.Text = $res1!cd_ptl
+    textNom2.Text = $res1!nom
+    TextVil2.Text = $res1!ville
+    textTou.Text = $res1!tourne
+    Try Texttipp.Text = $res1!tipp
+  Endif
+  '                                                           Gere la fenetre observation ds le fichier client laurux
+  If $res!cli_obs Then
+    pan = New Panel(Panel1)
+    pan.NoTabFocus = False
+    pan.Ignore = True
+    pan.x = 500
+    pan.y = 0
+    pan.Width = 300
+    pan.Height = 300
+    pan.Background = Color.Background + 100
+    
+    txt = New TextArea(pan)
+    txt.Width = 300
+    txt.Height = 270
+    txt.Background = Color.Background + 100
+    txt.Text = $res!cli_obs
+    txt.ReadOnly = True
+    txt.x = 0
+    txt.y = 0
+    
+    but = New Button(pan) As "but"
+    but.Height = 30
+    but.Width = 20
+    but.Background = Color.Background + 100
+    but.x = 10
+    but.y = 270
+    but.Picture = Picture["icon:/small/cancel"]
+    
+    but = New Button(pan) As "cop"
+    but.Height = 30
+    but.Width = 80
+    but.Background = Color.Background + 100
+    but.x = 50
+    but.y = 270
+    but.Picture = Picture["icon:/small/copy"]
+    but.Text = "Copie"
+  Endif
+  afficheincid
+  
+End
+
+Public Sub but_Click()
+
+  pan.Delete
+
+End
+
+Public Sub cop_Click()
+
+  textAcom.Text = txt.Text
+  pan.Delete
+ 
+End
+Private Sub affichelivlaurux(cle As Integer)
+  
+  Dim $res As Result
+  
+  $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE num=&1", cle)
+  
+  TextAdr2.Text = $res!adr1
+  textCp2.Text = $res!cd_ptl
+  textNom2.Text = $res!nom
+  TextVil2.Text = $res!ville
+  
+End
+
+Private Sub afficheclient()
+    
+  textAdr.Text = co.com.adresse
+  textAdr11.Text = co.com.adresse1
+  TextAdr2.Text = co.com.adressel
+  textAdr21.Text = co.com.adressel1
+  textAcom.Text = co.com.commentaire
+  textCp.Text = co.com.cp
+  textCp2.Text = co.com.cpl
+  textNom.Text = co.com.nom
+  textNom2.Text = co.com.noml
+  textnumcl.Text = co.com.numclient
+  textTou.Text = co.com.numtourne
+  DateCom.Value = co.com.datedecommande
+  RadioButton1.Value = co.com.encours
+  TextVil.Text = co.com.ville
+  TextVil2.Text = co.com.villel
+  Textfixe.Text = co.com.telfixe
+  Textport.Text = co.com.telport
+  Texttipp.Text = co.com.tipp
+  afficheincid
+End
+
+Private Sub affichenb()
+  Dim res As Result
+  
+ Label8.Text = "Nb de camion sur la tournée    : " & co.Nbcamionpartourne
+ Label9.Text = "Nb de commande sur la tournée  : " & co.Nbclientpartourne
+ Label10.Text = "Nb de commande total          : " & co.Nbtotaldecommande
+ Label11.Text = "Nb de commande pour ce client : " & co.Nbcommandeancienne
+ res = connect.cconlaurux.Exec("SELECT solde FROM Fiches_Comptes WHERE compte_cc=&1", Val(textnumcl.Text))
+ If res.Available Then
+   Label14.Text = "Solde du compte :  " & Format(res!solde, "0.00 €")
+ Endif
+
+End
+
+Private Sub listedescamions(lNumcom As Long)
+  
+  Dim res As Result
+  Dim i As Integer
+  Dim moncamion As Camion
+  
+  scrolcam = New ScrollView(Me)
+  scrolcam.Height = 245
+  scrolcam.Width = Screen.AvailableWidth
+  scrolcam.Border = Border.Double
+  scrolcam.Arrangement = Arrange.Horizontal
+  
+  res = co.RecCom1()
+  If Not res.Available Then Return
+  res.MoveFirst
+  For i = 0 To co.Nbcamionpartourne - 1 
+    moncamion = New Camion("ouvrir", lNumcom, scrolcam, res!idcpc)
+    moncamion.Tag = res!idcpc
+    res.MoveNext
+  Next
+  
+End
+
+Private Sub listedesdates(lNumcom As Long)
+  
+  Dim res As Result
+  Dim i As Integer
+  
+  Dim madate As Saisie
+                           'recherche et affichage des dates de livraison possible pour ce client
+  res = Utils.RecCom("datelivraison", True, lNumcom)
+  If Not res.Available Then Return
+  res.MoveFirst
+  For i = 0 To res.Max
+    madate = New Saisie("ouvrir", res!datelivr, lNumcom, scrolcam, scroldate)
+    res.MoveNext
+  Next
+  
+End
+
+
+Public Sub DateChooser1_Activate()
+
+  Dim saisie As Saisie
+  Dim mescamions As Variant
+  Dim moncamion As Camion
+  
+  Dim res As Result
+  Dim i As Integer
+  '                       recherche et affichage des camions existants à cette date et test si ils ne sont pas déja affiché
+  scrolcam.Enabled = True
+  mescamions = scrolcam.Children
+  res = Utils.RecCom("date", True, DateChooser1.Value)
+  If res.Available Then
+    res.MoveFirst
+    For i = 0 To res.Max
+     If Not existecam(mescamions, res!idncomcam) Then
+       moncamion = New Camion("ouvrir", $lNumcom, scrolcam, res!idncomcam)
+       moncamion.Tag = res!idncomcam
+       res.MoveNext
+     Endif
+    Next
+  Endif
+                      'création de la dates de livraison pour ce client si elle n'existe pas
+  res = Utils.RecCom("dtexist", True, DateChooser1.Value, Str($lNumcom))
+  If Not res.Available Then
+    saisie = New Saisie("creer", DateChooser1.Value, $lNumcom, scrolcam, scroldate)
+  Else
+    saisie = New Saisie("ouvrir", DateChooser1.Value, $lNumcom, scrolcam, scroldate)
+  Endif
+  
+ 
+ 
+  
+End
+
+Public Function existecam(c As Variant, lIdcom As Long) As Boolean
+  
+  Dim i As Integer
+  
+  If c.count = 0 Then Return False
+  For i = 0 To c.count - 1 
+    If c[i].tag = lIdcom Then Return True
+  Next
+  Return False
+  
+End
+
+Public Sub Butext_Click()
+
+  Dim win As Window
+  Dim grdv As GridView
+  Dim res As Result
+  Dim i As Integer
+  
+  win = New Window As "win"
+  grdv = New GridView(win)
+  win.Arrangement = Arrange.Horizontal
+  win.AutoResize = True
+  win.Text = "Liste des extraits de compte non léttrés"
+'  grdv.AutoResize = True
+  win.Height = 300
+  win.Width = 850
+  grdv.Columns.Count = 4
+  grdv.Columns[0].Title = "DATE"
+  grdv.Columns[0].Width = 150
+  grdv.Columns[1].Title = "Libelle"
+  grdv.Columns[1].Width = 400
+  grdv.Columns[2].Title = "DEBIT"
+  grdv.Columns[2].Width = 150
+  grdv.Columns[3].Title = "CREDIT"
+  grdv.Columns[3].Width = 150
+  res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Mvt where compte=&1 ORDER BY dte", textnumcl.Text)
+  If res.Available Then
+     grdv.Rows.Count = res.Count
+     res.MoveFirst
+     For i = 0 To res.Max
+       grdv[i, 0].Text = Format(res!dte, "dd.mm.yyyy")
+       grdv[i, 1].Text = res!intitule
+       grdv[i, 2].Text = Format(res!montantd, "0.00")
+       grdv[i, 3].Text = Format(res!montantc, "0.00")
+       res.MoveNext
+     Next
+   Endif
+  win.ShowModal
+
+End

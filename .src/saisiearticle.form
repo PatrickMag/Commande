@@ -1,0 +1,172 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,133,80)
+  Expand = True
+  Border = False
+  AutoResize = True
+  { GridView1 GridView
+    MoveScaled(0,0,132,38)
+  }
+  { Panel1 Panel
+    MoveScaled(0,38,132,78)
+    AutoResize = True
+    Border = Border.Plain
+    { Panel4 Panel
+      MoveScaled(0,29,132,14)
+      NoTabFocus = True
+      AutoResize = True
+      { ValueBox1 ValueBox
+        MoveScaled(109,1,11,4)
+        Enabled = False
+        Type = ValueBox.Currency
+      }
+      { ValueBox2 ValueBox
+        MoveScaled(121,1,11,4)
+        Enabled = False
+        Type = ValueBox.Currency
+      }
+      { mcom Label
+        MoveScaled(0,4,26,3)
+        NoTabFocus = True
+        Expand = True
+        AutoResize = True
+        Text = ("Marge commande : ")
+      }
+      { Label12 Label
+        MoveScaled(0,10,15,3)
+        NoTabFocus = True
+        Text = ("Prix de revient :")
+      }
+      { pamp Label
+        MoveScaled(27,10,27,3)
+        NoTabFocus = True
+        Text = ("Prixd' achat  mp :")
+      }
+      { Button1 Button
+        MoveScaled(91,1,15,4)
+        NoTabFocus = True
+        Text = ("Sortie")
+        Picture = Picture["icon:/medium/apply"]
+      }
+      { stk Label
+        MoveScaled(80,10,17,3)
+        NoTabFocus = True
+        Text = ("Stock :")
+      }
+      { qcom Label
+        MoveScaled(99,10,32,3)
+        NoTabFocus = True
+        Text = ("Qte en commande :")
+      }
+      { mart Label
+        MoveScaled(55,10,24,3)
+        NoTabFocus = True
+        Expand = True
+        Text = ("Marge article :")
+      }
+      { pxrevient ValueBox
+        MoveScaled(15,10,11,3)
+      }
+      { poidtot Label
+        MoveScaled(27,4,21,3)
+        Text = ("Poid :")
+      }
+      { voltot Label
+        MoveScaled(49,4,17,3)
+        Text = ("Volume :")
+      }
+      { Label3 Label
+        MoveScaled(0,1.5,91,3)
+        Background = &HF7DFFF&
+        Expand = True
+        Text = ("Commande")
+        Alignment = Align.Center
+      }
+      { Label4 Label
+        MoveScaled(0,7,132,2.625)
+        Background = &HF7DFFF&
+        Expand = True
+        Text = ("Article ")
+        Alignment = Align.Center
+      }
+      { fraisgest Label
+        MoveScaled(67,4,23,3)
+        Text = ("Frais de gestion :")
+      }
+    }
+    { TabStrip1 TabStrip
+      MoveScaled(0,0,134,29)
+      Index = 0
+      Text = ("Détail")
+      { Panel2 Panel
+        MoveScaled(0,0,132,3)
+        Background = &HF5FFFF&
+        Arrangement = Arrange.Horizontal
+        { Label8 Label
+          MoveScaled(0,0,13,3)
+          Text = ("N° Article")
+          Alignment = Align.Center
+        }
+        { Label9 Label
+          MoveScaled(15,0,35,3)
+          Expand = True
+          Text = ("Libellé")
+          Alignment = Align.Center
+        }
+        { Panel3 Panel
+          MoveScaled(48,0,12,3)
+          Visible = False
+          Arrangement = Arrange.Horizontal
+          { Label18 Label
+            MoveScaled(0,0,6,3)
+            Visible = False
+            Expand = True
+            Text = ("Palette")
+            Alignment = Align.Center
+          }
+          { Label1 Label
+            MoveScaled(8,0,9,3)
+            Expand = True
+            Text = ("Colis")
+          }
+        }
+        { Label13 Label
+          MoveScaled(60,0,9,3)
+          Text = ("Qte")
+          Alignment = Align.Center
+        }
+        { Label14 Label
+          MoveScaled(74,0,10,3)
+          Text = ("Px H.T")
+          Alignment = Align.Center
+        }
+        { Label15 Label
+          MoveScaled(85,0,10,3)
+          Text = ("Px TTC")
+          Alignment = Align.Center
+        }
+        { Label19 Label
+          MoveScaled(97,0,9,3)
+          Text = ("Remise")
+          Alignment = Align.Center
+        }
+        { Label16 Label
+          MoveScaled(109,0,11,3)
+          Text = ("Montant HT")
+          Alignment = Align.Center
+        }
+        { Label17 Label
+          MoveScaled(121,0,11,3)
+          Text = ("Montant TTC")
+          Alignment = Align.Center
+        }
+      }
+      { ScrollView1 ScrollView
+        MoveScaled(0,3,133,24)
+        Arrangement = Arrange.Vertical
+      }
+      Index = 0
+    }
+  }
+}

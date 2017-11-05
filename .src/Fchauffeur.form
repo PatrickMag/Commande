@@ -1,0 +1,41 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,78,51)
+  Text = ("Chauffeurs")
+  { Label1 Label
+    MoveScaled(3,2,7,3)
+    Text = ("N° :")
+  }
+  { Textnum TextBox
+    MoveScaled(11,2,12,3)
+    ReadOnly = True
+  }
+  { Label2 Label
+    MoveScaled(3,10,7,3)
+    Text = ("Nom : ")
+  }
+  { Textnom TextBox
+    MoveScaled(10,10,26,3)
+  }
+  { Label4 Label
+    MoveScaled(39,10,9,3)
+    Text = ("Prenom :")
+  }
+  { Textpren TextBox
+    MoveScaled(50,10,26,3)
+  }
+  { Panel1 Panel
+    MoveScaled(2,17,74,5)
+    Arrangement = Arrange.Horizontal
+  }
+  { GridView1 GridView
+    MoveScaled(1,29,75,21)
+  }
+  { Label5 Label
+    MoveScaled(2,24,74,4)
+    Background = &HF7DFFF&
+    Text = ("EVENEMENTS")
+    Alignment = Align.Center
+  }
+}

@@ -1,0 +1,17 @@
+FMain
+Gestion des commandes
+0
+0
+0.0.3
+
+gb.image
+gb.gui.qt
+gb.form
+gb.data
+gb.db
+gb.db.form
+gb.db.mysql
+gb.settings
+gb.mysql
+gb.report2
+

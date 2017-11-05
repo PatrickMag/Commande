@@ -1,0 +1,96 @@
+' Gambas module file
+
+
+Private $icouleur As Integer
+Public icompteur As Integer
+
+
+Public Function GotF(nm As Integer, la As Lignearticle, ScrollView1 As ScrollView) As Lignearticle
+
+  Dim tab As Variant
+  
+  If la.Tag <> nm And Not IsNull(la.tag) Then 
+    Print nm, la.Tag
+    tab = ScrollView1.Children
+    la.couleur = couleur(la.Tag)
+    la = tab[nm]
+    la.couleur = Color.Background - 100
+
+  Endif
+  
+  Return la
+End
+
+Public Function up(nm As Integer, la As Lignearticle, ScrollView1 As ScrollView) As Lignearticle
+
+  Dim tab As Variant
+  
+  If nm > 0 Then
+    tab = ScrollView1.Children
+    la.couleur = couleur(la.Tag)
+    la = tab[nm - 1]
+    la.couleur = Color.Background - 100
+  Endif
+  Return la
+End
+
+Public Function Down(nm As Integer, la As Lignearticle, ScrollView1 As ScrollView) As Lignearticle
+  
+  Dim tab As Variant
+  
+  If nm < icompteur - 1 Then
+    tab = ScrollView1.Children
+    la.couleur = couleur(la.tag)
+    tab[nm + 1].SetFocus
+    la = tab[nm + 1]
+    la.couleur = Color.Background - 100
+
+  Endif
+  Return la
+  
+End
+
+Public Function supprime(nm As Integer, la As Lignearticle, ScrollView1 As ScrollView) As Lignearticle
+
+  Dim tab As Variant
+  Dim i As Integer
+  
+  If nm < icompteur - 1 Then
+    tab = ScrollView1.Children
+    la.Visible = False
+    tab[nm].Delete
+    tab = ScrollView1.Children
+    la = tab[nm]
+    la.couleur = Color.Background - 100
+    For i = 0 To tab.count - 1
+      tab[i].tag = i
+    Next
+    icompteur -= 1
+  Endif
+  Return la
+End
+
+Public Function couleur(i As Integer) As Integer
+  
+  If Not Even(i) Then
+    $icouleur = &HF5FFFF&
+  Else
+    $icouleur = Color.Background
+  Endif
+  Return $icouleur
+  
+End
+
+Public Sub Scroll(ScrollView1 As ScrollView)
+  Dim tab As Variant
+  Dim i As Integer
+  
+  tab = ScrollView1.Children
+
+  For i = 0 To tab.count - 1
+    If tab[i].grvactif Then
+      tab[i].depalcegrv
+    Endif
+  Next
+  
+End

@@ -1,0 +1,133 @@
+' Gambas class file
+
+Private $bs As Barselection
+Private $rescam As Result
+
+
+Public Sub _new()
+
+  $bs = New Barselection("111111110", Panel1) As "bar"
+  affprem
+  
+End
+
+Private Sub affprem()
+
+  $rescam = connect.ccon.Exec("Select * FROM camion")
+  If $rescam.Available Then
+    $rescam.MoveFirst
+    affiche
+  Endif
+  
+End
+
+Private Sub affiche()
+  
+  Textimm.Text = $rescam!idimat
+  Textmar.Text = $rescam!nomducamion
+  Textdte.Text = Format($rescam!ageducamion, "dd.mm.yyyy")
+  Textm3.Text = $rescam!capacitem3
+  Textcu.Text = $rescam!chargutil
+  Textcli.Text = $rescam!nbclient
+  
+End
+
+Private Sub valide()
+  
+  $rescam!idimat = Textimm.Text
+  $rescam!nomducamion = Textmar.Text
+  $rescam!ageducamion = Date(Right(Textdte.Text, 4), Val(Mid(Textdte.Text, 4, 2)), Val(Left(Textdte.Text, 2)))
+  $rescam!capacitem3 = Textm3.Text
+  $rescam!chargutil = Textcu.Text
+  $rescam!chargutil = Textcu.Text
+  $rescam!nbclient = Textcli.Text
+  
+  $rescam.Update
+  connect.ccon.Commit
+  affprem
+  
+End
+
+Private Sub mablanc()
+  
+  Textcli.Clear
+  Textcu.Clear
+  Textdte.Clear
+  Textimm.Clear
+  Textm3.Clear
+  Textmar.Clear
+  
+End
+
+Public Sub bar_precedant()
+
+  If Not $rescam.MovePrevious() Then affiche
+
+End
+
+Public Sub bar_suivant()
+
+  If Not $rescam.MoveNext() Then affiche
+
+End
+
+Public Sub bar_premier()
+
+  If Not $rescam.MoveFirst() Then affiche
+
+End
+
+Public Sub bar_dernier()
+
+  If $rescam.Available Then
+    If Not $rescam.MoveLast() Then affiche
+  Endif
+  
+End
+
+Public Sub bar_creer()
+
+  $rescam = connect.ccon.Create("camion")
+  mablanc
+  Textimm.ReadOnly = False
+  Textimm.Select
+
+End
+
+Public Sub bar_suprimer()
+
+  If $rescam.Available Then
+    connect.ccon.Delete("camion", "idimat=&1", $rescam!idimat)
+    affprem
+  Endif
+  
+End
+
+Public Sub bar_modif()
+
+  If $rescam.Available Then
+    $rescam = connect.ccon.Edit("camion", "idimat=&1 FOR UPDATE", $rescam!idimat)
+ Else
+   Stop Event
+  Endif
+
+End
+
+Public Sub bar_quitter()
+
+  Me.Close
+
+End
+
+Public Sub bar_valide(creer As Boolean, annul As Boolean)
+
+  If creer Or (Not creer And annul) Then valide
+
+End
+
+Public Sub bar_annule(creer As Boolean, annul As Boolean)
+
+  connect.ccon.Rollback
+  affprem
+
+End

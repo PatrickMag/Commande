@@ -1,0 +1,747 @@
+' Gambas class file
+
+
+Private frm As Form
+Private $icouleur As Integer
+'                         Gestion des gridviews pir recherche article
+Private grdv As GridView
+Private $bgrdn As Boolean = False
+Private $bgrdl As Boolean = False
+
+Private $lnumcom As Long
+Private $rescli As Result
+Private $snumart As String
+Private $res As Result
+Private $resart As Result
+Private $obs As Observer
+
+Property Read montantht As Float
+Property Read montantttc As Float
+Property Read margeart As Float
+Property prixachat As Float
+Property Read montrem As Float
+Property Read quantites As Float
+Property Read prixht As Float
+Property Read pamp As Float
+Property Read stock As Float
+Property Read poid As Integer
+Property Read volume As Float
+Property Read grvactif As Boolean
+Property couleur As Integer
+Property numart As String
+Property Read lib As String
+Property Read qte As Float
+Property Read stcom As Float
+
+
+Private $fmontantht As Float
+Private $fmontantttc As Float
+Private $fmargeart As Float
+Private $fprixachat As Float
+Private $ftxtva As Float
+Private $fpamp As Float
+Private $fstock As Float
+Private $bgrvactif As Boolean = False
+Private $ipoid As Integer
+Private $bgotf As Boolean
+Private $icalcul As Integer
+Private $sancvaleur As String
+Private $schoix As String
+
+Event GotF(nm As Integer) 
+Event ValideLigne()
+Event up(mn As Integer)
+Event Down(mn As Integer)
+Event supprime(mn As Integer)
+
+
+Public Sub _new(fr As Form, choix As String, lnumcom As Long, rclient As Result, couleur As Integer, Optional nart As Variant)
+
+  'défini les relations entres les textbox
+  $obs = New Observer(num) As "saisie"
+  $obs = New Observer(Butboxnom) As "saisie"
+  $obs = New Observer(quantite) As "saisie"
+  $obs = New Observer(pxht) As "saisie"
+  $obs = New Observer(pxttc) As "saisie"
+  $obs = New Observer(remise) As "saisie"
+  $obs = New Observer(montht) As "saisie"
+  $obs = New Observer(montttc) As "saisie"
+  num.tag = [num, quantite]
+  Butboxnom.Tag = [num, quantite]
+  quantite.Tag = [Butboxnom, pxht]
+  pxht.Tag = [quantite, pxttc]
+  pxttc.Tag = [pxht, remise]
+  remise.Tag = [pxttc, montht]
+  montht.Tag = [remise, montttc]
+  montttc.Tag = [montht, num]
+  ' a faire les options
+  
+  frm = fr
+  $lnumcom = lnumcom
+  $rescli = rclient
+  $schoix = choix
+  $icouleur = couleur
+  dessincouleur
+  
+  num.SetFocus
+
+  If Not IsNull(nart) And $schoix = "creer" Then
+    num.Text = nart
+    quantite.SetFocus
+    quantite.Select
+  Endif
+  If Not IsNull(nart) And $schoix = "ouvrir" Then
+    $res = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1 AND  numligne=&2", $lnumcom, nart)
+    If $res.Available Then
+      num.Text = $res!numarticle
+      afficheart
+      Butboxnom.Text = $res!libarticle
+'      caisse.text = Format($res!caisse, "0")
+      remise.text = Format($res!remise, "0.00")
+      $ftxtva = $res!txtva
+      $fprixachat = $res!pxamp
+      quantite.text = Format($res!qte, "0.00")
+      pxht.text = Format($res!prix, "0.00")
+      calculpxht
+      
+    Endif
+  Endif
+End
+
+Public Sub dessincouleur()
+  
+  num.Background = $icouleur
+  Butboxnom.Background = $icouleur
+  caisse.Background = $icouleur
+  quantite.Background = $icouleur
+  pxht.Background = $icouleur
+  pxttc.Background = $icouleur
+  remise.Background = $icouleur
+  montht.Background = $icouleur
+  montttc.Background = $icouleur
+  Panel1.Background = $icouleur
+  
+End
+
+Public Sub saisie_gotfocus()
+
+  $bgotf = True
+  Raise GotF(Me.Tag)
+  $sancvaleur = Last.Text
+  Last.Background = Color.Yellow
+  $bgotf = False
+
+End
+
+Public Sub saisie_LostFocus()
+
+  If $bgotf Then Return
+  Last.Background = $icouleur
+
+End
+
+Public Sub saisie_KeyPress()
+ 
+  Select Case Key.Code
+  Case Key.Enter, Key.Return, Key.Tab
+    If Last = montttc Then
+      valide
+      Stop Event
+      Return
+    Endif
+    
+    Last.tag[1].SetFocus
+    Last.tag[1].Select
+    Stop Event
+    
+  Case Key.Esc
+    Last.text = $sancvaleur
+  Case Key.F2
+    If Last = num Then num_Click
+    If Last = Butboxnom Then Butboxnom_Click
+  Case Key.Up
+    Raise up(Me.Tag)
+  Case Key.Down
+    Raise Down(Me.Tag)
+  Case Key.Del
+    Raise supprime(Me.Tag)
+    
+  End Select
+ 
+  
+End
+
+Public Sub saisie_mousedown()
+
+  If $bgrvactif Then
+    grdv.Delete
+    $bgrvactif = False
+    $bgrdl = False
+    $bgrdn = False
+  Endif
+
+End
+
+Public Sub num_Click()
+
+  Dim x, y As Integer
+  
+  If $bgrdl Then 
+    grdv.Delete
+    $bgrdl = False
+  Endif
+  
+  If $bgrdn Then 
+    grdv.Delete
+    $bgrdn = False
+    $bgrvactif = False
+    Return
+  Endif
+  
+  x = num.ScreenX - frm.ScreenX + num.Width
+  y = num.ScreenY - frm.ScreenY
+  creergrdv(x, y)
+  $bgrdn = True
+  
+  num_Change
+  
+End
+
+Public Sub num_Change()
+  
+  Dim $sreq As String
+  
+  If Not $bgrdn Then Return
+  
+  $sreq = "%" & num.text & "%"
+  $res = connect.cconlaurux.Exec("SELECT art_code,art_design FROM Fiches_Art WHERE art_code LIKE &1", $sreq) 
+  grdv.Rows.Count = $res.Count
+  grdv.Row = 0
+  
+End
+
+Public Sub num_LostFocus()
+  
+  If $bgrvactif Then
+    If grdv.Rows.Count > 0 Then grdv_Activate()
+  Else
+    afficheart
+  Endif
+  
+End
+
+Public Sub Butboxnom_Click()
+
+  Dim x, y As Integer
+  
+  If $bgrdn Then 
+    grdv.Delete
+    $bgrdn = False
+  Endif
+  
+  If $bgrdl Then 
+    grdv.Delete
+    $bgrdl = False
+    $bgrvactif = False
+    Return
+  Endif
+
+  x = Butboxnom.ScreenX - frm.ScreenX + Butboxnom.Width
+  y = Butboxnom.ScreenY - frm.ScreenY
+  creergrdv(x, y)
+  $bgrdl = True
+  
+  Butboxnom_Change
+  
+End
+
+
+Public Sub Butboxnom_Change()
+
+  Dim $sreq As String
+
+  If Not $bgrdl Then Return
+  
+  $sreq = "%" & Butboxnom.text & "%"
+  $res = connect.cconlaurux.Exec("SELECT art_code,art_design FROM Fiches_Art WHERE art_design LIKE &1", $sreq) 
+  grdv.Rows.Count = $res.Count
+  grdv.Row = 0
+End
+
+Public Sub Butboxnom_LostFocus()
+  
+  If $bgrvactif Then
+    If grdv.Rows.Count > 0 Then grdv_Activate()
+  Else
+    afficheart
+  Endif
+  
+End
+
+Private Sub creergrdv(x As Integer, y As Integer)
+  
+  grdv = New GridView(frm) As "grdv"
+  grdv.Height = 150
+  grdv.Width = 240
+  grdv.X = x
+  grdv.y = y
+  $bgrvactif = True
+  
+  grdv.Columns.count = 2
+  grdv.Columns[0].Title = "N° Article" 
+  grdv.Columns[1].Title = "Nom"
+  grdv.Columns[0].Width = 80
+  grdv.Columns[1].Width = 150
+  grdv.Header = GridView.Horizontal
+  grdv.Mode = Select.Single
+  grdv.ScrollBar = Scroll.Both
+ 
+End
+
+Public Sub depalcegrv()
+
+  Dim x, y As Integer
+  
+  If $bgrdl Then
+    x = Butboxnom.ScreenX - frm.ScreenX + Butboxnom.Width
+    y = Butboxnom.ScreenY - frm.ScreenY
+  Else
+    x = num.ScreenX - frm.ScreenX + num.Width
+    y = num.ScreenY - frm.ScreenY
+  Endif
+
+  grdv.Move(x, y)
+  
+End
+
+
+Public Sub grdv_Activate()
+
+  
+  num.Text = grdv[grdv.Row, 0].Text
+  grdv.Delete
+  $bgrvactif = False
+  $bgrdl = False
+  $bgrdn = False
+  afficheart
+  quantite.SetFocus
+  quantite.Select
+  
+End
+
+Public Sub grdv_keypress()
+
+  If Key.code = Key.Esc Then
+    grdv.Delete
+    $bgrvactif = False
+    $bgrdl = False
+    $bgrdn = False
+  Endif
+  If Key.Code = Key.Return Or Key.Code = Key.Enter Or Key.code = Key.Tab Then
+    If grdv.Rows.Count > 0 Then grdv_Activate()
+  Endif
+  
+End
+
+Public Sub grdv_Data(row As Integer, column As Integer)
+
+   
+  If Even(row) Then grdv.Data.Background = Color.Background - 50
+  
+  $res.MoveTo(row)
+  Select Case Column
+    Case 0
+       grdv.Data.Text = $res!art_code
+    Case 1
+       grdv.Data.Text = $res!art_design
+  End Select
+
+End
+
+Private Sub afficheart()
+  
+  Dim res As Result
+  Dim $ftaux As Float = 1
+  
+  num.Background = $icouleur
+  Butboxnom.Background = $icouleur
+  
+  If num.Text = $snumart And num.Text Then
+'    num.SetFocus
+    Return
+  Endif
+  If Not num.Text And $schoix = "creer" Then
+ '   num.SetFocus
+    Return
+  Endif
+  
+  $snumart = num.Text
+  $resart = connect.cconlaurux.Exec("SELECT* FROM Fiches_Art WHERE art_code=&1", $snumart)
+  If Not $resart.Available Then
+    Message.Error("Article innexistant", "OK")
+    num.Clear
+    $snumart = ""
+    num.SetFocus
+    Return
+  Endif
+  Butboxnom.Text = $resart!art_design
+  $fprixachat = $resart!art_prvt
+  $fpamp = $resart!art_pmp
+  $fstock = $resart!art_qte
+  res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Tvaav WHERE code_tva=&1", $resart!art_tva) 
+  $ftxtva = res!taux_tva
+  
+  res = connect.cconlaurux.Exec("SELECT * FROM Fiches_TarTypcli WHERE type=&1 AND cart=&2", $rescli!cli_typec, $snumart)
+  If res.Available Then 
+    $ftaux = res!coef
+  Endif
+  
+  res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Tarcli WHERE ccli=&1 and cart=&2", $rescli!cli_code, $snumart)
+  If res.Available Then
+    $ftaux = res!coef
+  Endif
+  
+  pxht.Text = Utils.CDec($resart!art_nbd, Str($resart!art_pvht * $ftaux))
+  pxttc.text = Format(Utils.totobs(pxht.text) * (1 + ($ftxtva / 100)), "0.00")
+  
+End
+
+Public Sub caisse_GotFocus()
+
+  $bgotf = True
+  If Not num.Text Then 
+    num.SetFocus
+    Return
+  Endif
+  Raise GotF(Me.Tag)
+  $sancvaleur = Str(caisse.text)
+  caisse.Background = Color.White
+  $bgotf = False
+  
+End
+
+Public Sub caisse_LostFocus()
+' a changer lorsque le programme fera les boissons
+  If $bgotf Then Return
+  caisse.Background = $icouleur
+  If $resart.Available Then
+    If Val($resart!art_uv) <> 0 Then
+      If Val($sancvaleur) <> caisse.text Then
+        quantite.text = caisse.text * Val($resart!art_uv)
+      Endif
+    Endif
+  Endif
+End
+
+
+Public Sub quantite_LostFocus()
+
+  quantite.Text = Str(Utils.totobs(quantite.Text))
+  If num.Text Then
+    If $resart.Available Then quantite.Text = Utils.CDec($resart!art_nbd, quantite.Text) Else quantite.Text = "0"
+  Endif
+  If Utils.totobs(pxht.text) <> 0 Then calcul
+  
+End
+
+
+Public Sub pxht_LostFocus()
+
+
+  calculpxht
+
+End
+
+
+Public Sub pxttc_LostFocus()
+
+  If $schoix = "ouvrir" Then
+    pxht.text = Format((Utils.totobs(pxttc.text) / (1 + ($ftxtva / 100))), "0.00")
+    calculpxht
+  Endif
+End
+
+
+
+Public Sub remise_LostFocus()
+  
+  If Utils.totobs(pxht.text) <> 0 Then
+    calcul
+    Return
+  Endif
+  
+End
+
+Public Sub montht_LostFocus()
+
+  montht.Text = Format(Utils.totobs(montht.Text), "0.00")
+  calculmontht
+  
+End
+
+
+Public Sub montttc_LostFocus()
+
+  montht.text = Format(Utils.totobs(montttc.text) / (1 + ($ftxtva / 100)), "0.00")
+  calculmontht
+  
+End
+
+Public Sub calculmontht()
+
+  If Not $resart.Available Then Return
+  If Utils.totobs(quantite.text) <> 0 And Utils.totobs(pxht.text) <> 0 Then 
+    calcul
+    Return
+  Endif
+
+  If Utils.totobs(quantite.text) = 0 And (Utils.totobs(pxht.text) - Utils.totobs(remise.text)) <> 0 Then
+    quantite.text = Utils.totobs(montht.text) / (Utils.totobs(pxht.text) - Utils.totobs(remise.text)) 
+    quantite.text = Utils.CDec($resart!art_dec, quantite.text)
+    calcul
+    Return
+  Endif
+
+  If Utils.totobs(pxht.text) - Utils.totobs(remise.text) = 0 And Utils.totobs(quantite.text) <> 0 Then
+    pxht.text = Utils.CDec($resart!art_nbd, Str(Utils.totobs(montht.text) / Utils.totobs(quantite.text)))
+    calcul
+    Return
+  Endif
+End
+
+Private Sub calculpxht()
+
+  pxttc.text = Format(Utils.totobs(pxht.text) * (1 + ($ftxtva / 100)), "0.00")
+  If Utils.totobs(quantite.text) <> 0 Then
+    calcul
+    Return
+  Endif
+  
+  If Utils.totobs(pxht.text) - Utils.totobs(remise.text) <> 0 Then
+   If Utils.totobs(montht.text) <> 0 Then
+      quantite.text = Utils.CDec($resart!art_dec, Str(Utils.totobs(montht.text) / (Utils.totobs(pxht.text) - Utils.totobs(remise.text))))
+      calcul
+      Return
+    Endif
+    
+    If Utils.totobs(montttc.text) <> 0 Then
+      quantite.text = (montttc.text / (1 + ($ftxtva / 100))) / (pxht.text - remise.text)
+      quantite.text = Utils.CDec($resart!art_dec, Utils.totobs(quantite.text))
+      calcul
+      Return
+    Endif
+  Endif
+
+End
+
+
+Private Sub calcul()
+  
+  pxttc.text = Format(Utils.totobs(pxht.text) * (1 + ($ftxtva / 100)), "0.00")
+  montht.text = Format(Utils.totobs(quantite.text) * (Utils.totobs(pxht.text) - Utils.totobs(remise.text)), "0.00")
+  montttc.text = Format(Utils.totobs(montht.text) * (1 + ($ftxtva / 100)), "0.00")
+  $fmargeart = (Utils.totobs(quantite.text) * Utils.totobs(pxht.text)) - (Utils.totobs(quantite.text) * $fprixachat)
+  $fmontantht = Utils.totobs(montht.text)
+  $fmontantttc = Utils.totobs(montttc.text)
+  $ipoid = Round(Utils.totobs(quantite.text) * $resart!art_poids)
+  
+  If Utils.totobs(pxht.text) < Utils.totobs($resart!art_prvt) Then
+    Balloon.Delay = 5000
+    Try Balloon.Warning("<FONT Color=#212121>" & "Prix de vente inferieur au prix de revient", pxht)
+    Try pxht.Background = Color.Red
+  Else
+    If Balloon.Visible Then Try Balloon.Hide(pxht)
+    Try pxht.Background = $icouleur
+  Endif
+
+End
+
+
+Public Sub valide()
+
+
+  If Not num.Text Then
+    If $schoix = "ouvrir" Then
+      Balloon.Delay = 5000
+      Try Balloon.Warning("<FONT Color=#212121>" & "Numéro article obligatoire", num)
+      num.SetFocus
+      Return
+    Else
+      Return
+    Endif
+  Endif
+  
+  If $schoix = "creer" Then
+    $schoix = "ouvrir"
+'    Raise ValideLigne()
+  Endif
+  
+  Raise ValideLigne()
+ 
+End
+
+Public Sub enregistre()
+
+  Dim res As Result
+  If num.Text Then
+    connect.ccon.Begin
+    res = connect.ccon.Create("lignedecommande")
+    res!idligne = $lnumcom
+    res!numligne = Me.Tag
+    res!numarticle = num.Text
+    res!libarticle = Left(Butboxnom.Text, 25)
+'    res!caisse = caisse.Text
+    res!qte = Utils.totobs(quantite.Text)
+    res!prix = Utils.totobs(pxht.Text)
+    res!txtva = $ftxtva
+    res!remise = Utils.totobs(remise.Text)
+    res!pxamp = $fprixachat
+    res.Update
+    connect.ccon.Commit
+  Endif
+
+End
+
+Private Function montantht_Read() As Float
+
+  Return $fmontantht
+
+End
+
+Private Function montantttc_Read() As Float
+
+  Return $fmontantttc
+
+End
+
+Private Function margeart_Read() As Float
+
+  Return $fmargeart
+
+End
+
+Private Function prixachat_Read() As Float
+
+  Return $fprixachat
+
+End
+
+Private Sub prixachat_Write(Value As Float)
+
+  $fprixachat = Value
+  $fmargeart = (Utils.totobs(quantite.text) * Utils.totobs(pxht.text)) - (Utils.totobs(quantite.text) * $fprixachat)
+  
+End
+
+Private Function pamp_Read() As Float
+
+  Return $fpamp
+
+End
+
+Private Function grvactif_Read() As Boolean
+
+  Return $bgrvactif
+
+End
+
+
+Private Function stock_Read() As Float
+
+  Return $fstock
+
+End
+
+Private Function couleur_Read() As Integer
+
+  Return $icouleur
+
+End
+
+Private Sub couleur_Write(Value As Integer)
+
+  $icouleur = value
+  dessincouleur
+  num.SetFocus
+  
+End
+
+Private Function poid_Read() As Integer
+
+  Return $ipoid
+
+End
+
+Private Function numart_Read() As String
+
+  Return num.Text
+
+End
+
+Private Sub numart_Write(Value As String)
+
+  If $schoix = "creer" Then
+    num.Text = value
+    quantite.SetFocus
+  Endif
+  
+  afficheart
+  
+End
+
+Private Function lib_Read() As String
+
+  Return Butboxnom.Text
+
+End
+
+Private Function qte_Read() As Float
+
+  Return Utils.totobs(quantite.text)
+
+End
+
+Private Function stcom_Read() As Float
+
+  Dim res As Result
+  If $snumart Then
+    If $resart.Available Then
+      res = connect.ccon.Exec("SELECT SUM(qte) AS qte FROM commande JOIN lignedecommande ON idligne=idcom WHERE NOT comlivre and numarticle=&1", $snumart)
+      If Not IsNull(res!qte) Then
+        Return res!qte
+      Else
+        Return 0
+      Endif
+    Endif
+  Endif
+  
+End
+
+Private Function montrem_Read() As Float
+
+  Return Utils.totobs(remise.text)
+
+End
+
+Private Function quantites_Read() As Float
+
+  Return Utils.totobs(quantite.text)
+
+End
+
+Private Function prixht_Read() As Float
+
+  Return Utils.totobs(pxht.text)
+
+End
+
+Private Function volume_Read() As Float
+
+    If $snumart Then
+      If $resart.Available Then
+        If $resart!art_vol = "M3" Then Return Utils.totobs(quantite.Text)
+      Endif
+    Endif
+    Return 0
+
+End

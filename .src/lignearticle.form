@@ -1,0 +1,61 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,132,3)
+  AutoResize = True
+  { Panel1 Panel
+    MoveScaled(0,0,132,3)
+    Background = &HF5FFFF&
+    Arrangement = Arrange.Horizontal
+    Border = Border.Plain
+    { num ButtonBox
+      MoveScaled(0,0,15,3)
+      Background = &HF5FFFF&
+    }
+    { Butboxnom ButtonBox
+      MoveScaled(13,0,35,3)
+      Background = &HF5FFFF&
+      NoTabFocus = True
+      Expand = True
+    }
+    { Panel2 Panel
+      MoveScaled(48,0,18,3)
+      Visible = False
+      Arrangement = Arrange.Horizontal
+      { palette TextBox
+        MoveScaled(0,0,8,3)
+        Expand = True
+        Alignment = Align.Right
+      }
+      { caisse TextBox
+        MoveScaled(10,0,8,3)
+        Expand = True
+        Alignment = Align.Right
+      }
+    }
+    { quantite TextBox
+      MoveScaled(66,0,14,3)
+      Alignment = Align.Right
+    }
+    { pxht TextBox
+      MoveScaled(80,0,11,3)
+      Alignment = Align.Right
+    }
+    { pxttc TextBox
+      MoveScaled(91,0,10,3)
+      Alignment = Align.Right
+    }
+    { remise TextBox
+      MoveScaled(101,0,10,3)
+      Alignment = Align.Right
+    }
+    { montht TextBox
+      MoveScaled(111,0,10,3)
+      Alignment = Align.Right
+    }
+    { montttc TextBox
+      MoveScaled(121,0,10,3)
+      Alignment = Align.Right
+    }
+  }
+}

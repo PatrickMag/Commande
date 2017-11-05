@@ -1,0 +1,542 @@
+' Gambas class file
+
+                                  'combobox pour la fenetre win ==>fin du programme
+Private win As New Window                                  
+Private combocnc As New ComboBox(win)
+Private combocam As New ComboBox(win)
+Private ob As GridView
+
+Private $ccon As New Connection
+                                    'test pour afficher les bouttons + & -
+Private $bExist As Boolean = False
+
+Private $rescom As Result
+Private $rescpc As Result
+Private $resligcpc As Result
+Private $resligtourpc As Result
+                                'n° du camion et de la commande en cours
+Private $lNumcam As Long
+Private $lnumcom As Long
+Private $poid As Integer
+Private $vol As Float
+
+Property Read Nbclient As Integer
+Property Read Nbtourne As Integer
+
+Public Struct cam
+  
+  datecam As Date
+  comnumcam As String
+  mataprem As String
+  cnumchauf As String
+  
+End Struct
+
+Public ca As New Cam
+
+
+Public Sub _new(sChoix As String, lIdcom As Long, Optional lId As Long, dDte As Date, sMatapr As String)
+  
+  Dim res As Result
+  Dim i As Integer
+
+  
+  ouvreconnection
+
+                  'si lIdcom =>id table commande est à 0 c'est que la création vient de Fmain sinon vient de client
+  Select Case sChoix
+              'passez en parametre sChoix + llidcom id table commande + date&1/2 journée de livraison
+    Case "creer"                            'creer 1 nouveau camion
+      $lnumcom = lIdcom
+      $ccon.Begin
+      $rescpc = $ccon.Create("commandeparcamion")
+      ca.datecam = dDte
+      ca.mataprem = sMatapr
+
+      affectres
+      $rescpc.Update
+      $ccon.Commit
+      $rescpc = $ccon.Exec("SELECT * FROM commandeparcamion ORDER BY idncomcam DESC LIMIT 0,1")
+              ' ou last_insert_id() c'est quoi le mieux ?
+      $lNumcam = $rescpc!idncomcam
+      If lIdcom <> 0 Then
+        AddCam(lIdcom)
+        res = $ccon.Exec("SELECT * FROM commande WHERE idcom=&1", lIdcom)
+        AddTou(res!numtourne)
+        $bExist = True
+      Else
+        ajoudescom(lId)
+      Endif
+      affbouton(sChoix)
+      
+    Case "ouvrir"                                 ' affiche 1 camion existant
+                'passez en paramétre sChoix + lLidcom id table commande et lId l'id table commandeparcamion -- pas le reste
+                
+     $lnumcom = lIdcom
+     $lNumcam = lId
+     $rescpc = $ccon.Exec("SELECT * FROM commandeparcamion WHERE idncomcam=&1", lId)
+     affectstru
+     
+     ajoudescom(lId)
+     ajoudestourne(lId)
+     
+  End Select
+
+  Labelmatam.Text = ca.mataprem
+  Datecom.Value = ca.datecam
+  Labelcam.Text = ca.comnumcam
+  Labelchauf.Text = ca.cnumchauf
+  
+End
+
+Private Sub ouvreconnection()                  'ouvre la connection $ccon
+  $ccon = Connect.ccon
+  
+End
+
+Private Sub couleur(nb As Integer)
+  
+  'modification de la couleur du panel en fonction du taux de remplissage du camion ==> ex sur la table camion avec le volume maxi et le nb de client max estimé sur 1 tournée
+
+  Dim ftaux, ft1 As Float
+  Dim rescam As Result
+  
+  rescam = connect.ccon.Exec("SELECT * FROM camion WHERE idimat=&1", ca.comnumcam)
+  If rescam.Available Then
+    ftaux = nb / rescam!nbclient
+    ft1 = $poid / rescam!chargutil
+    If ft1 > ftaux Then ftaux = ft1
+    ft1 = $vol / rescam!capacitem3
+    If ft1 > ftaux Then ftaux = ft1
+    If ftaux > 1 Then ftaux = 1
+    Panelcouleur.Background = Color.Gradient(Color.Green, Color.Red, ftaux)
+  Endif
+  
+End
+
+
+Private Function Nbclient_Read() As Integer
+
+  Dim res As Result
+  
+  res = $ccon.Exec("SELECT * FROM lignecomparcamion WHERE idlignec=&1", $lNumcam)
+  Return res.Count
+
+End
+
+
+Private Function Nbtourne_Read() As Integer
+
+  Dim res As Result
+  res = $ccon.Exec("SELECT * FROM lignetournepcam WHERE idcpc=&1 GROUP BY idnumtourne")
+  Return res.Count
+  
+End
+
+
+Public Sub AddCam(lNumc As Long)
+  
+  $ccon.Begin
+  $resligcpc = $ccon.Create("lignecomparcamion")
+  $resligcpc!idcomcl = lNumc
+  $resligcpc!idcpc = $lNumcam
+  $resligcpc.Update
+  $ccon.Commit
+  ajoudescom($lNumcam)
+  
+End
+
+Public Sub SupCam(lNumc As Long, numtourne As String)
+  Dim res As Result
+  
+  If $resligcpc!idcomcl = $lnumcom Then $bExist = False
+  $ccon.Begin
+  $ccon.Delete("lignecomparcamion", "idcpc=&1 AND idcomcl=&2", $lNumcam, lNumc)
+  $ccon.Commit
+  ajoudescom($lNumcam)
+  
+  res = $ccon.Exec("SELECT * FROM commande,lignecomparcamion WHERE idcpc=&1 AND idcom=idcomcl AND numtourne=&2", $lNumcam, numtourne)
+  If Not res.Available Then 
+    $ccon.Begin
+    $ccon.Delete("lignetournepcam", "idcpc=&1 AND idnumtourne=&2", $lNumcam, numtourne)
+    $ccon.Commit
+    ajoudestourne($lNumcam)
+  Endif
+ 
+End
+
+Public Sub SupAllCam(lidcam As Long)
+
+  Dim qst As Integer
+  
+  qst = Message.Delete("ATTENTION : Supression de ce camion " & Chr$(10) & " Etes vous sur ?", "OUI ", " NON ")
+  If qst = 2 Then Return
+  
+  $ccon.Begin
+  $ccon.Delete("commandeparcamion", "idncomcam = &1 ", lidcam)
+  $ccon.Delete("lignecomparcamion", "idcpc = &1 ", lidcam)
+  $ccon.Delete("lignetournepcam", "idcpc = &1 ", lidcam)
+  $ccon.Commit
+ 
+End
+
+
+Private Sub AffCam(lNumcom As Long, id As Integer)
+  
+  Dim res As Result
+  
+  res = $ccon.Exec("SELECT * FROM commande WHERE idcom=&1", lNumcom)
+  ListBox1.Add(res!nom)
+  If lNumcom = $lnumcom Then          'change la couleur si commande courrante
+    ob[id, 0].Background = Color.Cyan
+    ob[id, 0].Text = ListBox1[id].text
+  Endif
+    
+  If res!comencours Then
+    ob[id, 0].Background = Color.Red
+    ob[id, 0].Text = ListBox1[id].text
+  Endif
+  
+  $poid += res!poid
+  $vol += res!volume
+  
+End
+
+Public Sub AddTou(sId As String)
+  
+  $ccon.Begin
+  $resligtourpc = $ccon.Create("lignetournepcam")
+  $resligtourpc!idcpc = $lNumcam
+  $resligtourpc!idnumtourne = sId
+  $resligtourpc.Update
+  $ccon.Commit
+  ajoudestourne($lNumcam)
+  
+End
+
+Private Sub AffTou(sId As String)
+  
+  ListBox2.Add(sId)
+  
+End
+
+
+
+Private Sub affectres()
+  
+  $rescpc!datecam = ca.datecam
+  $rescpc!comnumcam = ca.comnumcam
+  $rescpc!mataprem = ca.mataprem
+  $rescpc!cnumchauf = Left(ca.cnumchauf, 3)
+  
+End
+
+Private Sub affectstru()
+  
+  Dim res As Result
+  
+  ca.datecam = $rescpc!datecam
+  ca.comnumcam = $rescpc!comnumcam
+  ca.mataprem = $rescpc!mataprem
+  res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", $rescpc!cnumchauf)
+  If res.Available Then ca.cnumchauf = $rescpc!cnumchauf & " " & res!nom
+  
+End
+                                                      'gestion du menu popup
+                                                      
+Public Sub modif_Click()
+
+  win = New Window
+  ouvrewind(win)
+
+End
+
+Public Sub sup_Click()
+  
+  SupAllCam($lNumcam)
+  Me.Delete
+  
+End
+Public Sub masquer_Click()
+  
+  Me.Delete
+  
+End
+
+
+ '                                          GESTION DES BOUTONS + & -
+
+Public Sub Butplus_Click()
+
+Dim s As String
+
+  AddCam($lnumcom)
+  s = existetourne($lnumcom)
+  If s <> "" Then
+    AddTou(s) 
+  Endif
+  
+End
+
+Public Sub Butmoins_Click()
+
+Dim res As Result
+
+  $resligcpc.MoveTo(ListBox1.Index)
+  res = $ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $resligcpc!idcomcl) 
+  SupCam($resligcpc!idcomcl, res!numtourne)
+  affbouton
+ 
+
+End
+
+Private Sub affbouton(Optional s As String)
+  
+  If $lnumcom = 0 Then
+    Select Case s
+      Case "creer"
+        Butmoins.Enabled = False
+        Butplus.Enabled = False
+      Case "ouvrir"
+        Butmoins.Enabled = True
+        Butplus.Enabled = False
+     Case Else
+       Butmoins.Enabled = True
+       Butplus.Enabled = False
+
+      End Select
+    
+    Return
+  Endif
+  If $bExist Then
+    Butplus.Enabled = False
+    Butmoins.Enabled = True
+  Else
+    Butplus.Enabled = True
+    Butmoins.Enabled = False 
+  Endif
+  
+End
+
+Private Sub ajoudescom(lId As Long)
+
+  Dim i As Integer
+  
+
+  $resligcpc = $ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcpc=&1", lId)
+ 
+  If $resligcpc.Available Then
+    $poid = 0
+    $vol = 0
+    ListBox1.Clear
+    Valuenbc.Value = $resligcpc.Count
+    ob = ListBox1.Children[0]
+    $resligcpc.MoveFirst
+    For i = 0 To $resligcpc.Max
+      AffCam($resligcpc!idcomcl, i)
+      If $resligcpc!idcomcl = $lnumcom Then $bExist = True
+      $resligcpc.MoveNext
+    Next
+    couleur($resligcpc.Count)
+    ListBox1.Index = 0
+    affbouton
+  Endif
+  
+End
+
+Private Sub ajoudestourne(lId As Long)
+  
+  Dim i As Integer
+
+  $resligtourpc = $ccon.Exec("SELECT * FROM lignetournepcam WHERE idcpc=&1", lId) 
+  ListBox2.Clear
+    If $resligtourpc.Available Then
+      Valuenbt.Value = $resligtourpc.Count
+      $resligtourpc.MoveFirst
+      For i = 0 To $resligtourpc.Max
+        AffTou($resligtourpc!idnumtourne)
+        $resligtourpc.MoveNext
+      Next
+      ListBox2.Index = 0
+    Endif
+    
+End
+
+Private Function existetourne(lnumcom As Long) As String
+  Dim res As Result
+  
+  res = $ccon.Exec("SELECT * FROM commande WHERE idcom=&1", lnumcom)
+  If ListBox2.Find(res!numtourne) <> -1 Then
+    Return ""
+  Else
+    Return res!numtourne
+  Endif
+  
+End
+
+'                                           Fenetre pour rentrer le camion et le chauffeur
+Private Sub ouvrewind(win As Window)
+  
+  Dim pan As New Panel(Me)
+  Dim lab As New Label(pan)
+  Dim butok As New Button(win)
+  Dim res As Result
+  
+  win.AutoResize = True
+  win.Border = False
+  win.Border = Border.Etched
+  win.Height = 100
+  win.Width = 250
+  win.Arrangement = Arrange.Vertical
+  win.Text = "Choix du camion"
+  
+  pan = New Panel(win)
+  pan.AutoResize = True
+  pan.Arrangement = Arrange.Horizontal
+
+  lab = New Label(pan)
+  lab.Text = "Nom du chauffeur :"
+  lab.AutoResize = True
+  lab.Height = 26
+ 
+  combocnc = New ComboBox(pan)
+  combocnc.ReadOnly = True
+  combocnc.Height = 26
+  combocnc.Width = 200
+  
+  res = connect.ccon.Exec("SELECT * FROM chauffeur")
+  If res.Available Then
+    res.MoveFirst
+    Repeat
+      combocnc.Add(res!idchauffeur & " " & res!nom)
+    Until res.MoveNext()
+  Endif
+  
+  pan = New Panel(win)
+  pan.AutoResize = True
+  pan.Arrangement = Arrange.Horizontal
+
+  lab = New Label(pan)
+  lab.Text = "N° du camion     :"
+  lab.AutoResize = True
+  lab.Height = 26
+ 
+  combocam = New ComboBox(pan)
+  combocam.ReadOnly = True
+  combocam.Height = 26
+  combocam.Width = 200
+ 
+  res = connect.ccon.Exec("SELECT * FROM camion")
+  If res.Available Then
+    res.MoveFirst
+    Repeat
+      combocam.Add(res!idimat)
+    Until res.MoveNext()
+  Endif
+  
+  butok = New Button(win) As "ok"
+  butok.Height = 26
+  butok.Width = 50
+  butok.Text = "OK"
+  
+  win.ShowModal
+    
+
+End
+
+Public Sub ok_Click()
+  
+  ca.cnumchauf = combocnc.Current.Text
+  ca.comnumcam = combocam.current.Text
+  $ccon.Begin
+  $rescpc = $ccon.Edit("commandeparcamion", "idncomcam=&1 FOR UPDATE", $lNumcam)
+  affectres
+  $rescpc.Update
+  $ccon.Commit
+  Labelcam.Text = ca.comnumcam
+  Labelchauf.Text = ca.cnumchauf
+  win.Delete
+  
+End
+
+
+Public Sub ListBox1_Activate()
+
+  Dim cl As Client
+  Dim res As Result
+  
+  win = New Window
+  win.AutoResize = True
+  win.Border = False
+  win.Border = Border.Etched
+  win.Height = 100
+  win.Width = 250
+  win.Arrangement = Arrange.Vertical
+  $resligcpc.MoveTo(ListBox1.Index)
+  cl = New Client($resligcpc!idcomcl, win)
+   
+  win.Show
+End
+
+Public Sub ListBox1_MouseDrag()
+  Dim ctr As String
+  
+  Me.Parent.Mouse = Mouse.Pointing
+  $resligcpc.MoveTo(ListBox1.Index)
+        'envoie le n° du camion et le n) de lacommande à glisser
+  ctr = Str($lNumcam) & "/" & Str($resligcpc!idcomcl)
+  ListBox1.Drag(ctr)
+  'petit probleme d'affichage de la sourie dans client.class
+End
+
+Public Sub ListBox1_MouseUp()
+  
+    Me.Parent.Mouse = Mouse.Default
+  
+End
+
+
+Public Sub ListBox1_Drop()
+  
+  Dim choix As String[]
+  Dim cms As Variant
+  Dim i As Integer
+  Dim res As Result
+  Dim lNumcom, lnumcam As Long
+  Dim s As String
+  
+  
+            'recuper le n°du camion d'origine et de la commande
+  choix = Split(Drag.Data, "/")
+  lnumcam = CLong(choix[0])
+  lNumcom = CLong(choix[1])
+      Print lnumcam, lNumcom
+      
+ ' verifie que la commande passée n'existe pas dans ce camion ==> si oui arret du glissé déposé ... si non ajout commande
+  If $resligcpc.Available Then
+    $resligcpc.MoveFirst
+    For i = 0 To $resligcpc.Max
+      If lnumcom = $resligcpc!idcomcl Then Return
+      $resligcpc.MoveNext
+    Next
+  Endif
+  
+  AddCam(lNumcom)
+  s = existetourne(lnumcom)
+  If s <> "" Then
+    AddTou(s) 
+  Endif
+
+  '                 supprime la commande dans le camion d'origine si n° camion à 0 c'est que le drag vient du gridview de FMain
+  If lnumcam <> 0 Then
+    cms = Me.Parent.Children
+    i = 0
+    While cms[i].tag <> lnumcam
+      Inc i
+    Wend
+  
+    res = $ccon.Exec("SELECT * FROM commande WHERE idcom=&1", lNumcom) 
+    cms[i].SupCam(lNumcom, res!numtourne)
+  Endif
+ 
+End

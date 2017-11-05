@@ -1,0 +1,63 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,68)
+  Text = ("Camions")
+  Mask = True
+  { Label1 Label
+    MoveScaled(2,3,17,3)
+    Text = ("Immatriculation :")
+  }
+  { Textimm TextBox
+    MoveScaled(22,3,15,3)
+    ReadOnly = True
+  }
+  { Label2 Label
+    MoveScaled(2,8,15,3)
+    Text = ("Marque :")
+  }
+  { Textmar TextBox
+    MoveScaled(22,8,21,3)
+  }
+  { Label3 Label
+    MoveScaled(2,12,17,3)
+    Text = ("Mise en service :")
+  }
+  { Textdte TextBox
+    MoveScaled(22,12,16,3)
+  }
+  { Label4 Label
+    MoveScaled(2,17,15,3)
+    Text = ("Capacité M3 :")
+  }
+  { Textm3 TextBox
+    MoveScaled(22,17,9,3)
+  }
+  { Label5 Label
+    MoveScaled(2,22,16,3)
+    Text = ("Charge utile :")
+  }
+  { Textcu TextBox
+    MoveScaled(22,22,12,3)
+  }
+  { Panel1 Panel
+    MoveScaled(2,31,60,5)
+    Arrangement = Arrange.Horizontal
+  }
+  { GridView1 GridView
+    MoveScaled(2,42,60,25)
+  }
+  { Label6 Label
+    MoveScaled(2,37,60,4)
+    Background = &HF7DFFF&
+    Text = ("EVENEMENTS")
+    Alignment = Align.Center
+  }
+  { Label7 Label
+    MoveScaled(2,26,16,3)
+    Text = ("Nb client estimés")
+  }
+  { Textcli TextBox
+    MoveScaled(22,26,7,3)
+  }
+}

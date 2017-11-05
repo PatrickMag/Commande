@@ -1,0 +1,44 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,140,6)
+  Drop = True
+  Border = False
+  Arrangement = Arrange.Horizontal
+  AutoResize = True
+  { Panel1 Panel
+    MoveScaled(0,0,138,5)
+    Arrangement = Arrange.Horizontal
+    { Label1 Label
+      MoveScaled(0,1,13,3)
+      Text = ("Date souhaitée :")
+    }
+    { DateBox1 DateBox
+      MoveScaled(13,1,15,3)
+      Enabled = False
+    }
+    { ComboBox1 ComboBox
+      MoveScaled(28,1,15,3)
+    }
+    { TextArea1 TextArea
+      MoveScaled(44,0,77,5)
+      Drop = True
+      Expand = True
+    }
+    { Butval Button
+      MoveScaled(120,0,7,3)
+      ToolTip = ("Validation")
+      Picture = Picture["icon:/32/apply"]
+    }
+    { Butcam Button
+      MoveScaled(126,0,5,4)
+      ToolTip = ("Ajout camion")
+      Picture = Picture["icon:/32/add"]
+    }
+    { Butsup Button
+      MoveScaled(131,1,7,2)
+      ToolTip = ("Suppression")
+      Picture = Picture["icon:/32/delete"]
+    }
+  }
+}

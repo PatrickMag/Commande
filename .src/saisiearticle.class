@@ -1,0 +1,262 @@
+' Gambas class file
+
+Private obs As Observer
+Public la As Lignearticle
+Private lacourant As Lignearticle
+
+Private $rescli As Result
+Private $reslignecom As Result
+Private $restetfac As Result
+Private $resligfac As Result
+
+Private $clicreer As Boolean
+
+Private $lnumcom As Long
+Private $lnumcli As Long
+Private $icouleur As Integer = &HF5FFFF&
+
+
+Public Sub _new(lnumcom As Long, lnumcli As Long)
+
+  Dim res, res1, resart As Result
+  Dim i, j, k As Integer
+  
+  $lnumcli = lnumcli
+  $lnumcom = lnumcom
+
+  gestionligne.icompteur = 0
+  $rescli = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_code=&1", $lnumcli)
+  $clicreer = $rescli.Available
+  afficheleslignes
+  If Not $reslignecom.Available Then
+    la = New Lignearticle(Me, "creer", $lnumcom, $rescli, Color.Background - 100, ScrollView1) As "ligne"
+    la.Tag = gestionligne.icompteur
+    Inc gestionligne.icompteur
+  Else
+  gestionligne.creerligne(la, $lnumcom, $rescli)
+ 
+Endif
+  
+  res = connect.cconlaurux.Exec("SELECT datefac AS dte FROM Fiches_HistoFac WHERE cdclifac=&1 UNION(SELECT datebl as dte FROM Fiches_Bl WHERE cdclibl=&1 AND totalht<>0) ORDER BY dte DESC LIMIT 10", $lnumcli)
+  If res.Available Then
+    res.MoveFirst
+    GridView1.Header = GridView.Horizontal
+    GridView1.ScrollBar = Scroll.Both
+    GridView1.Columns.Count = 2 + (res.Count * 3)
+    GridView1.Columns[0].Text = "Code"
+    GridView1.Columns[1].Text = "Designation"
+    GridView1.Columns[1].Width = 200
+    GridView1.Mode = Select.Single
+    i = 2
+    Repeat
+      GridView1.Columns[i].Text = Format(res!dte, "dd/mm/yyyy")
+     Inc i
+     GridView1.Columns[i].Text = "Quantité"
+     Inc i
+       GridView1.Columns[i].Text = "Px HT"
+       Inc i
+       res.MoveNext
+    Until i >= 20 Or i >= GridView1.Columns.Max
+    
+    i = 0
+    res.MoveFirst
+    Repeat
+      res1 = connect.cconlaurux.Exec("SELECT SUM(REPLACE(qte_ligfac,',','.')) AS qte,SUM(REPLACE(netht_ligfac,',','.')) as net,code_ligfac as code, libel_ligfac as design FROM Fiches_HistoFac JOIN Fiches_HistoLigfac ON  numfac=num_ligfac WHERE datefac=&1 AND cdclifac=&2 And typel_ligfac='A' GROUP BY code_ligfac UNION(SELECT SUM(REPLACE(qte_ligbl,',','.')) AS qte,SUM(REPLACE(netht_ligbl,',','.')) AS net,code_ligbl as code, libel_ligbl as design FROM Fiches_Bl JOIN Fiches_Ligbl ON num_ligbl=numbl WHERE datebl=&1 AND cdclibl=&2 AND typel_ligbl='A' GROUP BY code_ligbl)", res!dte, $lnumcli) 
+      res1.MoveFirst
+      For k = 0 To res1.Max
+        If GridView1.Rows.Count = 0 Then ajouart(res1!code)
+        i = rechart(res1!code)
+        
+        If i = -2 Then 
+          ajouart(res1!code)
+          i = rechart(res1!code)
+        Endif
+        
+        j = 3 + (res.Index * 3)
+        GridView1[i, j].Text = Format(res1!qte, "0.000")
+        Inc j
+        GridView1[i, j].Text = Format(res1!net / res1!qte, "0.000")
+        res1.MoveNext
+      Next
+      res.MoveNext
+    Until j >= GridView1.Columns.Max
+    
+  Endif
+End
+
+Private Sub ajouart(code As String)
+  
+  Dim i As Integer
+  Dim res As Result
+  
+  GridView1.Rows.Count += 1
+  i = GridView1.Rows.Max
+  res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Art WHERE art_code=&1", code)
+  GridView1[i, 0].Text = code
+  GridView1[i, 1].Text = res!art_design
+  
+End
+
+Public Sub GridView1_Activate()
+
+  Dim tab As Variant
+  Dim i As Integer
+  
+  tab = ScrollView1.Children
+  tab[tab.count - 1].numart = GridView1[GridView1.Row, 0].text
+
+End
+
+Private Function rechart(code As String) As Integer
+  
+  Dim i As Integer
+  
+  For i = 0 To GridView1.Rows.Max
+    If GridView1[i, 0].Text = code Then Return i
+  Next
+  Return -2
+End
+
+
+
+Public Sub ligne_ValideLigne()
+
+ 
+  If la.Tag = gestionligne.icompteur - 1 Then
+    la.couleur = couleur(la.Tag)
+    creerligne
+    la.couleur = Color.Background - 100
+  Else
+    ligne_Down(la.tag)
+  Endif
+  
+End
+
+Public Sub ligne_GotF(nm As Integer)
+
+  la = gestionligne.GotF(nm, la, ScrollView1)
+  surveille
+  
+End
+
+Public Sub ligne_up(nm As Integer)
+
+ la = gestionligne.up(nm, la, ScrollView1)
+ surveille
+
+End
+
+Public Sub ligne_Down(nm As Integer)
+
+ la = gestionligne.Down(nm, la, ScrollView1)
+ surveille
+
+End
+
+Public Sub ligne_supprime(nm As Integer)
+
+ la = gestionligne.supprime(nm, la, ScrollView1)
+  surveille
+
+End
+
+Private Sub afficheleslignes()
+  
+  Dim i As Integer
+  
+  If Not $clicreer Then Return
+  $reslignecom = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne = &1 ", $lnumcom)
+  If Not $reslignecom.Available Then Return
+  
+  For i = 0 To $reslignecom.max
+    couleur(i)
+    la = New Lignearticle(Me, "ouvrir", $lnumcom, $rescli, $icouleur, ScrollView1, i) As "ligne"
+    la.Tag = $reslignecom!numligne
+    gestionligne.icompteur = la.Tag
+    $reslignecom.MoveNext
+    
+  Next
+  Inc gestionligne.icompteur
+  
+End
+
+Private Sub creerligne()
+  
+  couleur(la.Tag)
+  la = New Lignearticle(Me, "creer", $lnumcom, $rescli, $icouleur, ScrollView1) As "ligne"
+  la.Tag = gestionligne.icompteur
+  Inc gestionligne.icompteur
+ 
+End
+
+Public Sub ScrollView1_Scroll()
+  Dim tab As Variant
+  Dim i As Integer
+  
+  gestionligne.Scroll(ScrollView1)
+  
+End
+
+
+Public Sub surveille()
+  
+  Dim i As Integer
+  Dim poid As Integer
+  Dim ht, ttc, mar, vol As Float
+  Dim tab As Variant
+  
+  tab = ScrollView1.Children
+  pxrevient.Value = la.prixachat
+  mart.Text = "Marge article : " & Format(la.margeart, "0.00")
+  pamp.Text = "Prixd' achat  mp : " & la.pamp
+  stk.Text = "Stock :   " & la.stock
+  qcom.Text = "Qte en commande : " & la.stcom
+  For i = 0 To tab.count - 1
+    mar += tab[i].margeart
+    ht += tab[i].montantht
+    ttc += tab[i].montantttc
+    poid += tab[i].poid
+    vol += tab[i].volume
+  Next
+  
+  mcom.Text = "Marge commande : " & Format(mar, "0.00")
+  ValueBox1.Value = ht
+  ValueBox2.Value = ttc
+  poidtot.text = "Poid : " & poid
+  voltot.Text = "Volume : " & Format(vol, "0.000")
+  fraisgest.Text = "Frais de gestion : " & Format($rescli!cli_gestion, "0.00") 
+End
+
+Public Sub pxrevient_LostFocus()
+
+  la.prixachat = pxrevient.Value
+  
+End
+
+Private Function couleur(i As Integer) As Integer
+  
+  If Not Even(i) Then
+    $icouleur = &HF5FFFF&
+  Else
+    $icouleur = Color.Background
+  Endif
+  Return $icouleur
+  
+End
+
+Public Sub Button1_Click()
+  
+  Dim tab As Variant
+  Dim i As Integer
+  
+  If Message.Question("Voulez - vous sauvegarder les changements ", " Oui ", " Non ") = 1 Then
+    tab = ScrollView1.Children
+    connect.ccon.Delete("lignedecommande", "idligne=&1", $lnumcom)
+    For i = 0 To tab.Count - 1 
+      tab[i].enregistre
+    Next
+  Endif
+  Me.Close
+  
+End
+

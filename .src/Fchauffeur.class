@@ -1,0 +1,123 @@
+' Gambas class file
+
+Private $bs As Barselection
+Private $rescha As Result
+
+
+Public Sub _new()
+
+  $bs = New Barselection("111111110", Panel1) As "bar"
+  affprem
+  
+End
+
+Private Sub affprem()
+
+  $rescha = connect.ccon.Exec("Select * FROM chauffeur")
+  If $rescha.Available Then
+    $rescha.MoveFirst
+    affiche
+  Endif
+  
+End
+
+Private Sub affiche()
+  
+  Textnum.Text = $rescha!idchauffeur
+  Textnom.Text = $rescha!nom
+  Textpren.Text = $rescha!prenom
+  
+End
+
+Private Sub valide()
+  
+  $rescha!idchauffeur = Textnum.Text
+  $rescha!nom = Textnom.Text
+  $rescha!prenom = Textpren.Text
+  
+  $rescha.Update
+  connect.ccon.Commit
+  affprem
+  
+End
+
+Private Sub mablanc()
+  
+  Textnum.Clear
+  Textnom.Clear
+  Textpren.Clear
+  
+End
+
+Public Sub bar_precedant()
+
+  If Not $rescha.MovePrevious() Then affiche
+
+End
+
+Public Sub bar_suivant()
+
+  If Not $rescha.MoveNext() Then affiche
+
+End
+
+Public Sub bar_premier()
+
+  If Not $rescha.MoveFirst() Then affiche
+
+End
+
+Public Sub bar_dernier()
+
+  If $rescha.Available Then
+    If Not $rescha.MoveLast() Then affiche
+  Endif
+  
+End
+
+Public Sub bar_creer()
+
+  $rescha = connect.ccon.Create("chauffeur")
+  mablanc
+  Textnum.ReadOnly = False
+  Textnum.Select
+
+End
+
+Public Sub bar_suprimer()
+
+  If $rescha.Available Then
+    connect.ccon.Delete("chauffeur", "idchauffeur=&1", $rescha!idchauffeur)
+    affprem
+  Endif
+  
+End
+
+Public Sub bar_modif()
+
+  If $rescha.Available Then
+    $rescha = connect.ccon.Edit("chauffeur", "idchauffeur=&1 FOR UPDATE", $rescha!idchauffeur)
+ Else
+   Stop Event
+  Endif
+
+End
+
+Public Sub bar_quitter()
+
+  Me.Close
+
+End
+
+Public Sub bar_valide(creer As Boolean, annul As Boolean)
+
+  If creer Then valide
+
+End
+
+Public Sub bar_annule(creer As Boolean, annul As Boolean)
+
+  connect.ccon.Rollback
+  affprem
+
+End
