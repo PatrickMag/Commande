@@ -192,7 +192,7 @@ Public Sub Butart_Click()
   Dim saisie As Saisiearticle
   
   saisie = New Saisiearticle($lNumcom, CLong(textnumcl.text))
-  saisie.ShowModal
+  saisie.Raise
   
 End
 

@@ -256,7 +256,7 @@ Public Sub Button1_Click()
       tab[i].enregistre
     Next
   Endif
-  Me.Close
+  Me.Delete
   
 End
 
