@@ -393,9 +393,7 @@ Public Sub imp_click()
   c = Panel2.Children             'recupere les camions dans le scrolview
   c = c[c.count - 2].Children               '
   If c.count = 0 Then Return
-  Connect.ccon.Begin
-                                      'lit les commandes de chaque camion et passe comencours a vrais pour indiquer que la commande est en cours de livraison
-  For i = 0 To c.count - 1
+   For i = 0 To c.count - 1
     impr = New Edittourn(c[i], $dte) 
     impr.Preview
   Next

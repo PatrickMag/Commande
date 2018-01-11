@@ -9,6 +9,14 @@ Public Sub _new(cam As Camion, dte As Date)
 
   Dim res As Result
   Dim i, j As Integer
+  Dim rp As ReportPanel
+  Dim reportPclient, ReportPc1 As ReportPanel
+  Dim rph As ReportHBox
+  Dim ReportVart As ReportVBox
+  Dim rpv As ReportVBox
+  Dim lab As ReportLabel
+  Dim nom, tport, tfixe, adr1, adr2, cp, ville As ReportLabel
+  Dim comgen, comjou As ReportTextLabel
   
   $dtel = dte
   res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", Left(cam.ca.cnumchauf, 3)) 
@@ -16,144 +24,155 @@ Public Sub _new(cam As Camion, dte As Date)
   
   $rescom = connect.ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcpc=&1", cam.Tag)
   If $rescom.Available Then
-    ReportPclient.DataCount = $rescom.Count
-'    $rescom.MoveFirst
-'    For i = 0 To $rescom.Max
-'      $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
-  '    If $rescmd.Available Then
+    $rescom.MoveFirst
+    For i = 0 To $rescom.Max
+      $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
+      If $rescmd.Available Then
+        'panel pricipal
+        reportPclient = New ReportPanel(Me)
+        reportPclient.Arrangement = Arrange.Vertical
+        reportPclient.Autoresize = True
+        'panel des clients
+        ReportPc1 = New ReportPanel(reportPclient)
+        ReportPc1.Arrangement = Arrange.Horizontal
+        ReportPc1.Autoresize = True
+        'n°+nom+tel
+        rp = New ReportPanel(ReportPc1)
+        rp.Arrangement = Arrange.Vertical
+        rp.BackGround = ReportBrush["#DFDFDF"]
+        'rp.Expand = True
         
-'        For j = 0 To $rescmd.Max
-          
-'          $reslco = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", $rescmd!idcom)
-'          If $reslco.Available Then Reportart.DataCount = $reslco.Count Else Reportart.DataCount = 0
-'            Reportart.DataCount = $reslco.Count
-'            $reslco.MoveFirst
-'            Repeat
-' '             Print reslco!libarticle
-'            Until $reslco.MoveNext()
-'          Endif
-       ' Until $rescmd.MoveNext()
-'        Next
- '     Endif
- '   $rescom.MoveNext
- '   Next
+        lab = New ReportLabel(rp)
+        lab.Text = "Client N° : "
+        
+        nom = New ReportLabel(rp)
+        nom.Font = Font["Bold,+1"]
+        nom.Text = $rescmd!numclient & " " & $rescmd!nom & "  "
+        'tel fixe
+        rph = New ReportHBox(rp)
+        lab = New ReportLabel(rph)
+        lab.Text = "Tel fixe : "
+        
+        tfixe = New ReportLabel(rph)
+        tfixe.Text = $rescmd!telfixe
+        
+        rph = New ReportHBox(rp)
+        lab = New ReportLabel(rph)
+        lab.Text = "Tel portable : "
+        
+        tport = New ReportLabel(rph)
+        tport.Text = $rescmd!telport
+        
+        rpv = New ReportVBox(ReportPc1)
+        rpv.Expand = True
+        adr1 = New ReportLabel(rpv)
+        adr1.Text = $rescmd!adressel
+        adr2 = New ReportLabel(rpv)
+        adr2.Text = $rescmd!adressel1
+        
+        rph = New ReportHBox(rpv)
+        cp = New ReportLabel(rph)
+        cp.text = $rescmd!cpl & "    "
+        ville = New ReportLabel(rph)
+        ville.text = $rescmd!cpl
+        ville.Expand = True
+        'panel des commentaires
+        rp = New ReportPanel(ReportPc1)
+        rp.Arrangement = Arrange.Vertical
+        rp.Autoresize = True
+        rp.Expand = True
+        
+        comjou = New ReportTextLabel(rp)
+        comjou.Autoresize = True
+        comjou.Expand = True
+        comjou.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
+        res = connect.ccon.Exec("SELECT * FROM datedelivraison WHERE idlivraison=&1 AND datelivr=&2", $rescom!idcomcl, $dtel)
+        If res.Available Then comjou.Text = res!datecommentaire Else comjou.Text = ""
+        
+        comgen = New ReportTextLabel(rp)
+        comgen.Autoresize = True
+        comgen.Expand = True
+        comgen.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
+        comgen.Text = $rescmd!commentaire
+        'Edition des artcles commandés
+        rph = New ReportHBox(reportPclient)
+        rph.BackGround = ReportBrush["#DFDFDF"]
+        rph.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
+        
+        lab = New ReportLabel(rph)
+        lab.Height = "5mm"
+        lab.Width = "30mm"
+        lab.Alignment = Align.Center
+        lab.Border = ReportBorder["Right:1pt #000000"]
+        lab.Text = "Quantité"
+        
+        lab = New ReportLabel(rph)
+        lab.Height = "5mm"
+        lab.Width = "40mm"
+        lab.Alignment = Align.Center
+        lab.Border = ReportBorder["Right:1pt #000000"]
+        lab.Text = "Code"
+        
+        lab = New ReportLabel(rph)
+        lab.Height = "5mm"
+        lab.Expand = True
+        lab.Alignment = Align.Normal
+        lab.Border = ReportBorder["Right:1pt #000000"]
+        lab.Text = "Libellé"
+        
+        lab = New ReportLabel(rph)
+        lab.Height = "5mm"
+        lab.Width = "30mm"
+        lab.Alignment = Align.Center
+        lab.Text = "P.U."
+        
+        For j = 0 To $rescmd.Max
+          Print $rescmd!nom
+          $reslco = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", $rescmd!idcom)
+          If $reslco.Available Then 
+            ReportVart = New ReportVBox(reportPclient)
+            ReportVart.Autoresize = True
+            ReportVart.Expand = True
+            
+            $reslco.MoveFirst
+            Repeat
+             rph = New ReportHBox(ReportVart)
+             rph.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
+             
+             lab = New ReportLabel(rph)
+             lab.Alignment = Align.Right
+             lab.Border = ReportBorder["Right:1pt #000000"]
+             lab.Height = "5mm"
+             lab.Width = "30mm"
+             lab.text = $reslco!qte
+             
+             lab = New ReportLabel(rph)
+             lab.Alignment = Align.Left
+             lab.Border = ReportBorder["Right:1pt #000000"]
+             lab.Height = "5mm"
+             lab.Width = "40mm"
+             lab.text = $reslco!numarticle
+             
+             lab = New ReportLabel(rph)
+             lab.Alignment = Align.Left
+             lab.Border = ReportBorder["Right:1pt #000000"]
+             lab.Height = "5mm"
+             lab.Expand = True
+             lab.text = $reslco!libarticle
+             
+             lab = New ReportLabel(rph)
+             lab.Alignment = Align.Right
+             lab.Height = "5mm"
+             lab.Width = "30mm"
+             lab.text = $reslco!prix
+             
+            Until $reslco.MoveNext()
+          Endif
+          $rescmd.MoveNext()
+        Next
+      Endif
+    $rescom.MoveNext
+    Next
   Endif
- ' $reslco = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", $rescom!idcomcl)
-  'If $reslco.Available Then Reportart.DataCount = $reslco.Count Else Reportart.DataCount = 0
-End
-
-
-Public Sub nom_Data(Index As Integer)
-Print Index
-  $rescom.MoveTo(Index)
-  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
-  Last.data = $rescmd!numclient & " " & $rescmd!nom & "  "
- 
- 
-End
-
-Public Sub tfixe_Data(Index As Integer)
-
-  $rescom.MoveTo(Index)
-  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
-  Last.data = $rescmd!telfixe
-
-End
-
-Public Sub tport_Data(Index As Integer)
-
-  $rescom.MoveTo(Index)
-  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
-  Last.data = $rescmd!telport
- 
-End
-
-Public Sub adr1_Data(Index As Integer)
-
-  $rescom.MoveTo(Index)
-  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
-  Last.data = $rescmd!adressel
-
-End
-
-Public Sub adr2_Data(Index As Integer)
-
-  $rescom.MoveTo(Index)
-  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
-  Last.data = $rescmd!adressel1
-
-End
-
-Public Sub cp_Data(Index As Integer)
-
-  $rescom.MoveTo(Index)
-  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
-  Last.data = $rescmd!cpl
-
-End
-
-Public Sub ville_Data(Index As Integer)
-
-  $rescom.MoveTo(Index)
-  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
-  Last.Data = $rescmd!villel
-  
-  
-End
-
-Public Sub comgen_Data(Index As Integer)
-
-  $rescom.MoveTo(Index)
-  $rescmd = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $rescom!idcomcl)
-  Last.data = $rescmd!commentaire
-
-End
-
-Public Sub comjou_Data(Index As Integer)
-
-  Dim res As Result
-  
-  $rescom.MoveTo(Index)
-  res = connect.ccon.Exec("SELECT * FROM datedelivraison WHERE idlivraison=&1 AND datelivr=&2", $rescom!idcomcl, $dtel)
-  If res.Available Then Last.data = res!datecommentaire Else Last.data = ""
-
-End
-
-Public Sub Reportqte_Data(Index As Integer)
-
-  $rescom.MoveTo(Index)
-  $reslco = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", $rescom!idcomcl)
-  $reslco.MoveTo(Reportart.DataIndex)
-  Last.data = $reslco!qte
-Print "/" & Index
-End
-
-Public Sub Reportcode_Data(Index As Integer)
-
-  $reslco.MoveTo(Index)
-  Last.data = $reslco!numarticle
-
-End
-
-Public Sub Reportlib_Data(Index As Integer)
-
-  $reslco.MoveTo(Index)
-  Last.data = $reslco!libarticle
-  
-
-End
-
-Public Sub Reportpu_Data(Index As Integer)
-
-  $reslco.MoveTo(Index)
-  Last.data = $reslco!prix
-
-End
-
-Public Sub Reportart_AfterData()
-
-  $rescom.MoveTo(ReportPclient.dataIndex)
-  $reslco = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", $rescom!idcomcl)
-  If $reslco.Available Then Reportart.DataCount = $reslco.Count Else Reportart.DataCount = 0
 
 End

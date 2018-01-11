@@ -25,7 +25,6 @@ Dim res, rescam, rescom As Result
   TreeView1["C" & Str(ca.Tag)].Selected = True
 End
 
-
 Public Sub TreeView1_Activate()
   Dim rescom, resligne, rescli As Result
   Dim i, j As Integer
