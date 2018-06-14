@@ -289,7 +289,7 @@ Public Sub dte_Activate()
   but.Expand = True
   but.Text = "Ajou d'un camion"
   but.Picture = Picture["icon:/medium/add"]
-                                              'imprime les tournées pour les chauffeurs => pas fait
+                                              'imprime les tournées pour les chauffeurs 
                                               'suivant besoin imprimer 1 commande par feuille ou plusieur/transformer en bl / recape des articles à charcher ect ...
                                               
   but = New Button(pan) As "imp"
@@ -299,7 +299,7 @@ Public Sub dte_Activate()
   but.Text = "Impression des tournées"
   but.Picture = Picture["icon:/medium/print"]
 
-                                        ''facturation des commandes => a faire avec votre base de donnée
+                                        ''facturation des commandes
   but = New Button(pan) As "fac"
   but.Height = 32
   but.AutoResize = True

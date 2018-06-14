@@ -155,7 +155,7 @@ Public Sub butfac_Click()
     
      res!num_ligbl = Format(dnbon, "000000")
      numlig += 1
-     res!numlig_ligbl = Format(numlig, "000000")
+     res!numlig_ligbl = Format(numlig, "0000")
      res!code_ligbl = ligne.numart
      res!libel_ligbl = ligne.lib
      res!fam_ligbl = resart!art_fam
@@ -175,6 +175,8 @@ Public Sub butfac_Click()
      res!four_ligbl = resart!art_four
      res!tour_ligbl = rescom!numtourne
      Try res!tipp_ligbl = rescom!tipp
+     res!dte_ligbl = DateBox1.Value
+     
      resart!art_qte -= ligne.qte
      res.Update
      resart.Update
