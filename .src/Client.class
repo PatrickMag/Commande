@@ -513,10 +513,12 @@ Public Sub Butext_Click()
   grdv = New GridView(win)
   win.Arrangement = Arrange.Horizontal
   win.AutoResize = True
-  win.Text = "Liste des extraits de compte non léttrés"
-'  grdv.AutoResize = True
+  win.Text = "Liste des extraits de compte"
+  grdv.Expand = True
   win.Height = 300
   win.Width = 850
+  grdv.Height = 300
+  grdv.Width = 850
   grdv.Columns.Count = 4
   grdv.Columns[0].Title = "DATE"
   grdv.Columns[0].Width = 150
@@ -532,12 +534,14 @@ Public Sub Butext_Click()
      res.MoveFirst
      For i = 0 To res.Max
        grdv[i, 0].Text = Format(res!dte, "dd.mm.yyyy")
-       grdv[i, 1].Text = res!intitule
+       grdv[i, 1].Text = res!libelle
        grdv[i, 2].Text = Format(res!montantd, "0.00")
+       grdv[i, 2].Alignment = Align.Right
        grdv[i, 3].Text = Format(res!montantc, "0.00")
+       grdv[i, 3].Alignment = Align.Right
        res.MoveNext
      Next
-   Endif
+  Endif
   win.ShowModal
 
 End
