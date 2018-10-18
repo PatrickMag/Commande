@@ -489,6 +489,7 @@ End
 
 Public Sub calculmontht()
 
+  If IsNull($resart) Then Return
   If Not $resart.Available Then Return
   If Utils.totobs(quantite.text) <> 0 And Utils.totobs(pxht.text) <> 0 Then 
     calcul
