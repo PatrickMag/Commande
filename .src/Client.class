@@ -288,6 +288,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
   Endif
   
   textAdr.Text = $res!cli_adr1
+  textAdr11.Text = $res!cli_adr2
   textCp.Text = $res!cli_cd_ptl
   textNom.Text = $res!cli_nom
   textnumcl.Text = Str($res!cli_code)
@@ -299,12 +300,14 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
   
   If cleliv = -1 Then
     TextAdr2.Text = $res!cli_adr1
+    textadr21.Text = $res!cli_adr2
     textCp2.Text = $res!cli_cd_ptl
     textNom2.Text = $res!cli_nom
     TextVil2.Text = $res!cli_ville
   Else
     $res1 = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE num=&1", cleliv) 
     textAdr2.Text = $res1!adr1
+    textadr21.Text = $res1!adr2
     textCp2.Text = $res1!cd_ptl
     textNom2.Text = $res1!nom
     TextVil2.Text = $res1!ville
@@ -371,6 +374,7 @@ Private Sub affichelivlaurux(cle As Integer)
   $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE num=&1", cle)
   
   TextAdr2.Text = $res!adr1
+  textadr21.Text = $res!adr2
   textCp2.Text = $res!cd_ptl
   textNom2.Text = $res!nom
   TextVil2.Text = $res!ville
