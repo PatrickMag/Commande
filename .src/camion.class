@@ -68,7 +68,8 @@ Public Sub _new(sChoix As String, lIdcom As Long, Optional lId As Long, dDte As 
         ajoudescom(lId)
       Endif
       affbouton(sChoix)
-      
+'      modif_Click()
+       
     Case "ouvrir"                                 ' affiche 1 camion existant
                 'passez en paramétre sChoix + lLidcom id table commande et lId l'id table commandeparcamion -- pas le reste
                 
@@ -227,7 +228,7 @@ Private Sub affectres()
   $rescpc!datecam = ca.datecam
   $rescpc!comnumcam = ca.comnumcam
   $rescpc!mataprem = ca.mataprem
-  $rescpc!cnumchauf = Left(ca.cnumchauf, 3)
+  $rescpc!cnumchauf = Trim(Left(ca.cnumchauf, 3))
   
 End
 
@@ -239,7 +240,7 @@ Private Sub affectstru()
   ca.comnumcam = $rescpc!comnumcam
   ca.mataprem = $rescpc!mataprem
   res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", $rescpc!cnumchauf)
-  If res.Available Then ca.cnumchauf = $rescpc!cnumchauf & " " & res!nom
+  If res.Available Then ca.cnumchauf = $rescpc!cnumchauf & "   " & res!nom
   
 End
                                                       'gestion du menu popup
@@ -377,9 +378,9 @@ End
 '                                           Fenetre pour rentrer le camion et le chauffeur
 Private Sub ouvrewind(win As Window)
   
-  Dim pan As New Panel(Me)
-  Dim lab As New Label(pan)
-  Dim butok As New Button(win)
+  Dim pan As Panel
+  Dim lab As Label
+  Dim butok As Button
   Dim res As Result
   
   win.AutoResize = True
@@ -408,7 +409,7 @@ Private Sub ouvrewind(win As Window)
   If res.Available Then
     res.MoveFirst
     Repeat
-      combocnc.Add(res!idchauffeur & " " & res!nom)
+      combocnc.Add(res!idchauffeur & "   " & res!nom)
     Until res.MoveNext()
   Endif
   

@@ -14,9 +14,9 @@ Public Sub _new(sChoix As String, dte As Date, lNumcom As Long, cam As Container
   $lNumcom = lNumcom
   ouvreconnection
                                    'combobox peut venir d'un fichier 
-  ComboBox1.Add("AM")
-  ComboBox1.Add("PM")
-  ComboBox1.Add("JO")
+  ComboBox1.Add("MATIN")
+  ComboBox1.Add("APREM")
+  ComboBox1.Add("JOUR")
        
   Select Case sChoix
     Case "ouvrir"

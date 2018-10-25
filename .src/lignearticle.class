@@ -100,8 +100,8 @@ Public Sub _new(fr As Form, choix As String, lnumcom As Long, rclient As Result,
       remise.text = Format($res!remise, "0.00")
       $ftxtva = $res!txtva
       $fprixachat = $res!pxamp
-      quantite.text = Format($res!qte, "0.00")
-      pxht.text = Format($res!prix, "0.00")
+      quantite.text = Format($res!qte, "0.000")
+      pxht.text = Format($res!prix, "0.000")
       calculpxht
       
     Endif

@@ -30,10 +30,7 @@ Public Sub _new($snum As String)
   GridView1.Header = GridView.Horizontal
   GridView1.Mode = Select.Single
   GridView1.ScrollBar = Scroll.Both
-    
-'  Valuenum_GotFocus
-'  Valuenum_Change
-   Radiofac.Value = True
+  Radioliv.Value = True
 End 
 
 '                                   Recherche par numero
@@ -283,8 +280,7 @@ Public Sub GridView1_Data(r As Integer, c As Integer)
        If Radiofac.Value Then
         GridView1.Data.richText = $res!cli_adr2
       Else
-        GridView1.Data.Text = Str($res!num)
-        GridView1.Data.Foreground = Color.Background
+        GridView1.Data.Text = $res!adr2
       Endif
       Case 4
          If Radiofac.Value Then

@@ -389,13 +389,25 @@ Public Sub imp_click()
   Dim c As Variant
   Dim impr As Edittourn
   Dim i As Integer
+  Dim Filename As String
+  Dim prt As New Printer
   
   c = Panel2.Children             'recupere les camions dans le scrolview
   c = c[c.count - 2].Children               '
   If c.count = 0 Then Return
-   For i = 0 To c.count - 1
+  'test la validité des camions
+  For i = 0 To c.count - 1
+    If IsNull(c[i].ca.comnumcam) Or IsNull(c[i].ca.cnumchauf) Then
+      Message.Info("Vous devez définir un camion et un chauffeur pour chaque tournées")
+      Return
+    Endif
+  Next
+  For i = 0 To c.count - 1
+    Filename = User.Home & "/tmp/tourne" & Str(i) & ".pdf"
+    prt.OutputFile = Filename
     impr = New Edittourn(c[i], $dte) 
-    impr.Preview
+    impr.Print(prt)
+    Desktop.Open(Filename)
   Next
 
 End

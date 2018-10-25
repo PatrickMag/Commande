@@ -85,6 +85,7 @@ Public Sub saisie_keypress()
   If Key.code = Key.Enter Or Key.code = Key.Return Or Key.code = Key.Tab Or Key.Code = Key.Down Then
     Last.tag[1].SetFocus
     Try Last.tag[1].Select
+    Stop Event
   Endif
   If Key.code = Key.Up Then
     Last.tag[0].SetFocus
@@ -124,6 +125,11 @@ Public Sub ButVal_Click()
   Butart.Enabled = True
   If co.bCreer Then DateCom.Value = Now
 
+  If IsNull(textTou.Text) Then
+    Message.Info("Vous devez renseigner le n° de tournée")
+    textTou.SetFocus
+    Return
+  Endif
   co.com.adresse = textAdr.Text
   co.com.adresse1 = textAdr11.Text
   co.com.adressel = textAdr2.Text

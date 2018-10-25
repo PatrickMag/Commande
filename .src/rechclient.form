@@ -4,7 +4,6 @@
   MoveScaled(0,0,149,64)
   Ignore = True
   Text = ("Recherche d'un client")
-  Border = False
   Arrangement = Arrange.Vertical
   { Panel1 Panel
     MoveScaled(1,0,146,17)
@@ -54,6 +53,7 @@
       { Radioliv RadioButton
         MoveScaled(2,0,23,3)
         Text = ("Adresse de livraison")
+        Value = True
       }
       { Radiofac RadioButton
         MoveScaled(2,3,24,3)

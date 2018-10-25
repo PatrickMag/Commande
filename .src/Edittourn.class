@@ -10,8 +10,8 @@ Public Sub _new(cam As Camion, dte As Date)
   Dim res As Result
   Dim i, j As Integer
   Dim rp As ReportPanel
-  Dim reportPclient, ReportPc1 As ReportPanel
   Dim rph As ReportHBox
+  Dim reportPclient, ReportPc1 As ReportPanel
   Dim ReportVart As ReportVBox
   Dim rpv As ReportVBox
   Dim lab As ReportLabel
@@ -19,9 +19,8 @@ Public Sub _new(cam As Camion, dte As Date)
   Dim comgen, comjou As ReportTextLabel
   
   $dtel = dte
-  res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", Left(cam.ca.cnumchauf, 3)) 
+  res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", Trim(Left(cam.ca.cnumchauf, 3))) 
   entete.Text = "TOURNÉE DU CAMION N° " & cam.ca.comnumcam & " EN DATE DU " & Format(cam.ca.datecam, "dd.mm.yyyy") & " CHAUFFEUR " & res!nom
-  
   $rescom = connect.ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcpc=&1", cam.Tag)
   If $rescom.Available Then
     $rescom.MoveFirst
@@ -47,7 +46,7 @@ Public Sub _new(cam As Camion, dte As Date)
         
         nom = New ReportLabel(rp)
         nom.Font = Font["Bold,+1"]
-        nom.Text = $rescmd!numclient & " " & $rescmd!nom & "  "
+        nom.Text = $rescmd!numclient & " " & $rescmd!nom & "   "
         'tel fixe
         rph = New ReportHBox(rp)
         lab = New ReportLabel(rph)
@@ -74,7 +73,7 @@ Public Sub _new(cam As Camion, dte As Date)
         cp = New ReportLabel(rph)
         cp.text = $rescmd!cpl & "    "
         ville = New ReportLabel(rph)
-        ville.text = $rescmd!cpl
+        ville.text = $rescmd!villel
         ville.Expand = True
         'panel des commentaires
         rp = New ReportPanel(ReportPc1)
