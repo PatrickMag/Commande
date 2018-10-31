@@ -3,7 +3,6 @@
 { Form Form
   MoveScaled(0,0,133,80)
   Expand = True
-  Border = False
   AutoResize = True
   { GridView1 GridView
     MoveScaled(0,0,132,38)

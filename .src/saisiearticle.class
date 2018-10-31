@@ -15,7 +15,6 @@ Private $lnumcom As Long
 Private $lnumcli As Long
 Private $icouleur As Integer = &HF5FFFF&
 
-
 Public Sub _new(lnumcom As Long, lnumcli As Long)
 
   Dim res, res1, resart As Result
@@ -246,6 +245,12 @@ End
 
 Public Sub Button1_Click()
   
+  Me.Close
+  
+End
+
+Public Sub form_Close()
+
   Dim tab As Variant
   Dim i As Integer
   
