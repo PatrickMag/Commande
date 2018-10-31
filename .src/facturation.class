@@ -111,6 +111,7 @@ End
 
 Public Sub butfac_Click()
 
+  
   Dim resent, reslig, resart, res, respart As Result
   Dim rescom, rescli, resech As Result
   Dim i, ipoid As Integer
@@ -120,6 +121,7 @@ Public Sub butfac_Click()
   Dim tab As Variant
   Dim bck As String
   Dim dt As String
+  Dim obj As Variant
   
   If Not DateBox1.Value Then
     Message.Error("Entrez la date de livraison ", "OK")
@@ -254,6 +256,10 @@ Public Sub butfac_Click()
     connect.ccon.Commit
     connect.cconlaurux.Commit
     TreeView1.Current.Delete
+    obj = ScrollView1.Children
+    For i = 0 To obj.count - 1
+      obj[0].Delete
+    Next
   Endif
   butfac.Enabled = False
 End
