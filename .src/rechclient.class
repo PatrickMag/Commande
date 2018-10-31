@@ -14,7 +14,7 @@ Public Sub _new($snum As String)
   Textnum.Text = $snum
   $soujesuis = "num"
 
-  GridView1.Columns.count = 6
+  GridView1.Columns.count = 7
   GridView1.Columns[0].Title = "N° Cient" 
   GridView1.Columns[1].Title = "Nom"
   GridView1.Columns[2].Title = "Adresse 1"
@@ -27,6 +27,7 @@ Public Sub _new($snum As String)
   GridView1.Columns[3].Width = 250
   GridView1.Columns[4].Width = 60
   GridView1.Columns[5].Width = 250
+  GridView1.Columns[6].Width = 0
   GridView1.Header = GridView.Horizontal
   GridView1.Mode = Select.Single
   GridView1.ScrollBar = Scroll.Both
@@ -294,6 +295,8 @@ Public Sub GridView1_Data(r As Integer, c As Integer)
       Else
         GridView1.Data.richText = $res!ville
       Endif
+    Case 6
+      GridView1.Data.Text = Str($res!num)
   End Select
 
 End
@@ -304,7 +307,7 @@ Public Sub GridView1_Activate()
    If Radiofac.Value Then
     $icleliv = -1
     Else
-      $icleliv = Val(GridView1[GridView1.Row, 3].Text)
+      $icleliv = Val(GridView1[GridView1.Row, 6].Text)
    Endif
    Raise trouver(Val(GridView1[GridView1.Row, 0].Text), $icleliv)
    Me.Close
