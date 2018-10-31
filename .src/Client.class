@@ -38,11 +38,13 @@ Public Sub _new(id As Long)
   TabStrip1[1].Text = "Livraison"
   Butart.Enabled = False
   'tabstrip 0
+  $obs = New Observer(textnumcl) As "saisie"
   $obs = New Observer(textNom) As "saisie"
   $obs = New Observer(textAdr) As "saisie"
   $obs = New Observer(textAdr11) As "saisie"
   $obs = New Observer(textCp) As "saisie"
   $obs = New Observer(TextVil) As "saisie"
+  textnumcl.tag = [textnumcl, textNom]
   textNom.tag = [textnom, textAdr]
   textAdr.Tag = [textnom, textAdr11]
   textAdr11.Tag = [textAdr, textcp]
@@ -440,7 +442,7 @@ Private Sub listedescamions(lNumcom As Long)
   If Not res.Available Then Return
   res.MoveFirst
   For i = 0 To co.Nbcamionpartourne - 1 
-    moncamion = New Camion("ouvrir", lNumcom, scrolcam, res!idcpc)
+    moncamion = New Camion("ouvrir", lNumcom, scrolcam, res!idcpc) As "cam"
     moncamion.Tag = res!idcpc
     res.MoveNext
   Next
@@ -481,7 +483,7 @@ Public Sub DateChooser1_Activate()
     res.MoveFirst
     For i = 0 To res.Max
      If Not existecam(mescamions, res!idncomcam) Then
-       moncamion = New Camion("ouvrir", $lNumcom, scrolcam, res!idncomcam)
+       moncamion = New Camion("ouvrir", $lNumcom, scrolcam, res!idncomcam) As "cam"
        moncamion.Tag = res!idncomcam
        res.MoveNext
      Endif
@@ -496,7 +498,7 @@ Public Sub DateChooser1_Activate()
   Endif
   
  
- 
+
   
 End
 
@@ -553,5 +555,12 @@ Public Sub Butext_Click()
      Next
   Endif
   win.ShowModal
+
+End
+
+Public Sub cam_rafraichi()
+
+  scrolcam.Refresh
+  Wait 0.001
 
 End

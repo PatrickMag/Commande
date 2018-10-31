@@ -23,6 +23,8 @@ Private $vol As Float
 Property Read Nbclient As Integer
 Property Read Nbtourne As Integer
 
+Event rafraichi()     'Rafraichit l'affichage aprés une suppression de camion
+
 Public Struct cam
   
   datecam As Date
@@ -255,11 +257,16 @@ End
 Public Sub sup_Click()
   
   SupAllCam($lNumcam)
+  Me.Visible = False
+  Raise rafraichi()
   Me.Delete
   
 End
+
 Public Sub masquer_Click()
   
+  Me.Visible = False
+  Raise rafraichi()
   Me.Delete
   
 End

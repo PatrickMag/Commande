@@ -262,7 +262,7 @@ Public Sub dte_Activate()
   If res.Available Then
     res.MoveFirst
     For i = 0 To res.Max
-     moncamion = New Camion("ouvrir", 0, scrolcam, res!idncomcam)  ' CLong(GridView1[GridView1.Row, 7].Text)
+     moncamion = New Camion("ouvrir", 0, scrolcam, res!idncomcam) As "cam"
      moncamion.Tag = res!idncomcam
      res.MoveNext
     Next
@@ -369,7 +369,7 @@ Public Sub ajo_Click()
   Dim c As Variant
   
   c = Panel2.Children
-  cam = New Camion("creer", 0, c[c.count - 2], 0, $dte)
+  cam = New Camion("creer", 0, c[c.count - 2], 0, $dte) As "cam"
   
 End
 
@@ -438,5 +438,15 @@ End
 Public Sub camion_Click()
 
   Fcamion.ShowModal
+
+End
+
+Public Sub cam_rafraichi()
+
+   Dim c As Variant
+  
+  c = Panel2.Children
+  c[2].Refresh
+  Wait 0.001
 
 End
