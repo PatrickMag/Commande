@@ -521,8 +521,8 @@ Public Sub ListBox1_Drop()
       Print lnumcam, lNumcom
       
  ' verifie que la commande passée n'existe pas dans ce camion ==> si oui arret du glissé déposé ... si non ajout commande
+ $resligcpc.MoveFirst
   If $resligcpc.Available Then
-    $resligcpc.MoveFirst
     For i = 0 To $resligcpc.Max
       If lnumcom = $resligcpc!idcomcl Then Return
       $resligcpc.MoveNext

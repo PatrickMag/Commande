@@ -303,7 +303,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
   textTou.Text = $res!cli_tour
   Try Texttipp.Text = $res!cli_tipp
   TextVil.Text = $res!cli_ville
-  Textfixe.Text = $res!cli_tel_dom
+  Textfixe.Text = $res!cli_tel_bur
   Textport.Text = $res!cli_pble
   
   If cleliv = -1 Then

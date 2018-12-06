@@ -60,7 +60,7 @@ Endif
     i = 0
     res.MoveFirst
     Repeat
-      res1 = connect.cconlaurux.Exec("SELECT SUM(REPLACE(qte_ligfac,',','.')) AS qte,SUM(REPLACE(netht_ligfac,',','.')) as net,code_ligfac as code, libel_ligfac as design FROM Fiches_HistoFac JOIN Fiches_HistoLigfac ON  numfac=num_ligfac WHERE datefac=&1 AND cdclifac=&2 And typel_ligfac='A' GROUP BY code_ligfac UNION(SELECT SUM(REPLACE(qte_ligbl,',','.')) AS qte,SUM(REPLACE(netht_ligbl,',','.')) AS net,code_ligbl as code, libel_ligbl as design FROM Fiches_Bl JOIN Fiches_Ligbl ON num_ligbl=numbl WHERE datebl=&1 AND cdclibl=&2 AND typel_ligbl='A' GROUP BY code_ligbl)", res!dte, $lnumcli) 
+      res1 = connect.cconlaurux.Exec("SELECT SUM(REPLACE(qte_ligfac,',','.')) AS qte,SUM(REPLACE(netht_ligfac,',','.')) as net,code_ligfac as code, libel_ligfac as design FROM Fiches_HistoFac JOIN Fiches_HistoLigfac ON  numfac=num_ligfac WHERE datefac=&1 AND cdclifac=&2 And typel_ligfac='A' GROUP BY code_ligfac,design UNION(SELECT SUM(REPLACE(qte_ligbl,',','.')) AS qte,SUM(REPLACE(netht_ligbl,',','.')) AS net,code_ligbl as code, libel_ligbl as design FROM Fiches_Bl JOIN Fiches_Ligbl ON num_ligbl=numbl WHERE datebl=&1 AND cdclibl=&2 AND typel_ligbl='A' GROUP BY code_ligbl,design)", res!dte, $lnumcli) 
       res1.MoveFirst
       For k = 0 To res1.Max
         If GridView1.Rows.Count = 0 Then ajouart(res1!code)
@@ -79,8 +79,9 @@ Endif
       Next
       res.MoveNext
     Until j >= GridView1.Columns.Max
-    
   Endif
+  Me.Raise
+  ScrollView1.Tooltip = $rescli!cli_obs
 End
 
 Private Sub ajouart(code As String)

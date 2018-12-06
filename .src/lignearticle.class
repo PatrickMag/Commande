@@ -83,6 +83,7 @@ Public Sub _new(fr As Form, choix As String, lnumcom As Long, rclient As Result,
   $icouleur = couleur
   dessincouleur
   
+  num.Tooltip = rclient!cli_obs
   num.SetFocus
 
   If Not IsNull(nart) And $schoix = "creer" Then
@@ -106,6 +107,7 @@ Public Sub _new(fr As Form, choix As String, lnumcom As Long, rclient As Result,
       
     Endif
   Endif
+  Me.Raise
 End
 
 Public Sub dessincouleur()
@@ -378,7 +380,8 @@ Private Sub afficheart()
   $snumart = num.Text
   $resart = connect.cconlaurux.Exec("SELECT* FROM Fiches_Art WHERE art_code=&1", $snumart)
   If Not $resart.Available Then
-    Message.Error("Article innexistant", "OK")
+    Stop Event
+    Try Message.Error("Article innexistant", "OK")
     num.Clear
     $snumart = ""
     num.SetFocus
