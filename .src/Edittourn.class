@@ -39,6 +39,7 @@ Public Sub _new(cam As Camion, dte As Date)
         rp = New ReportPanel(ReportPc1)
         rp.Arrangement = Arrange.Vertical
         rp.BackGround = ReportBrush["#DFDFDF"]
+'        rp.Width = "80mm"
         'rp.Expand = True
         
         lab = New ReportLabel(rp)
@@ -174,7 +175,11 @@ Public Sub _new(cam As Camion, dte As Date)
           $rescmd.MoveNext()
         Next
       Endif
-    $rescom.MoveNext
+      rph = New ReportHBox(reportPclient)
+      rph.Height = "3mm"
+'      rph.Expand = True
+      rph.BackGround = ReportBrush["#0000FF"]
+      $rescom.MoveNext
     Next
   Endif
 
