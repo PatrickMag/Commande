@@ -292,7 +292,7 @@ Dim res As Result
 
   $resligcpc.MoveTo(ListBox1.Index)
   res = $ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $resligcpc!idcomcl) 
-  SupCam($resligcpc!idcomcl, res!numtourne)
+  If res.Available Then SupCam($resligcpc!idcomcl, res!numtourne)
   affbouton
  
 

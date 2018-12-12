@@ -9,7 +9,9 @@ Private $resdte As Result
 
 
 Public Sub _new(sChoix As String, dte As Date, lNumcom As Long, cam As Container)
-                    Dim st As ResultField
+  
+  Dim st As ResultField
+  
   $scrolcam = cam
   $lNumcom = lNumcom
   ouvreconnection
@@ -18,20 +20,16 @@ Public Sub _new(sChoix As String, dte As Date, lNumcom As Long, cam As Container
   ComboBox1.Add("APREM")
   ComboBox1.Add("JOUR")
        
+  $ccon.Begin
   Select Case sChoix
     Case "ouvrir"
       $resdte = $ccon.edit("datedelivraison", "idlivraison=&1 AND datelivr=&2", lNumcom, dte)
       DateBox1.Value = dte
- '     ComboBox1.Text = $resdte!mataprem
-                                 
- '                                  Print $resdte.Fields.Count   ' st.Name, st.Result
-  '                                    Print ComboBox1.Text
       TextArea1.Text = $resdte!datecommentaire
+      ComboBox1.Current.Text = $resdte!mataprem
       $bCreer = False
      
-      
     Case "creer"
-      $ccon.Begin
       $resdte = $ccon.Create("datedelivraison")
       $resdte!idlivraison = $lNumcom
       $resdte!datelivr = dte
