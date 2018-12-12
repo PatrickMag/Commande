@@ -120,7 +120,7 @@ Public Sub butfac_Click()
   Dim totmht, totremise, totmarge, totttc As Float
   Dim tab As Variant
   Dim bck As String
-  Dim dt As String
+  Dim dt, txtva As String
   Dim obj As Variant
   
   If Not DateBox1.Value Then
@@ -129,6 +129,16 @@ Public Sub butfac_Click()
     Return
   Endif
   ligne_ValideLigne
+  tab = ScrollView1.Children
+  For i = 0 To tab.count - 2
+    ligne = tab[i]
+    resart = connect.cconlaurux.Exec("SELECT * FROM Fiches_Art WHERE art_code=&1", ligne.numart)
+    If Not resart.Available Then
+      Message.Error("L'article numero " & ligne.numart & " est innexistant")
+      Stop Event
+      Return
+    Endif
+  Next 
   Try connect.cconlaurux.Exec("LOCK TABLE Fiches_Parametres WRITE")
   If Error Then
     Message.Error("Table paramètre utilisée par un autre pose", "OK")
@@ -138,13 +148,13 @@ Public Sub butfac_Click()
   respart = connect.cconlaurux.Edit("Fiches_Parametres")
   dnbon = Val(respart!dnbon) + 1
   respart!dnbon = Format(dnbon, "000000")
+  txtva = respart!tvafrais
   respart.Update
   connect.cconlaurux.Commit
   Try connect.cconlaurux.Exec("UNLOCK TABLE")
   connect.cconlaurux.Begin
   
   rescom = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", Val(TreeView1.Current.Key))
-  tab = ScrollView1.Children
   numlig = 0
   For i = 0 To tab.count - 2
     ligne = tab[i]
@@ -214,15 +224,17 @@ Public Sub butfac_Click()
   res!tvar = 0
   res!datebl = DateBox1.Value
   res!remartbl = Round(totremise, -2)
-  res!marge_art = totmarge
-  res!totalht = Round(totmht, -2)
+  res!marge_art = totmarge + rescom!fraisfac
+  res!totalht = Round(totmht + rescom!fraisfac, -2)
   res!imp = 0
   resech = connect.cconlaurux.Exec("SELECT * FROM Fiches_Echeances WHERE num=&1", $rescli!cli_cdech)
    If resech.Available Then
      dt = Utils.Calcech(resech!duree, resech!jours, resech!finmois, Format(DateBox1.Value, "dd.mm.yyyy"))
      res!ech = Date(Right(dt, 4), Val(Mid(dt, 4, 2)), Val(Left(dt, 2)))
    Endif
-      
+  
+   resart = connect.cconlaurux.Exec("SELECT taux_tva FROM Fiches_Tvaav WHERE code_tva=&1", txtva)
+   totttc += (rescom!fraisfac * (resart!taux_tva / 100))
    res!totalttc = Round(totttc, -2)
    res.Update
    respart.Update
@@ -284,14 +296,14 @@ Public Sub Butsupcam_Click()
   
   qst = Message.Delete("ATTENTION : Supression de ce camion " & Chr$(10) & " Etes vous sur ?", "OUI ", " NON ")
   If qst = 2 Then Return
-  If TreeView1.MoveParent() Then clf = Val(Right(TreeView1.Current.Key, -1)) Else clf = Val(Right(TreeView1.Item.Key, -1))
+  clf = Val(Right(TreeView1.Current.Key, -1)) 
   
   connect.ccon.Begin
   connect.ccon.Delete("commandeparcamion", "idncomcam = &1 ", clf)
   connect.ccon.Delete("lignecomparcamion", "idcpc = &1 ", clf)
   connect.ccon.Delete("lignetournepcam", "idcpc = &1 ", clf)
   connect.ccon.Commit
-  Try TreeView1.Item.Delete
   Try TreeView1.Current.Delete
+  If TreeView1.Count = 0 Then Me.Close
   
 End

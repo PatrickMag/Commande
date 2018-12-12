@@ -150,6 +150,7 @@ Public Sub ButVal_Click()
   co.com.telfixe = Textfixe.Text
   co.com.telport = Textport.Text
   co.com.tipp = Texttipp.Text
+  co.com.fraisfac = Utils.totobs(frfac.Text)
   
   If $bDch Then
     lab = New Label(panel8)
@@ -305,6 +306,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
   TextVil.Text = $res!cli_ville
   Textfixe.Text = $res!cli_tel_bur
   Textport.Text = $res!cli_pble
+  frfac.Text = Str($res!cli_gestion)
   
   If cleliv = -1 Then
     TextAdr2.Text = $res!cli_adr1

@@ -214,6 +214,10 @@
         { Texttipp TextBox
           MoveScaled(36,0,12,3)
         }
+        { frfac TextBox
+          MoveScaled(49,0,2,3)
+          Visible = False
+        }
       }
       { RadioButton1 RadioButton
         MoveScaled(1,34,21,3)
