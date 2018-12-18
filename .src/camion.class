@@ -2,8 +2,10 @@
 
                                   'combobox pour la fenetre win ==>fin du programme
 Private win As New Window                                  
-Private combocnc As New ComboBox(win)
-Private combocam As New ComboBox(win)
+Private combocnc As ComboBox
+Private combocam As ComboBox
+Private combomatap As ComboBox
+Private dtelivr As DateBox
 Private ob As GridView
 
 Private $ccon As New Connection
@@ -423,7 +425,7 @@ Private Sub ouvrewind(win As Window)
   pan = New Panel(win)
   pan.AutoResize = True
   pan.Arrangement = Arrange.Horizontal
-
+  
   lab = New Label(pan)
   lab.Text = "N° du camion     :"
   lab.AutoResize = True
@@ -442,6 +444,35 @@ Private Sub ouvrewind(win As Window)
     Until res.MoveNext()
   Endif
   
+  pan = New Panel(win)
+  pan.AutoResize = True
+  pan.Arrangement = Arrange.Horizontal
+  
+  lab = New Label(pan)
+  lab.Text = "Demi jourée  : "
+  lab.AutoResize = True
+  lab.Height = 26
+  combomatap = New ComboBox(pan)
+  combomatap.Height = 26
+  combomatap.Width = 200
+  combomatap.Add("MATIN")
+  combomatap.Add("APREM")
+  combomatap.Add("JOURNE")
+'  combomatap.Current.Text = ca.mataprem
+  
+  pan = New Panel(win)
+  pan.AutoResize = True
+  pan.Arrangement = Arrange.Horizontal
+  
+  lab = New Label(pan)
+  lab.Text = "Date de livraison  : "
+  lab.AutoResize = True
+  lab.Height = 26
+  dtelivr = New DateBox(pan)
+  dtelivr.Height = 26
+  dtelivr.Width = 200
+  dtelivr.Value = Datecom.Value
+  
   butok = New Button(win) As "ok"
   butok.Height = 26
   butok.Width = 50
@@ -456,6 +487,8 @@ Public Sub ok_Click()
   
   ca.cnumchauf = combocnc.Current.Text
   ca.comnumcam = combocam.current.Text
+  ca.mataprem = combomatap.Current.Text
+  ca.datecam = dtelivr.Value
   $ccon.Begin
   $rescpc = $ccon.Edit("commandeparcamion", "idncomcam=&1 FOR UPDATE", $lNumcam)
   affectres
@@ -463,6 +496,8 @@ Public Sub ok_Click()
   $ccon.Commit
   Labelcam.Text = ca.comnumcam
   Labelchauf.Text = ca.cnumchauf
+  Labelmatam.Text = ca.mataprem
+  Datecom.Value = ca.datecam
   win.Delete
   
 End

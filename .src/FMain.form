@@ -1,7 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,136,76)
+  MoveScaled(0,0,152,76)
   Icon = Picture["logo.png"]
   Arrangement = Arrange.Row
   AutoResize = True
@@ -22,7 +22,7 @@
     Arrangement = Arrange.Vertical
     AutoResize = True
     { Panel3 Panel
-      MoveScaled(3,1,141,55)
+      MoveScaled(3,1,148,55)
       Arrangement = Arrange.Vertical
       AutoResize = True
       { Frame2 Frame
@@ -65,7 +65,7 @@
         }
       }
       { GridView1 GridView
-        MoveScaled(0,14,138,41)
+        MoveScaled(0,14,147,41)
       }
       { Panelvue Panel
         MoveScaled(61,0,71,14)
