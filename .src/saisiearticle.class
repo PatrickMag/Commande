@@ -202,28 +202,18 @@ Public Sub surveille()
   
   Dim i As Integer
   Dim poid As Integer
-  Dim ht, ttc, mar, vol As Float
-  Dim tab As Variant
   
-  tab = ScrollView1.Children
   pxrevient.Value = la.prixachat
   mart.Text = "Marge article : " & Format(la.margeart, "0.00")
   pamp.Text = "Prixd' achat  mp : " & la.pamp
   stk.Text = "Stock :   " & la.stock
   qcom.Text = "Qte en commande : " & la.stcom
-  For i = 0 To tab.count - 1
-    mar += tab[i].margeart
-    ht += tab[i].montantht
-    ttc += tab[i].montantttc
-    poid += tab[i].poid
-    vol += tab[i].volume
-  Next
   
-  mcom.Text = "Marge commande : " & Format(mar, "0.00")
-  ValueBox1.Value = ht
-  ValueBox2.Value = ttc
-  poidtot.text = "Poid : " & poid
-  voltot.Text = "Volume : " & Format(vol, "0.000")
+  mcom.Text = "Marge commande : " & Format(gestionligne.totmarge(ScrollView1), "0.00")
+  ValueBox1.Value = gestionligne.totht(ScrollView1)
+  ValueBox2.Value = gestionligne.totttc(ScrollView1)
+  poidtot.text = "Poid : " & gestionligne.totpoid(ScrollView1)
+  voltot.Text = "Volume : " & Format(gestionligne.totvolume(ScrollView1), "0.000")
   fraisgest.Text = "Frais de gestion : " & Format($rescli!cli_gestion, "0.00") 
 End
 

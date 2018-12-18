@@ -94,3 +94,78 @@ Public Sub Scroll(ScrollView1 As ScrollView)
   Next
   
 End
+
+Public Function totht(ScrollView1 As ScrollView) As Float
+  
+  Dim tab As Variant
+  Dim i As Integer
+  Dim tot As Float
+  
+  tab = ScrollView1.Children
+
+  For i = 0 To tab.count - 1
+    tot += tab[i].montantht
+  Next
+  Return tot
+  
+End
+
+Public Function totttc(ScrollView1 As ScrollView) As Float
+  
+  Dim tab As Variant
+  Dim i As Integer
+  Dim tot As Float
+  
+  tab = ScrollView1.Children
+
+  For i = 0 To tab.count - 1
+    tot += tab[i].montantttc
+  Next
+  Return tot
+  
+End
+
+Public Function totmarge(ScrollView1 As ScrollView) As Float
+  
+  Dim tab As Variant
+  Dim i As Integer
+  Dim tot As Float
+  
+  tab = ScrollView1.Children
+
+  For i = 0 To tab.count - 1
+    tot += tab[i].margeart
+  Next
+  Return tot
+  
+End
+
+Public Function totpoid(ScrollView1 As ScrollView) As Float
+  
+  Dim tab As Variant
+  Dim i As Integer
+  Dim tot As Float
+  
+  tab = ScrollView1.Children
+
+  For i = 0 To tab.count - 1
+    tot += tab[i].poid
+  Next
+  Return tot
+  
+End
+
+Public Function totvolume(ScrollView1 As ScrollView) As Float
+  
+  Dim tab As Variant
+  Dim i As Integer
+  Dim tot As Float
+  
+  tab = ScrollView1.Children
+
+  For i = 0 To tab.count - 1
+    tot += tab[i].volume
+  Next
+  Return tot
+  
+End

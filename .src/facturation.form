@@ -1,16 +1,16 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,133,84)
+  MoveScaled(0,0,133,86)
   Text = ("Validation des commandes en facture")
   { TreeView1 TreeView
     MoveScaled(3,0,44,37)
   }
   { TextArea1 TextArea
-    MoveScaled(9,75,118,8)
+    MoveScaled(9,77,118,8)
   }
   { Label1 Label
-    MoveScaled(1,71,133,4)
+    MoveScaled(1,73,133,4)
     Text = ("Incidents de livraison")
     Alignment = Align.Center
   }
@@ -110,5 +110,15 @@
       Arrangement = Arrange.Vertical
     }
     Index = 0
+  }
+  { Textttc TextBox
+    MoveScaled(121,72,11,4)
+    Alignment = Align.Right
+    ReadOnly = True
+  }
+  { Textht TextBox
+    MoveScaled(110,72,11,4)
+    Alignment = Align.Right
+    ReadOnly = True
   }
 }

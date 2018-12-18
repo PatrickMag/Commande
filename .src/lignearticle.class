@@ -442,6 +442,9 @@ Public Sub quantite_LostFocus()
   quantite.Text = Str(Utils.totobs(quantite.Text))
   If num.Text Then
     If $resart.Available Then quantite.Text = Utils.CDec($resart!art_nbd, quantite.Text) Else quantite.Text = "0"
+    If $schoix = "creer" Then
+      pxht.Text = defpxpp()
+    Endif
   Endif
   If Utils.totobs(pxht.text) <> 0 Then calcul
   
@@ -553,6 +556,7 @@ Private Sub calcul()
     Balloon.Delay = 3000
     Try Balloon.Warning("<FONT Color=#212121>" & "Prix de vente inferieur au prix de revient", pxht)
     Try pxht.Background = Color.Red
+    Me.Raise
   Else
     If Balloon.Visible Then Try Balloon.Hide(pxht)
     Try pxht.Background = $icouleur
@@ -603,6 +607,20 @@ Public Sub enregistre()
     res.Update
     connect.ccon.Commit
   Endif
+
+End
+
+Private Sub defpxpp() As String
+
+  Dim res As Result
+  Dim pxu As String
+
+  pxu = pxht.Text
+  res = connect.cconlaurux.Exec("SELECT * FROM Fiches_ligtarpp WHERE code=&1 AND binf <= &2 AND bsup > &2", num.Text, Val(quantite.Text))
+  If res.Available Then
+    pxu = res!normht
+  Endif
+  Return pxu
 
 End
 

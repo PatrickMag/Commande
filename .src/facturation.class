@@ -59,29 +59,37 @@ End
 Public Sub ligne_up(nm As Integer)
 
   ligne = gestionligne.up(nm, ligne, ScrollView1)
+  surveille
 
 End
+
 Public Sub ligne_ValideLigne()
 
   ligne_down(ligne.Tag)
 
 End
+
 Public Sub ligne_GotF(nm As Integer)
 
   ligne = gestionligne.GotF(nm, ligne, ScrollView1)
+  surveille
 
 End
+
 Public Sub ligne_down(nm As Integer)
 
   ligne = gestionligne.Down(nm, ligne, ScrollView1)
   If nm = gestionligne.icompteur - 1 Then
       creerligne(Val(TreeView1.Current.Key))
   Endif
+  surveille
+  
 End
 
 Public Sub ligne_supprime(nm As Integer)
   
   ligne = gestionligne.supprime(nm, ligne, ScrollView1)
+  surveille
   
 End
 
@@ -91,6 +99,12 @@ Public Sub ScrollView1_Scroll()
   
 End
 
+Public Sub surveille()
+
+  Textht.Text = Format(gestionligne.totht(ScrollView1), "0.00")
+  Textttc.Text = Format(gestionligne.totttc(ScrollView1), "0.00")
+
+End
 
 Public Sub creerligne($lnumcom As Long)
   
