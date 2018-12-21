@@ -294,6 +294,7 @@ Public Sub Butrlc_Click()
 
   Dim res As Result
   
+  If Left(TreeView1.Current.Key, 1) = "C" Then Return
   connect.ccon.Begin
   res = connect.ccon.Edit("commande", "idcom=&1", Val(TreeView1.Current.Key))
   res!comencours = False
@@ -308,6 +309,7 @@ Public Sub Butsupcam_Click()
   Dim qst As Integer
   Dim clf As Integer
   
+  If Left(TreeView1.Current.Key, 1) <> "C" Then Return
   qst = Message.Delete("ATTENTION : Supression de ce camion " & Chr$(10) & " Etes vous sur ?", "OUI ", " NON ")
   If qst = 2 Then Return
   clf = Val(Right(TreeView1.Current.Key, -1)) 

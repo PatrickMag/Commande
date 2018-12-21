@@ -350,6 +350,8 @@ Private Sub ajoudescom(lId As Long)
     couleur($resligcpc.Count)
     ListBox1.Index = 0
     affbouton
+  Else
+    ListBox1.Clear
   Endif
   
 End
@@ -368,6 +370,8 @@ Private Sub ajoudestourne(lId As Long)
         $resligtourpc.MoveNext
       Next
       ListBox2.Index = 0
+    Else
+      ListBox2.Clear
     Endif
     
 End
