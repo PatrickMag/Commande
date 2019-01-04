@@ -39,15 +39,15 @@ Public Sub _new(cam As Camion, dte As Date)
         rp = New ReportPanel(ReportPc1)
         rp.Arrangement = Arrange.Vertical
         rp.BackGround = ReportBrush["#DFDFDF"]
-'        rp.Width = "80mm"
-        'rp.Expand = True
+        'rp.Width = "90mm"
+        rp.Expand = True
         
         lab = New ReportLabel(rp)
-        lab.Text = "Client N° : "
+        lab.Text = "Client N° : " & $rescmd!numclient
         
         nom = New ReportLabel(rp)
         nom.Font = Font["Bold,+1"]
-        nom.Text = $rescmd!numclient & " " & $rescmd!nom & "   "
+        nom.Text = $rescmd!nom & "   "
         'tel fixe
         rph = New ReportHBox(rp)
         lab = New ReportLabel(rph)

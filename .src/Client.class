@@ -424,6 +424,7 @@ Private Sub affichenb()
  res = connect.cconlaurux.Exec("SELECT solde FROM Fiches_Comptes WHERE compte_cc=&1", Val(textnumcl.Text))
  If res.Available Then
    Label14.Text = "Solde du compte :  " & Format(res!solde, "0.00 €")
+   If res!solde > 0 Then Label14.Background = Color.Green Else Label14.Background = Color.Background
  Endif
 
 End
@@ -487,8 +488,8 @@ Public Sub DateChooser1_Activate()
      If Not existecam(mescamions, res!idncomcam) Then
        moncamion = New Camion("ouvrir", $lNumcom, scrolcam, res!idncomcam) As "cam"
        moncamion.Tag = res!idncomcam
-       res.MoveNext
      Endif
+     res.MoveNext
     Next
   Endif
                       'création de la dates de livraison pour ce client si elle n'existe pas

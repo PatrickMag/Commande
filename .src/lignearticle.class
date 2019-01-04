@@ -572,7 +572,7 @@ Public Sub valide()
     If $schoix = "ouvrir" Then
       Balloon.Delay = 5000
       Try Balloon.Warning("<FONT Color=#212121>" & "Numéro article obligatoire", num)
-      num.SetFocus
+'      num.SetFocus
       Return
     Else
       Return
@@ -684,7 +684,7 @@ Private Sub couleur_Write(Value As Integer)
 
   $icouleur = value
   dessincouleur
-  num.SetFocus
+'  num.SetFocus
   
 End
 

@@ -491,7 +491,7 @@ Public Sub ok_Click()
   
   ca.cnumchauf = combocnc.Current.Text
   ca.comnumcam = combocam.current.Text
-  ca.mataprem = combomatap.Current.Text
+  ca.mataprem = Left(combomatap.Current.Text, 2)
   ca.datecam = dtelivr.Value
   $ccon.Begin
   $rescpc = $ccon.Edit("commandeparcamion", "idncomcam=&1 FOR UPDATE", $lNumcam)

@@ -144,8 +144,12 @@ Public Sub butfac_Click()
   Endif
   ligne_ValideLigne
   tab = ScrollView1.Children
-  For i = 0 To tab.count - 2
+  For i = 0 To tab.count - 1
     ligne = tab[i]
+    If IsNull(ligne.numart) Then 
+      ligne.Delete
+      Continue
+    Endif
     resart = connect.cconlaurux.Exec("SELECT * FROM Fiches_Art WHERE art_code=&1", ligne.numart)
     If Not resart.Available Then
       Message.Error("L'article numero " & ligne.numart & " est innexistant")
@@ -170,7 +174,8 @@ Public Sub butfac_Click()
   
   rescom = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", Val(TreeView1.Current.Key))
   numlig = 0
-  For i = 0 To tab.count - 2
+  tab = ScrollView1.Children
+  For i = 0 To tab.count - 1
     ligne = tab[i]
     resart = connect.cconlaurux.Edit("Fiches_Art", "art_code=&1", ligne.numart)
     res = connect.cconlaurux.Create("Fiches_Ligbl")
@@ -288,6 +293,8 @@ Public Sub butfac_Click()
     Next
   Endif
   butfac.Enabled = False
+  If Not TreeView1.MoveFirst() Then TreeView1.Item.Selected = True 
+  
 End
 
 Public Sub Butrlc_Click()
@@ -301,7 +308,8 @@ Public Sub Butrlc_Click()
   res.Update
   connect.ccon.Commit
   TreeView1.Current.Delete
-
+  If Not TreeView1.MoveFirst() Then TreeView1.Item.Selected = True 
+  
 End
 
 Public Sub Butsupcam_Click()
@@ -309,6 +317,7 @@ Public Sub Butsupcam_Click()
   Dim qst As Integer
   Dim clf As Integer
   
+  If Not TreeView1.Available Then Return
   If Left(TreeView1.Current.Key, 1) <> "C" Then Return
   qst = Message.Delete("ATTENTION : Supression de ce camion " & Chr$(10) & " Etes vous sur ?", "OUI ", " NON ")
   If qst = 2 Then Return
@@ -320,6 +329,6 @@ Public Sub Butsupcam_Click()
   connect.ccon.Delete("lignetournepcam", "idcpc = &1 ", clf)
   connect.ccon.Commit
   Try TreeView1.Current.Delete
-  If TreeView1.Count = 0 Then Me.Close
+  If Not TreeView1.MoveFirst() Then TreeView1.Item.Selected = True 
   
 End
