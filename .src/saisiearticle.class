@@ -74,7 +74,7 @@ Endif
         j = 3 + (res.Index * 3)
         GridView1[i, j].Text = Format(res1!qte, "0.000")
         Inc j
-        GridView1[i, j].Text = Format(res1!net / res1!qte, "0.000")
+        If res1!qte = 0 Then GridView1[i, j].Text = "0,000" Else Format(res1!net / res1!qte, "0.000")
         res1.MoveNext
       Next
       res.MoveNext
