@@ -16,7 +16,7 @@ Public Sub _new(cam As Camion, dte As Date)
   Dim rpv As ReportVBox
   Dim lab As ReportLabel
   Dim nom, tport, tfixe, adr1, adr2, cp, ville As ReportLabel
-  Dim comgen, comjou As ReportTextLabel
+  Dim comgen, comjou As ReportLabel
   
   $dtel = dte
   res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", Trim(Left(cam.ca.cnumchauf, 3))) 
@@ -84,18 +84,20 @@ Public Sub _new(cam As Camion, dte As Date)
         rp.Autoresize = True
         rp.Expand = True
         
-        comjou = New ReportTextLabel(rp)
+        comjou = New ReportLabel(rp)
         comjou.Autoresize = True
         comjou.Expand = True
-        comjou.Font = Font[-2]
+        comjou.Font = Font["Serif, -5"]
         comjou.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
         res = connect.ccon.Exec("SELECT * FROM datedelivraison WHERE idlivraison=&1 AND datelivr=&2", $rescom!idcomcl, $dtel)
+        comjou.Brush = ReportBrush.Color(Color.Red)
         If res.Available Then comjou.Text = res!datecommentaire Else comjou.Text = ""
-        
-        comgen = New ReportTextLabel(rp)
+        comjou.Brush = ReportBrush.Color(Color.Red)
+        comgen = New ReportLabel(rp)
         comgen.Autoresize = True
         comgen.Expand = True
-        comgen.Font = Font[-2]
+        comgen.Font = Font["Serif, -5"]
+        comgen.Brush = ReportBrush.Color(Color.Red)
         comgen.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
         comgen.Text = $rescmd!commentaire
         'Edition des artcles commandés
