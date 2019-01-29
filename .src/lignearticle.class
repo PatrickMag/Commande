@@ -441,7 +441,7 @@ Public Sub quantite_LostFocus()
 
   quantite.Text = Str(Utils.totobs(quantite.Text))
   If num.Text Then
-    If $resart.Available Then quantite.Text = Utils.CDec($resart!art_nbd, quantite.Text) Else quantite.Text = "0"
+    If $resart.Available Then quantite.Text = Utils.CDec($resart!art_dec, quantite.Text) Else quantite.Text = "0"
     If $schoix = "creer" Then
       pxht.Text = defpxpp()
     Endif

@@ -296,7 +296,7 @@ Public Sub GridView1_Data(r As Integer, c As Integer)
         GridView1.Data.richText = $res!ville
       Endif
     Case 6
-      GridView1.Data.Text = Str($res!num)
+      If Radioliv.Value Then GridView1.Data.Text = Str($res!num)
   End Select
 
 End

@@ -192,7 +192,7 @@ Public Sub butfac_Click()
      res!fam_ligbl = resart!art_fam
      res!pu_ligbl = Utils.CDec(resart!art_nbd, Utils.cpoint(ligne.prixht))
      res!dec_ligbl = resart!art_dec
-     res!qte_ligbl = ligne.qte
+     res!qte_ligbl = Utils.CDec(resart!art_nbd, Utils.cpoint(ligne.qte))
      res!brut_ligbl = Format(ligne.montantht + ligne.montrem, "0.00")
      res!rem_ligbl = ligne.montrem
      res!netht_ligbl = Format(ligne.montantht, "0.00")
