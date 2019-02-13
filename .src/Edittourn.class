@@ -44,26 +44,31 @@ Public Sub _new(cam As Camion, dte As Date)
         
         lab = New ReportLabel(rp)
         lab.Text = "Client N° : " & $rescmd!numclient
+        lab.Font = Font["Serif,+1"]
         
         nom = New ReportLabel(rp)
-        nom.Font = Font["Bold,+1"]
+        nom.Font = Font["Serif,Bold,+2"]
         nom.Text = $rescmd!nom & "   "
         'tel fixe
         rph = New ReportHBox(rp)
         lab = New ReportLabel(rph)
         lab.Text = "Tel fixe : "
+        lab.Font = Font["Serif,+1"]
         
         tfixe = New ReportLabel(rph)
         tfixe.Expand = True
         tfixe.Text = $rescmd!telfixe
+        tfixe.Font = Font["Serif,+1"]
         
         rph = New ReportHBox(rp)
         lab = New ReportLabel(rph)
         lab.Text = "Tel portable : "
+        lab.Font = Font["Serif,+1"]
         
         tport = New ReportLabel(rph)
         tport.Expand = True
         tport.Text = $rescmd!telport
+        tport.Font = Font["Serif,+1"]
         
         rpv = New ReportVBox(ReportPc1)
         rpv.Expand = True
@@ -87,7 +92,7 @@ Public Sub _new(cam As Camion, dte As Date)
         comjou = New ReportLabel(rp)
         comjou.Autoresize = True
         comjou.Expand = True
-        comjou.Font = Font["Serif, -5"]
+        comjou.Font = Font["Serif, -2"]
         comjou.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
         res = connect.ccon.Exec("SELECT * FROM datedelivraison WHERE idlivraison=&1 AND datelivr=&2", $rescom!idcomcl, $dtel)
         comjou.Brush = ReportBrush.Color(Color.Red)
@@ -96,7 +101,7 @@ Public Sub _new(cam As Camion, dte As Date)
         comgen = New ReportLabel(rp)
         comgen.Autoresize = True
         comgen.Expand = True
-        comgen.Font = Font["Serif, -5"]
+        comgen.Font = Font["Serif, -2"]
         comgen.Brush = ReportBrush.Color(Color.Red)
         comgen.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
         comgen.Text = $rescmd!commentaire
