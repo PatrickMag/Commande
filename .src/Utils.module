@@ -168,6 +168,9 @@ Public Function RecCom(sTri As String, bCom As Boolean, Optional vVal1 As Varian
                                     'test l'exitence d'une date souhaitée de livraison
   Case "dtexist"
     res = connect.ccon.Exec("SELECT * FROM datedelivraison WHERE  idlivraison=&1 AND datelivr=&2", Val(sVal2), vVal1)
+    
+  Case "camexist"
+    res = connect.ccon.Exec("SELECT * FROM commande WHERE NOT EXISTS (SELECT * FROM lignecomparcamion WHERE idcomcl=idcom) AND comlivre=&1", bCom)
   End Select
   
   Return res

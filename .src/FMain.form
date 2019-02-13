@@ -59,9 +59,13 @@
         { Texttsup TextBox
           MoveScaled(10,9,10,3)
         }
-        { Radiocomliv RadioButton
-          MoveScaled(28,8,14,3)
-          Text = ("Déja livré ")
+        { Checkattrib CheckBox
+          MoveScaled(27,6,20,2.6667)
+          Text = ("Non attribuées")
+        }
+        { Radiocomliv CheckBox
+          MoveScaled(27,10,17,2.6667)
+          Text = ("Déjà livré")
         }
       }
       { GridView1 GridView

@@ -56,6 +56,20 @@ Public Sub Textnum_Activate()
 
 End
 
+Public Sub Checkattrib_Click()
+
+  If Checkattrib.Value Then
+    $res = Utils.RecCom("camexist", Radiocomliv.Value)
+    GridView1.Rows.Count = $res.count
+    GridView1.Row = 0
+  Else
+    affiche()
+  Endif
+  
+End
+
+
+
 Public Sub Texttinf_Activate()
   
   $res = Utils.RecCom("tou", Radiocomliv.Value, Texttinf.Text, Texttsup.Text)
