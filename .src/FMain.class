@@ -9,10 +9,17 @@ Private $datejour As DateChooser
 Private $dte As Date
 
 
-Public Sub Form_Open()
+Public Sub form_Open()
 
+  Dim ev As Gesteven
+  
   Connect.Connection
   connect.connect_laurux
+  If Not connect.ccon.Tables.Exist("evenement") Then
+    Message.Warning("Veuillez mettre à jour votre base de donnée")
+    base.ShowModal
+  Endif
+  ev = New Gesteven(GridView1, "", "D")
   
   co = New Commande(0)
   GridView1.Columns.count = 8
@@ -38,6 +45,7 @@ Public Sub Form_Open()
   
   affiche
   affrenseignement(0)
+  
 End
 
 Public Sub Textnom_Activate()
@@ -67,8 +75,6 @@ Public Sub Checkattrib_Click()
   Endif
   
 End
-
-
 
 Public Sub Texttinf_Activate()
   
@@ -100,20 +106,28 @@ Public Sub GridView1_Data(Row As Integer, Column As Integer)
   Select Case Column
     Case 0
        GridView1.Data.Text = $res!numclient
+       GridView1.Data.Alignment = Align.Left
     Case 1
        GridView1.Data.Text = $res!nom
+       GridView1.Data.Alignment = Align.Left
     Case 2
        GridView1.Data.Text = $res!adresse
+       GridView1.Data.Alignment = Align.Left
      Case 3
       GridView1.Data.Text = $res!ville
+      GridView1.Data.Alignment = Align.Left
     Case 4
        GridView1.Data.Text = Format($res!datedecommande, "dd.mm.yyyy")
+       GridView1.Data.Alignment = Align.Left
     Case 5 
       GridView1.Data.Text = $res!comencours
+      GridView1.Data.Alignment = Align.Left
     Case 6
       GridView1.Data.Text = $res!numtourne
+      GridView1.Data.Alignment = Align.Left
     Case 7
        GridView1.Data.Text = $res!idcom
+       GridView1.Data.Alignment = Align.Left
     End Select
   
 End
@@ -393,6 +407,7 @@ Public Sub aba_Click()
   
   c = Panel2.Children
   c[c.count - 1].delete
+  c = Panel2.Children
   c[c.count - 1].delete
   Panel1.Show
   
@@ -464,3 +479,11 @@ Public Sub cam_rafraichi()
   Wait 0.001
 
 End
+
+Public Sub Evenements_Click()
+
+  evenement.Show
+
+End
+
+

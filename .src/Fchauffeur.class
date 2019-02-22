@@ -2,7 +2,7 @@
 
 Private $bs As Barselection
 Private $rescha As Result
-
+Private $gchau As Gesteven
 
 Public Sub _new()
 
@@ -23,9 +23,16 @@ End
 
 Private Sub affiche()
   
+  Dim geven As Gesteven
+  
   Textnum.Text = $rescha!idchauffeur
   Textnom.Text = $rescha!nom
   Textpren.Text = $rescha!prenom
+  If Not $gchau Then
+    $gchau = New Gesteven(GridView1, Textnum.Text, "C")
+  Else
+    $gchau.Identifiant = Textnum.Text
+  Endif
   
 End
 

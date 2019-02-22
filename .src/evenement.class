@@ -1,0 +1,54 @@
+' Gambas class file
+
+Private $gest As Gesteven
+
+Public Sub _new()
+  
+  $gest = New Gesteven(GridView1)
+
+End
+
+Public Sub Button1_Click()
+  
+  $gest = New Gesteven(GridView1, "", "A", True)
+
+End
+
+Public Sub tous_Click()
+  
+  If tous.Value Then $gest = New Gesteven(GridView1, "", "A")
+
+End
+
+Public Sub chauffeurs_Click()
+  
+  If chauffeurs.Value Then $gest = New Gesteven(GridView1, "", "C")
+
+End
+
+Public Sub camions_Click()
+  
+  If camions.Value Then $gest = New Gesteven(GridView1, "", "V") ' V comme véhicule
+
+End
+
+Public Sub entreprise_Click()
+  
+  If chauffeurs.Value Then $gest = New Gesteven(GridView1, "", "E")
+
+End
+
+Public Sub Button3_Click()
+
+  Me.Close
+
+End
+
+Public Sub Button2_Click()
+
+  connect.ccon.Begin
+  connect.ccon.Delete("evenement", "id=&1", Val(gridview1[gridview1.Row, 0].Text))
+  connect.ccon.Commit
+  $gest.affiche
+
+End

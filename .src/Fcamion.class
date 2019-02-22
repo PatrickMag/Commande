@@ -2,10 +2,13 @@
 
 Private $bs As Barselection
 Private $rescam As Result
+Private $gcam As Gesteven
 
 
 Public Sub _new()
 
+  
+  
   $bs = New Barselection("111111110", Panel1) As "bar"
   affprem
   
@@ -25,18 +28,22 @@ Private Sub affiche()
   
   Textimm.Text = $rescam!idimat
   Textmar.Text = $rescam!nomducamion
-  Textdte.Text = Format($rescam!ageducamion, "dd.mm.yyyy")
+  Textdte.Value = $rescam!ageducamion
   Textm3.Text = $rescam!capacitem3
   Textcu.Text = $rescam!chargutil
   Textcli.Text = $rescam!nbclient
-  
+  If Not $gcam Then
+    $gcam = New Gesteven(GridView1, Textimm.Text, "V")
+  Else
+    $gcam.Identifiant = Textimm.Text
+  Endif
 End
 
 Private Sub valide()
   
   $rescam!idimat = Textimm.Text
   $rescam!nomducamion = Textmar.Text
-  $rescam!ageducamion = Date(Right(Textdte.Text, 4), Val(Mid(Textdte.Text, 4, 2)), Val(Left(Textdte.Text, 2)))
+  $rescam!ageducamion = TextDte.Value
   $rescam!capacitem3 = Textm3.Text
   $rescam!chargutil = Textcu.Text
   $rescam!chargutil = Textcu.Text
@@ -52,7 +59,7 @@ Private Sub mablanc()
   
   Textcli.Clear
   Textcu.Clear
-  Textdte.Clear
+  Textdte.Value = Now
   Textimm.Clear
   Textm3.Clear
   Textmar.Clear

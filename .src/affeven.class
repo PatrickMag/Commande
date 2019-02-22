@@ -1,0 +1,157 @@
+' Gambas class file
+
+Private $res As Result
+
+Public Sub _new(id As Integer, choix As String)
+
+  Dim obs As Observer
+  Dim res As Result
+  
+  obs = New Observer(type) As "obs"
+  type.Tag = ident
+  obs = New Observer(ident) As "obs"
+  ident.Tag = trav
+  obs = New Observer(trav) As "obs"
+  trav.Tag = dttrav
+  obs = New Observer(dttrav) As "obs"
+  dttrav.Tag = per
+  obs = New Observer(per) As "obs"
+  per.Tag = rap
+  obs = New Observer(rap) As "obs"
+  rap.Tag = frn
+  obs = New Observer(frn) As "obs"
+  frn.Tag = tel
+  obs = New Observer(tel) As "obs"
+  tel.Tag = type
+  
+  connect.ccon.Begin
+  If id > 0 Then
+    type.Enabled = False
+    ident.Enabled = False
+    $res = connect.ccon.Edit("evenement", "id=&1", id)
+    If Not $res.Available Then
+      Message.Error("Enregistrement innexistant")
+      Me.Close
+    Endif
+    Select Case $res!type
+      Case "C"
+        type.Text = "Chauffeur"
+        res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", $res!num)
+      Case "V"
+        type.Text = "Camion"
+      Case "D"
+        type.Text = "Dépôt"
+    End Select
+    ident.Text = $res!num
+    If $res!type = "C" Then nom.Text = res!nom
+    trav.Text = $res!nom
+    dttrav.Value = $res!date
+    per.Text = $res!periodicite
+    rap.Text = $res!perioderap
+    frn.Text = $res!fournisseur
+    tel.Text = $res!tel
+  Endif
+  If choix <> "A" Then
+    type.Enabled = False
+  Endif
+  If id = 0 Then
+    $res = connect.ccon.Create("evenement")
+  Endif
+  
+End
+
+Public Sub obs_gotfocus()
+
+  Last.background = Color.Yellow
+
+End
+
+Public Sub obs_lostfocus()
+
+  Last.background = Color.Background
+
+End
+
+Public Sub obs_keypress()
+
+  If Key.Code = Key.Enter Or Key.Code = Key.Return Or Key.Code = Key.Tab Or Key.Code = Key.Down Then
+    Stop Event
+    Last.Tag.setfocus
+    Try Last.Tag.Select
+  Endif
+
+End
+
+Public Sub ident_GotFocus()
+
+  If type.Text = "Dépôt" Then
+    ident.Text = "Dépôt"
+    ident.ReadOnly = True
+  Else
+    ident.ReadOnly = False
+  Endif
+
+End
+
+Public Sub ident_LostFocus()
+
+  Dim res As Result
+  
+  Select Case type.Text
+    Case "Camion"
+      res = connect.ccon.Exec("SELECT * FROM camion WHERE idimat=&1", ident.Text)
+      If Not res.Available Then
+        Message.Error("Camion innexistant")
+        Stop Event
+        ident.SetFocus
+      Else
+        nom.Text = res!nomducamion
+      Endif
+    Case "Chauffeur"
+      res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", ident.Text)
+      If Not res.Available Then
+        Message.Error("Chauffeur innexistant")
+        Stop Event
+        ident.SetFocus
+      Endif
+    Case "Dépôt"
+      ident.Text = "Dépôt"
+  End Select
+
+End
+
+Public Sub Button1_Click()
+
+  Select Case type.Current.Text
+    Case "Camion"
+      $res!type = "V"
+    Case "Chauffeur"
+      $res!type = "C"
+    Case "Dépôt"
+      $res!type = "D"
+  End Select
+  $res!num = ident.Text
+  $res!nom = trav.Text
+  $res!date = dttrav.Value 
+  $res!periodicite = per.Text 
+  $res!perioderap = rap.Text 
+  $res!fournisseur = frn.Text 
+  $res!tel = tel.Text 
+  $res.Update
+  connect.ccon.Commit
+  Me.Close
+  
+End
+
+Public Sub Button2_Click()
+
+  connect.ccon.Rollback
+  Me.Close
+
+End
+
+Public Sub Button3_Click()
+
+  
+
+End

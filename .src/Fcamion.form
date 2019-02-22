@@ -23,8 +23,8 @@
     MoveScaled(2,12,17,3)
     Text = ("Mise en service :")
   }
-  { Textdte TextBox
-    MoveScaled(22,12,16,3)
+  { TextDte DateBox
+    MoveScaled(23,12,19,3)
   }
   { Label4 Label
     MoveScaled(2,17,15,3)

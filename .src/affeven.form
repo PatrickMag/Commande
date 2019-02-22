@@ -1,0 +1,85 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,77,64)
+  Text = ("Evenements ")
+  { Label1 Label
+    MoveScaled(3,8,14,3)
+    Text = ("Identifiant :")
+  }
+  { type ComboBox
+    MoveScaled(21,2,19,3)
+    ReadOnly = True
+    List = [("Camion"), ("Chauffeur"), ("Dépôt")]
+  }
+  { Label2 Label
+    MoveScaled(3,3,18,2)
+    Text = ("Type : ")
+  }
+  { ident TextBox
+    MoveScaled(25,8,14,3)
+    MaxLength = 10
+  }
+  { nom Label
+    MoveScaled(46,8,26,3)
+  }
+  { Label3 Label
+    MoveScaled(3,23,18,2)
+    Text = ("Derniers travaux :")
+  }
+  { dttrav DateBox
+    MoveScaled(25,22,14,3)
+  }
+  { Label4 Label
+    MoveScaled(3,29,25,3)
+    Text = ("Periodicité (en années)")
+  }
+  { per TextBox
+    MoveScaled(34,29,5,3)
+    MaxLength = 2
+  }
+  { Label5 Label
+    MoveScaled(3,36,21,3)
+    Text = ("Rappel (en mois) : ")
+  }
+  { rap TextBox
+    MoveScaled(34,36,5,3)
+    MaxLength = 2
+  }
+  { Label6 Label
+    MoveScaled(3,16,18,2)
+    Text = ("Nom des travaux :")
+  }
+  { trav TextBox
+    MoveScaled(25,15,47,3)
+  }
+  { Label7 Label
+    MoveScaled(3,44,17,3)
+    Text = ("Fournisseur :")
+  }
+  { frn TextBox
+    MoveScaled(25,44,46,3)
+  }
+  { Label8 Label
+    MoveScaled(3,51,16,3)
+    Text = ("Telephone :")
+  }
+  { tel TextBox
+    MoveScaled(25,51,21,3)
+    MaxLength = 14
+  }
+  { Button1 Button
+    MoveScaled(40,58,13.3333,4)
+    Text = ("Valider")
+    Picture = Picture["icon:/32/ok"]
+  }
+  { Button2 Button
+    MoveScaled(59,58,12,4)
+    Text = ("Quitter")
+    Picture = Picture["icon:/32/quit"]
+  }
+  { Button3 Button
+    MoveScaled(40,8,4,3)
+    Picture = Picture["icon:/32/find"]
+  }
+}

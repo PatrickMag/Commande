@@ -42,12 +42,12 @@
     Text = ("3306")
   }
   { Button1 Button
-    MoveScaled(6,45,14,5)
+    MoveScaled(2,45,14,5)
     Text = ("Valider")
     Picture = Picture["icon:/32/apply"]
   }
   { Button2 Button
-    MoveScaled(44,45,14,5)
+    MoveScaled(48,45,14,5)
     Text = ("Quitter")
     Picture = Picture["icon:/32/close"]
   }
@@ -60,8 +60,13 @@
     Text = ("Boissons")
   }
   { Button3 Button
-    MoveScaled(25,45,14,5)
+    MoveScaled(18,45,14,5)
     Text = ("Création")
     Picture = Picture["icon:/32/add"]
+  }
+  { Button4 Button
+    MoveScaled(33,45,14,5)
+    Text = ("Mise à jour")
+    Picture = Picture["icon:/32/apply"]
   }
 }

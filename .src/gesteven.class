@@ -1,0 +1,201 @@
+' Gambas class file
+
+Private $res As Result
+Private $gridview1 As GridView
+Private $req As String
+Private $cle As String
+Private $choix As String
+
+Property Identifiant As String
+
+
+Public Sub _new(Gri As GridView, Optional cle As String = "", Optional choix As String = "A", Optional creer As Boolean = False)
+
+  Dim reqch As String
+  Dim aff As Affeven
+  Dim obs As Observer
+  
+  $cle = cle
+  $choix = choix
+  $gridview1 = Gri
+  
+   If choix = "D" Then 
+     demar
+     Return
+  Endif
+  obs = New Observer($gridview1) As "$gridview1"
+  
+  entete($gridview1)
+  
+  If choix = "A" Then reqch = "" Else reqch = " type=&1"
+  If cle Then 
+    If reqch Then reqch = reqch & " AND"
+    reqch = reqch & " num=&2"
+  Endif
+  $req = "SELECT * FROM evenement"
+  If reqch Then $req &= " WHERE" & reqch
+  affiche(choix, cle)
+  If creer Then
+    aff = New Affeven(0, choix)
+    aff.ShowModal
+    affiche()
+  Endif
+End
+
+Public Sub $GridView1_Data(Row As Integer, Column As Integer)
+
+  Dim fent As Float
+  Dim res As Result
+  Dim dte As Date
+  
+  $res.MoveTo(row)
+  If Not $res.Available Then Return
+  fent = row / 2
+  If fent = Int(row / 2) Then $GridView1.Data.Background = Color.Background - 50
+  $GridView1.Data.Alignment = Align.Left
+  
+  Select Case Column
+    Case 0
+       $GridView1.Data.Text = $res!id
+    Case 1
+      res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", $res!num)
+      If res.Available Then
+        $GridView1.Data.Text = res!nom
+      Else
+       $GridView1.Data.Text = $res!num
+      Endif
+    Case 2
+       $GridView1.Data.Text = $res!nom
+     Case 3
+      $GridView1.Data.Text = Format($res!date, "dd.mm.yyyy")
+    Case 4
+      dte = DateAdd($res!date, gb.Year, $res!periodicite)
+      $GridView1.Data.Text = Format(dte, "dd.mm.yyyy")
+    Case 5 
+      $GridView1.Data.Text = $res!fournisseur
+    Case 6
+      $GridView1.Data.Text = $res!tel
+    End Select
+
+End
+
+Public Sub $gridview1_Activate()
+
+  Dim aff As Affeven
+  
+  If Not $gridview1 Then Return
+  aff = New Affeven(Val($gridview1[$gridview1.Row, 0].Text), "A") 
+  aff.ShowModal
+  affiche()
+
+End
+
+Public Sub affiche(Optional type As String = $choix, Optional cle As String = $cle)
+  
+  $res = connect.ccon.Exec($req, type, cle)
+  If $res.Available Then
+    $gridview1.Rows.Count = $res.Count
+  Else
+    $gridview1.Clear
+    $gridview1.Rows.Count = 0
+  Endif
+  
+End
+'cherche et affiche les evenements à la date
+Private Sub demar()
+  
+  Dim res As Result
+  Dim dte As Date
+  Dim ok As Boolean
+  Dim i As Integer
+  Dim win As Window
+  Dim GridView1 As GridView
+  
+  res = connect.ccon.Exec("SELECT * FROM evenement")
+  If res.Available Then
+    win = New Window
+    win.Height = 300
+    win.Width = 700
+    GridView1 = New GridView(win)
+    entete(GridView1)
+    GridView1.Expand = True
+    gridview1.AutoResize = True
+    GridView1.Height = 300
+    GridView1.Width = 700
+    GridView1.x = 0
+    GridView1.y = 0
+    Repeat
+      dte = DateAdd(res!date, gb.Year, res!periodicite)
+      dte = DateAdd(dte, gb.Month, res!perioderap * -1)
+      If Format(Now, "yyyymmdd") > Format(dte, "yyyymmdd") Then
+        ok = True
+        gridview1.Rows.Count = i + 1
+        GridView1[i, 0].Alignment = Align.Left
+        gridview1[i, 0].Text = res!id
+        GridView1[i, 1].Alignment = Align.Left
+        gridview1[i, 1].Text = res!num
+        GridView1[i, 2].Alignment = Align.Left
+        gridview1[i, 2].Text = res!nom
+        GridView1[i, 3].Alignment = Align.Left
+        gridview1[i, 3].Text = Format(res!date, "dd.mm.yyyy")
+        GridView1[i, 4].Alignment = Align.Left
+        dte = DateAdd(res!date, gb.Year, res!periodicite)
+        gridview1[i, 4].Text = Format(dte, "dd.mm.yyyy")
+        GridView1[i, 5].Alignment = Align.Left
+        gridview1[i, 5].Text = res!fournisseur
+        GridView1[i, 6].Alignment = Align.Left
+        gridview1[i, 6].Text = res!tel
+        i += 1
+      Endif
+    Until res.MoveNext()
+    If ok Then
+      win.ShowModal
+    Endif
+  Endif
+End
+
+Private Sub entete($gridview1 As GridView)
+  
+  $GridView1.Columns.count = 7
+  $GridView1.Columns[0].Title = "Id" 
+  $GridView1.Columns[1].Title = "Identifiant"
+  $GridView1.Columns[2].Title = "Travaux"
+  $GridView1.Columns[3].Title = "Date prec"
+  $GridView1.Columns[4].Title = "Date suiv"
+  $GridView1.Columns[5].Title = "Fournisseur"
+  $GridView1.Columns[6].Title = "Tel"
+
+  $GridView1.Columns[0].Width = 50
+  $GridView1.Columns[1].Width = 180
+  $GridView1.Columns[2].Width = 220
+  $GridView1.Columns[3].Width = 100
+  $GridView1.Columns[4].Width = 100
+  $GridView1.Columns[5].Width = 220
+  $GridView1.Columns[6].Width = 100
+  
+  $GridView1.Columns[0].Alignment = Align.Center
+  $GridView1.Columns[1].Alignment = Align.Center
+  $GridView1.Columns[2].Alignment = Align.Center
+  $GridView1.Columns[3].Alignment = Align.Center
+  $GridView1.Columns[4].Alignment = Align.Center
+  $GridView1.Columns[5].Alignment = Align.Center
+  $GridView1.Columns[6].Alignment = Align.Center
+  
+  $GridView1.Header = GridView.Horizontal
+  $GridView1.Mode = Select.Single
+  $GridView1.ScrollBar = Scroll.Both
+  
+End
+
+Private Function Identifiant_Read() As String
+
+  Return $cle
+
+End
+
+Private Sub Identifiant_Write(Value As String)
+
+  $cle = Value
+  affiche()
+
+End

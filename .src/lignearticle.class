@@ -55,7 +55,7 @@ Event Down(mn As Integer)
 Event supprime(mn As Integer)
 
 
-Public Sub _new(fr As Form, choix As String, lnumcom As Long, rclient As Result, couleur As Integer, Optional nart As Variant)
+Public Sub _new(fr As Form, choix As String, lnumcom As Long, rclient As Result, couleur As Integer, Optional nart As Variant, Optional com As Boolean = False)
 
   'défini les relations entres les textbox
   $obs = New Observer(num) As "saisie"

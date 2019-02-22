@@ -170,10 +170,42 @@ Public Sub Button3_Click()
     "remise DECIMAL(8,2)," &
     "pxamp DECIMAL(9,3)," &
     "PRIMARY KEY (idligne,numligne))")
+    'evenements
+    Try con.Exec("CREATE TABLE evenement" &
+    " (id int NOT NULL AUTO_INCREMENT," &
+    "type CHAR(1)," &
+    "num CHAR(10)," &
+    "nom CHAR(35)," &
+    "periodicite INTEGER," &
+    "perioderap INTEGER," &
+    "date DATE," &
+    "fournisseur CHAR(35)," &
+    "tel CHAR(14)," &
+    "PRIMARY KEY (id))")
+    
     Print Error.Text
     Me.Mouse = Mouse.Default
     
   Catch
     Message.Error(Error.Text, "OK")
     
+End
+
+Public Sub Button4_Click()
+
+   'evenements
+    Try connect.ccon.Exec("CREATE TABLE evenement" &
+    " (id int NOT NULL AUTO_INCREMENT," &
+    "type CHAR(1)," &
+    "num CHAR(10)," &
+    "nom CHAR(35)," &
+    "periodicite INTEGER," &
+    "perioderap INTEGER," &
+    "date DATE," &
+    "fournisseur CHAR(35)," &
+    "tel CHAR(14)," &
+    "PRIMARY KEY (id)) ")
+    
+    Print Error.Text
+
 End

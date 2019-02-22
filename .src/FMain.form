@@ -13,6 +13,9 @@
     { camion Menu
       Text = ("Fiche camion")
     }
+    { Evenements Menu
+      Text = ("Fiche évenements")
+    }
     { bases Menu
       Text = ("Base")
     }
