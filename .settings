@@ -1,15 +1,23 @@
 [Bookmarks]
 commande=[223]
 FMain=[397]
+Client=[485]
 
 [Breakpoints]
-Count=0
+Count=1
+Breakpoint[1]="base.196"
 
 [DebugWindow]
 Count=0
 
 [DebugWindow/$datejour]
 Geometry=[47,14,256,320]
+
+[DebugWindow/$gridview1[$gridview1.Row, 0]]
+Geometry=[67,242,288,360]
+
+[DebugWindow/$res]
+Geometry=[67,532,288,360]
 
 [DebugWindow/$resart]
 Geometry=[47,14,256,320]
@@ -29,8 +37,14 @@ Geometry=[47,14,256,320]
 [DebugWindow/DateBox1]
 Geometry=[43,14,256,320]
 
+[DebugWindow/GridView1]
+Geometry=[67,27,288,360]
+
+[DebugWindow/GridView1.Current]
+Geometry=[85,45,288,360]
+
 [DebugWindow/Last]
-Geometry=[47,14,256,320]
+Geometry=[67,27,288,360]
 
 [DebugWindow/Last.Border]
 Geometry=[53,20,256,320]
@@ -44,11 +58,14 @@ Geometry=[43,14,256,320]
 [DebugWindow/Object]
 Geometry=[47,14,256,320]
 
+[DebugWindow/Panel2]
+Geometry=[57,19,256,320]
+
 [DebugWindow/Panel2.Children]
-Geometry=[47,14,256,320]
+Geometry=[67,27,288,360]
 
 [DebugWindow/Panel2.Children[0]]
-Geometry=[53,20,256,320]
+Geometry=[63,27,256,320]
 
 [DebugWindow/Panel2.Children[2]]
 Geometry=[53,20,256,320]
@@ -59,11 +76,38 @@ Geometry=[53,20,256,320]
 [DebugWindow/ReportPclient]
 Geometry=[47,14,256,320]
 
+[DebugWindow/ScrollView1.Children]
+Geometry=[57,19,256,320]
+
+[DebugWindow/ScrollView1.Children[0]]
+Geometry=[63,27,256,320]
+
+[DebugWindow/ScrollView1.Children[1]]
+Geometry=[63,27,256,320]
+
+[DebugWindow/ScrollView1.Children[2]]
+Geometry=[63,27,256,320]
+
+[DebugWindow/TreeView1]
+Geometry=[57,19,256,320]
+
+[DebugWindow/TreeView1.Current]
+Geometry=[63,27,256,320]
+
+[DebugWindow/TreeView1.Item]
+Geometry=[57,168,256,320]
+
 [DebugWindow/c]
-Geometry=[47,14,256,320]
+Geometry=[57,19,256,320]
 
 [DebugWindow/c[0]]
-Geometry=[49,20,256,320]
+Geometry=[63,27,256,320]
+
+[DebugWindow/c[3]]
+Geometry=[63,27,256,320]
+
+[DebugWindow/c[4]]
+Geometry=[63,27,256,320]
 
 [DebugWindow/ca]
 Geometry=[47,14,256,320]
@@ -74,8 +118,14 @@ Geometry=[47,278,256,320]
 [DebugWindow/com]
 Geometry=[47,14,256,320]
 
+[DebugWindow/combomatap]
+Geometry=[57,19,256,320]
+
 [DebugWindow/fr]
 Geometry=[47,42,256,320]
+
+[DebugWindow/la]
+Geometry=[57,19,256,320]
 
 [DebugWindow/nbcam]
 Geometry=[43,14,256,320]
@@ -101,22 +151,56 @@ Geometry=[43,14,256,320]
 [DebugWindow/saisie]
 Geometry=[47,42,256,320]
 
+[DebugWindow/tab]
+Geometry=[131,357,256,320]
+
+[DebugWindow/tab[0]]
+Geometry=[-4,355,256,320]
+
+[DebugWindow/tab[1]]
+Geometry=[88,512,256,320]
+
+[DebugWindow/tab[2]]
+Geometry=[53,724,256,320]
+
+[DebugWindow/tab[i]]
+Geometry=[65,911,256,320]
+
 [DebugWindow/tabid]
 Geometry=[48,15,256,320]
 
 [DebugWindow/textnumcl]
 Geometry=[43,14,256,320]
 
+[DebugWindow/type]
+Geometry=[67,27,288,360]
+
+[Executable]
+Path="Commande.gambas"
+
 [OpenFile]
-Active=4
+Active=5
 File[1]=".src/FMain.form"
-File[2]=".src/FMain.class:3.399"
-File[3]=".src/Edittourn.report"
-File[4]=".src/Edittourn.class:40.151"
-File[5]=".src/camion.class:2.482"
-File[6]=".src/facturation.class:20.17"
-File[7]=".connection/Commande.connection"
-Count=7
+File[2]=".src/FMain.class:18.19"
+File[3]=".src/base.form"
+File[4]=".src/Fcamion.form"
+File[5]=".src/Fcamion.class:2.50"
+File[6]=".src/base.class:3.210"
+Count=20
+File[7]=".src/evenement.form"
+File[8]=".src/evenement.class:0.54"
+File[9]=".src/gesteven.class:0.0"
+File[10]=".src/affeven.form"
+File[11]=".src/affeven.class:2.154"
+File[12]=".src/lignearticle.form"
+File[13]=".src/lignearticle.class:2.129"
+File[14]=".src/Fchauffeur.form"
+File[15]=".src/Fchauffeur.class:10.30"
+File[16]=".src/connect.module:0.0"
+File[17]=".src/saisie.form"
+File[18]=".src/saisiearticle.form"
+File[19]=".src/saisiearticle.class:0.76"
+File[20]=".src/facturation.class:0.324"
 
 [Watches]
 Count=3

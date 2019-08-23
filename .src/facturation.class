@@ -290,6 +290,7 @@ Public Sub butfac_Click()
     obj = ScrollView1.Children
     For i = 0 To obj.count - 1
       obj[0].Delete
+      obj = ScrollView1.Children
     Next
   Endif
   butfac.Enabled = False
