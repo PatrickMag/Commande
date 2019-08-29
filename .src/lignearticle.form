@@ -14,10 +14,6 @@
       Font = Font["Serif,+1"]
       Background = &HF5FFFF&
     }
-    { com TextArea
-      MoveScaled(1,1,38,3)
-      Expand = True
-    }
     { Butboxnom ButtonBox
       MoveScaled(13,0,35,3.7778)
       Font = Font["Serif,+1"]

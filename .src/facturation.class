@@ -126,7 +126,7 @@ End
 Public Sub butfac_Click()
 
   
-  Dim resent, reslig, resart, res, respart As Result
+  Dim resent, reslig, resart, res, respart, restva As Result
   Dim rescom, rescli, resech As Result
   Dim i, ipoid As Integer
   Dim dnbon, numlig As Integer
@@ -196,6 +196,8 @@ Public Sub butfac_Click()
      res!brut_ligbl = Format(ligne.montantht + ligne.montrem, "0.00")
      res!rem_ligbl = ligne.montrem
      res!netht_ligbl = Format(ligne.montantht, "0.00")
+     restva = connect.cconlaurux.Exec("SELECT * FROM Fiches_Tvaav WHERE code_tva=&1", resart!art_tva)
+     If restva.Available Then res!mtx_ligfac = restva!taux_tva
      res!tx_ligbl = resart!art_tva
      res!nettc_ligbl = Format(ligne.montantttc, "0.00")
      res!typel_ligbl = "A"
@@ -207,7 +209,6 @@ Public Sub butfac_Click()
      res!tour_ligbl = rescom!numtourne
      Try res!tipp_ligbl = rescom!tipp
      res!dte_ligbl = DateBox1.Value
-     
      resart!art_qte -= ligne.qte
      res.Update
      resart.Update
@@ -232,9 +233,9 @@ Public Sub butfac_Click()
   res!numbl = respart!dnbon
   res!type = "B"
   res!cdclibl = rescom!numclient
-  Try res!cvclibl = rescli!cli_rs_soc
+  Try res!cvclibl = $rescli!cli_rs_soc
   Try res!nmclibl = rescom!nom
-'     res!pnmclibl = rescli!cli_pnm
+  Try res!pnmclibl = $rescli!cli_pnm
   Try res!adr1bl = rescom!adresse
   Try res!adr2bl = rescom!adresse1
   Try res!cpbl = rescom!cp
