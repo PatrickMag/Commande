@@ -207,7 +207,7 @@ End
 
 Public Sub Buttonqte_Click()
 
-  Me.Parent.Delete
+  Try Me.Parent.Delete
     
 End
 

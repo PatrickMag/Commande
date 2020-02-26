@@ -57,6 +57,7 @@ Public Sub _new(id As Integer, choix As String)
   If id = 0 Then
     $res = connect.ccon.Create("evenement")
   Endif
+  Crech.Columns.Count = 2
   
 End
 
@@ -97,11 +98,12 @@ Public Sub ident_LostFocus()
 
   Dim res As Result
   
+  If Not ident.Text Then Return
   Select Case type.Text
     Case "Camion"
       res = connect.ccon.Exec("SELECT * FROM camion WHERE idimat=&1", ident.Text)
       If Not res.Available Then
-        Message.Error("Camion innexistant")
+        Try Message.Error("Camion innexistant")
         Stop Event
         ident.SetFocus
       Else
@@ -110,9 +112,11 @@ Public Sub ident_LostFocus()
     Case "Chauffeur"
       res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", ident.Text)
       If Not res.Available Then
-        Message.Error("Chauffeur innexistant")
+        Try Message.Error("Chauffeur innexistant")
         Stop Event
         ident.SetFocus
+      Else
+        nom.Text = res!nom
       Endif
     Case "Dépôt"
       ident.Text = "Dépôt"
@@ -152,6 +156,41 @@ End
 
 Public Sub Button3_Click()
 
+  Dim res As Result
   
+  If Crech.Visible Then
+    Crech.Visible = False
+    Return
+  Else
+    Crech.Clear
+    Crech.Visible = True
+  Endif
+  
+  Select Case type.Current.Text
+    Case "Camion"
+      res = connect.ccon.Exec("SELECT idimat as cle,nomducamion as nom FROM camion")
+    Case "Chauffeur"
+      res = connect.ccon.Exec("SELECT idchauffeur as cle, nom FROM chauffeur")
+    Case Else
+      Crech.Visible = False
+      Return
+  End Select
+  
+  If res.Available Then
+    Crech.Rows.Count = 0
+    Repeat
+      Crech.Rows.Count += 1
+      Crech[Crech.Rows.Max, 0].Text = res!cle
+      Crech[Crech.Rows.Max, 1].Text = " " & res!nom
+    Until res.MoveNext()
+  Endif
+
+End
+
+Public Sub Crech_Activate()
+
+  ident.Text = Crech[Crech.Row, 0].Text
+  ident.SetFocus
+  Crech.Visible = False
 
 End

@@ -247,7 +247,7 @@ End
 
 Public Sub Button4_Click()
 
-  connect.ccon.Close
+  Try connect.ccon.Close
   Quit
 
 End

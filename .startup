@@ -2,7 +2,7 @@ FMain
 Gestion des commandes
 0
 0
-0.0.3
+0.0.20
 
 gb.image
 gb.gui.qt
@@ -11,6 +11,7 @@ gb.data
 gb.db
 gb.db.form
 gb.db.mysql
+gb.desktop
 gb.settings
 gb.mysql
 gb.report2

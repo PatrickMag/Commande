@@ -4,11 +4,16 @@ FMain=[397]
 Client=[485]
 
 [Breakpoints]
-Count=1
+Count=2
 Breakpoint[1]="base.196"
+Breakpoint[2]="facturation.175"
 
 [DebugWindow]
-Count=0
+Count=4
+DebugWindow[1]="$totvol"
+DebugWindow[2]="$totvol[\"400\"]"
+DebugWindow[3]="volume"
+DebugWindow[4]="$totvol[\"401\"]"
 
 [DebugWindow/$datejour]
 Geometry=[47,14,256,320]
@@ -22,6 +27,12 @@ Geometry=[67,532,288,360]
 [DebugWindow/$resart]
 Geometry=[47,14,256,320]
 
+[DebugWindow/$rescli]
+Geometry=[67,27,288,360]
+
+[DebugWindow/$rescli.Fields]
+Geometry=[85,45,288,360]
+
 [DebugWindow/$rescmd]
 Geometry=[47,14,256,320]
 
@@ -34,11 +45,26 @@ Geometry=[43,14,256,320]
 [DebugWindow/$reslco]
 Geometry=[47,14,256,320]
 
+[DebugWindow/$totvol]
+Geometry=[67,27,288,360]
+
+[DebugWindow/$totvol["400"]]
+Geometry=[89,679,288,360]
+
+[DebugWindow/$totvol["401"]]
+Geometry=[1547,45,288,360]
+
 [DebugWindow/DateBox1]
 Geometry=[43,14,256,320]
 
 [DebugWindow/GridView1]
-Geometry=[67,27,288,360]
+Geometry=[67,143,288,360]
+
+[DebugWindow/GridView1.Children]
+Geometry=[67,143,288,360]
+
+[DebugWindow/GridView1.Children[0]]
+Geometry=[1034,174,288,360]
 
 [DebugWindow/GridView1.Current]
 Geometry=[85,45,288,360]
@@ -75,6 +101,9 @@ Geometry=[53,20,256,320]
 
 [DebugWindow/ReportPclient]
 Geometry=[47,14,256,320]
+
+[DebugWindow/ScrollArea(GridView1.Children[0]).Children]
+Geometry=[121,81,288,360]
 
 [DebugWindow/ScrollView1.Children]
 Geometry=[57,19,256,320]
@@ -175,32 +204,27 @@ Geometry=[43,14,256,320]
 [DebugWindow/type]
 Geometry=[67,27,288,360]
 
+[DebugWindow/volume]
+Geometry=[82,433,288,360]
+
 [Executable]
 Path="Commande.gambas"
+DoNotIncrementVersion=True
 
 [OpenFile]
-Active=5
+Active=8
 File[1]=".src/FMain.form"
-File[2]=".src/FMain.class:18.19"
+File[2]=".src/FMain.class:35.185"
 File[3]=".src/base.form"
-File[4]=".src/Fcamion.form"
-File[5]=".src/Fcamion.class:2.50"
-File[6]=".src/base.class:3.210"
-Count=20
-File[7]=".src/evenement.form"
-File[8]=".src/evenement.class:0.54"
-File[9]=".src/gesteven.class:0.0"
-File[10]=".src/affeven.form"
-File[11]=".src/affeven.class:2.154"
-File[12]=".src/lignearticle.form"
-File[13]=".src/lignearticle.class:2.129"
-File[14]=".src/Fchauffeur.form"
-File[15]=".src/Fchauffeur.class:10.30"
-File[16]=".src/connect.module:0.0"
-File[17]=".src/saisie.form"
-File[18]=".src/saisiearticle.form"
-File[19]=".src/saisiearticle.class:0.76"
-File[20]=".src/facturation.class:0.324"
+File[4]=".src/evenement.form"
+File[5]=".src/evenement.class:0.54"
+File[6]=".src/gesteven.class:0.0"
+Count=11
+File[7]=".src/affeven.form"
+File[8]=".src/affeven.class:0.194"
+File[9]=".src/Fchauffeur.form"
+File[10]=".src/Fchauffeur.class:9.31"
+File[11]=".connection/Commande.connection"
 
 [Watches]
 Count=3

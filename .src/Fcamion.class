@@ -44,10 +44,9 @@ Private Sub valide()
   $rescam!idimat = Textimm.Text
   $rescam!nomducamion = Textmar.Text
   $rescam!ageducamion = TextDte.Value
-  $rescam!capacitem3 = Textm3.Text
-  $rescam!chargutil = Textcu.Text
-  $rescam!chargutil = Textcu.Text
-  $rescam!nbclient = Textcli.Text
+  $rescam!capacitem3 = Val(Textm3.Text)
+  $rescam!chargutil = Val(Textcu.Text)
+  $rescam!nbclient = Val(Textcli.Text)
   
   $rescam.Update
   connect.ccon.Commit
@@ -64,6 +63,19 @@ Private Sub mablanc()
   Textm3.Clear
   Textmar.Clear
   
+End
+
+Public Sub Textm3_LostFocus()
+
+  Textm3.Text = Replace(Textm3.Text, ".", ",")
+  If IsNull(Val(Textm3.Text)) Then Textm3.SetFocus
+
+End
+
+Public Sub num_lostfocus()
+
+  If IsNull(Val(Last.Text)) Then Last.SetFocus
+
 End
 
 Public Sub bar_precedant()

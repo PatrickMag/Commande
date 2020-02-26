@@ -37,7 +37,8 @@
     MoveScaled(2,22,16,3)
     Text = ("Charge utile :")
   }
-  { Textcu TextBox
+  { Textcu TextBox num
+    Name = "Textcu"
     MoveScaled(22,22,12,3)
   }
   { Panel1 Panel
@@ -57,7 +58,8 @@
     MoveScaled(2,26,16,3)
     Text = ("Nb client estimés")
   }
-  { Textcli TextBox
+  { Textcli TextBox num
+    Name = "Textcli"
     MoveScaled(22,26,7,3)
   }
 }

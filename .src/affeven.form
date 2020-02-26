@@ -82,4 +82,8 @@
     MoveScaled(40,8,4,3)
     Picture = Picture["icon:/32/find"]
   }
+  { Crech GridView
+    MoveScaled(46,5,26,33)
+    Visible = False
+  }
 }

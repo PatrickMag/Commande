@@ -1,5 +1,12 @@
 ' Gambas class file
 
+Public Struct volcom
+  code As String
+  lib As String
+  tot As Float
+End Struct
+
+Private $totvol As New Collection
 Private $rescom As Result
 Private $reslco As Result
 Private $rescmd As Result
@@ -17,6 +24,7 @@ Public Sub _new(cam As Camion, dte As Date)
   Dim lab As ReportLabel
   Dim nom, tport, tfixe, adr1, adr2, cp, ville As ReportLabel
   Dim comgen, comjou As ReportLabel
+  Dim volume As Volcom
   
   $dtel = dte
   res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", Trim(Left(cam.ca.cnumchauf, 3))) 
@@ -44,43 +52,48 @@ Public Sub _new(cam As Camion, dte As Date)
         
         lab = New ReportLabel(rp)
         lab.Text = "Client N° : " & $rescmd!numclient
-        lab.Font = Font["Serif,+1"]
+        lab.Font = Font["Serif,12"]
         
         nom = New ReportLabel(rp)
-        nom.Font = Font["Serif,Bold,+2"]
+        nom.Font = Font["Serif,Bold,13"]
         nom.Text = $rescmd!nom & "   "
         'tel fixe
         rph = New ReportHBox(rp)
         lab = New ReportLabel(rph)
         lab.Text = "Tel fixe : "
-        lab.Font = Font["Serif,+1"]
+        lab.Font = Font["Serif,12"]
         
         tfixe = New ReportLabel(rph)
         tfixe.Expand = True
         tfixe.Text = $rescmd!telfixe
-        tfixe.Font = Font["Serif,+1"]
+        tfixe.Font = Font["Serif,12"]
         
         rph = New ReportHBox(rp)
         lab = New ReportLabel(rph)
         lab.Text = "Tel portable : "
-        lab.Font = Font["Serif,+1"]
+        lab.Font = Font["Serif,12"]
         
         tport = New ReportLabel(rph)
         tport.Expand = True
         tport.Text = $rescmd!telport
-        tport.Font = Font["Serif,+1"]
+        tport.Font = Font["Serif,12"]
         
         rpv = New ReportVBox(ReportPc1)
         rpv.Expand = True
+        rpv.Font = Font["Serif,11"]
         adr1 = New ReportLabel(rpv)
         adr1.Text = $rescmd!adressel
+        adr1.Font = Font["Serif,11"]
         adr2 = New ReportLabel(rpv)
         adr2.Text = $rescmd!adressel1
+        adr2.Font = Font["Serif,11"]
         
         rph = New ReportHBox(rpv)
         cp = New ReportLabel(rph)
         cp.text = $rescmd!cpl & "    "
+        cp.Font = Font["Serif,11"]
         ville = New ReportLabel(rph)
+        ville.Font = Font["Serif,11"]
         ville.text = $rescmd!villel
         ville.Expand = True
         'panel des commentaires
@@ -92,7 +105,7 @@ Public Sub _new(cam As Camion, dte As Date)
         comjou = New ReportLabel(rp)
         comjou.Autoresize = True
         comjou.Expand = True
-        comjou.Font = Font["Serif, -2"]
+        comjou.Font = Font["Serif, 9"]
         comjou.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
         res = connect.ccon.Exec("SELECT * FROM datedelivraison WHERE idlivraison=&1 AND datelivr=&2", $rescom!idcomcl, $dtel)
         comjou.Brush = ReportBrush.Color(Color.Red)
@@ -101,7 +114,7 @@ Public Sub _new(cam As Camion, dte As Date)
         comgen = New ReportLabel(rp)
         comgen.Autoresize = True
         comgen.Expand = True
-        comgen.Font = Font["Serif, -2"]
+        comgen.Font = Font["Serif, 9"]
         comgen.Brush = ReportBrush.Color(Color.Red)
         comgen.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
         comgen.Text = $rescmd!commentaire
@@ -122,6 +135,7 @@ Public Sub _new(cam As Camion, dte As Date)
         lab.Width = "40mm"
         lab.Alignment = Align.Center
         lab.Border = ReportBorder["Right:1pt #000000"]
+        lab.Font = Font["Serif,11"]
         lab.Text = "Code"
         
         lab = New ReportLabel(rph)
@@ -129,12 +143,14 @@ Public Sub _new(cam As Camion, dte As Date)
         lab.Expand = True
         lab.Alignment = Align.Normal
         lab.Border = ReportBorder["Right:1pt #000000"]
+        lab.Font = Font["Serif,11"]
         lab.Text = "Libellé"
         
         lab = New ReportLabel(rph)
         lab.Height = "5mm"
         lab.Width = "30mm"
         lab.Alignment = Align.Center
+        lab.Font = Font["Serif,11"]
         lab.Text = "P.U."
         
         For j = 0 To $rescmd.Max
@@ -155,6 +171,7 @@ Public Sub _new(cam As Camion, dte As Date)
              lab.Border = ReportBorder["Right:1pt #000000"]
              lab.Height = "5mm"
              lab.Width = "30mm"
+             lab.Font = Font["Serif,11"]
              lab.text = $reslco!qte
              
              lab = New ReportLabel(rph)
@@ -162,6 +179,7 @@ Public Sub _new(cam As Camion, dte As Date)
              lab.Border = ReportBorder["Right:1pt #000000"]
              lab.Height = "5mm"
              lab.Width = "40mm"
+             lab.Font = Font["Serif,11"]
              lab.text = $reslco!numarticle
              
              lab = New ReportLabel(rph)
@@ -169,14 +187,27 @@ Public Sub _new(cam As Camion, dte As Date)
              lab.Border = ReportBorder["Right:1pt #000000"]
              lab.Height = "5mm"
              lab.Expand = True
+             lab.Font = Font["Serif,11"]
              lab.text = $reslco!libarticle
              
              lab = New ReportLabel(rph)
              lab.Alignment = Align.Right
              lab.Height = "5mm"
              lab.Width = "30mm"
+             lab.Font = Font["Serif,11"]
              lab.text = $reslco!prix
-             
+             'on compte les totaux par par produit
+             volume = New Volcom
+             If $totvol.Exist($reslco!numarticle) Then
+               volume = $totvol[$reslco!numarticle]
+               If Not IsNull($reslco!qte) Then volume.tot += $reslco!qte
+                $totvol[$reslco!numarticle] = volume
+              Else
+                volume.code = $reslco!numarticle
+                volume.lib = $reslco!libarticle
+                volume.tot = $reslco!qte
+                $totvol.Add(volume, $reslco!numarticle)
+             Endif
             Until $reslco.MoveNext()
           Endif
           $rescmd.MoveNext()
@@ -187,6 +218,37 @@ Public Sub _new(cam As Camion, dte As Date)
 '      rph.Expand = True
       rph.BackGround = ReportBrush["#0000FF"]
       $rescom.MoveNext
+    Next
+    'on édite les totaux
+    rph.BackGround = ReportBrush["#FF0000"]
+    For Each volume In $totvol
+      rph = New ReportHBox(Me)
+      rph.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
+      
+      lab = New ReportLabel(rph)
+      lab.Alignment = Align.Right
+      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Height = "5mm"
+      lab.Width = "30mm"
+      lab.Font = Font["Serif,11"]
+      lab.text = Format(volume.tot, "0.000")
+     
+      lab = New ReportLabel(rph)
+      lab.Alignment = Align.Left
+      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Height = "5mm"
+      lab.Width = "40mm"
+      lab.Font = Font["Serif,11"]
+      lab.text = volume.code
+      
+      lab = New ReportLabel(rph)
+      lab.Alignment = Align.Left
+      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Height = "5mm"
+      lab.Expand = True
+      lab.Font = Font["Serif,11"]
+      lab.text = volume.lib
+    
     Next
   Endif
 
