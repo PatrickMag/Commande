@@ -91,9 +91,9 @@ Public Sub _new(cam As Camion, dte As Date)
         rph = New ReportHBox(rpv)
         cp = New ReportLabel(rph)
         cp.text = $rescmd!cpl & "    "
-        cp.Font = Font["Serif,11"]
+        cp.Font = Font["Serif,10"]
         ville = New ReportLabel(rph)
-        ville.Font = Font["Serif,11"]
+        ville.Font = Font["Serif,10"]
         ville.text = $rescmd!villel
         ville.Expand = True
         'panel des commentaires

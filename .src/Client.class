@@ -13,6 +13,7 @@ Private pan As Panel        'pour afficher les commentaires de la fiche client
 Private but As Button
 Private txt As TextArea
 Private $win As Window
+Private $lab As Label
 
 Private DateChooser1 As DateChooser
                                           'scrolview pour affichage des camions et des dates de livraison souhaitées
@@ -290,7 +291,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
   
   Dim $res, $res1 As Result
   
-  $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_code=&1", cle)
+  $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli JOIN Fiches_Comptes ON cli_code=compte_cc WHERE cli_code=&1", cle)
   If Not $res.Available Then
     Message.Error("Client innexistant", "OK")
     Return
@@ -325,7 +326,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
     Try Texttipp.Text = $res1!tipp
   Endif
   '                                                           Gere la fenetre observation ds le fichier client laurux
-  If $res!cli_obs Then
+  If $res!cli_obs Or Round($res!solde, -2) <> 0 Then
     pan = New Panel(Panel1)
     pan.NoTabFocus = False
     pan.Ignore = True
@@ -360,6 +361,16 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
     but.y = 270
     but.Picture = Picture["icon:/small/copy"]
     but.Text = "Copie"
+    If Round($res!solde, -2) <> 0 Then
+      $lab = New Label(pan)
+      $lab.x = 140
+      $lab.y = 270
+      $lab.Height = 30
+      $lab.Width = 150
+      $lab.Background = Color.Red
+      $lab.Text = "Solde = " & Format($res!solde, "0.00")
+      $lab.Alignment = Align.Center
+    Endif
   Endif
   afficheincid
   
@@ -523,27 +534,29 @@ Public Sub Butext_Click()
   Dim grdv As GridView
   Dim res As Result
   Dim i As Integer
+  Dim deb, cre As Float
+  Dim lab As Label
   
   win = New Window As "win"
   grdv = New GridView(win)
-  win.Arrangement = Arrange.Horizontal
+  win.Arrangement = Arrange.Vertical
   win.AutoResize = True
   win.Text = "Liste des extraits de compte"
   grdv.Expand = True
   win.Height = 300
   win.Width = 850
-  grdv.Height = 300
+  grdv.Height = 250
   grdv.Width = 850
   grdv.Columns.Count = 4
   grdv.Columns[0].Title = "DATE"
   grdv.Columns[0].Width = 150
   grdv.Columns[1].Title = "Libelle"
-  grdv.Columns[1].Width = 400
+  grdv.Columns[1].Width = 395
   grdv.Columns[2].Title = "DEBIT"
   grdv.Columns[2].Width = 150
   grdv.Columns[3].Title = "CREDIT"
   grdv.Columns[3].Width = 150
-  res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Mvt where compte=&1 ORDER BY dte", textnumcl.Text)
+  res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Mvt where compte=&1 AND validee = True ORDER BY dte", textnumcl.Text)
   If res.Available Then
      grdv.Rows.Count = res.Count
      res.MoveFirst
@@ -554,8 +567,25 @@ Public Sub Butext_Click()
        grdv[i, 2].Alignment = Align.Right
        grdv[i, 3].Text = Format(res!montantc, "0.00")
        grdv[i, 3].Alignment = Align.Right
+       deb += res!montantd
+       cre += res!montantc
        res.MoveNext
      Next
+     pan = New Panel(win)
+     pan.Arrangement = Arrange.Horizontal
+     pan.Height = 30
+     lab = New Label(pan)
+     lab.Expand = True
+     lab.Text = "Solde : " & Format(deb - cre, "0.00")
+     lab.Alignment = Align.Center
+     lab = New Label(pan)
+     lab.Width = 150
+     lab.Alignment = Align.Right
+     lab.Text = Format(deb, "0.00")
+      lab = New Label(pan)
+     lab.Width = 150
+     lab.Alignment = Align.Right
+     lab.Text = Format(cre, "0.00")
   Endif
   win.ShowModal
 
