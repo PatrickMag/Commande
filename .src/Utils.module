@@ -143,22 +143,17 @@ Public Function Calcech(dureech As String, jours As String, finmois As Boolean, 
   
 End
 
-Public Function RecCom(sTri As String, bCom As Boolean, Optional vVal1 As Variant, sVal2 As String) As Result
+Public Function RecCom(sTri As String, bCom As Boolean, Optional vVal1 As Variant, sVal2 As String, nom As String) As Result
   
   '                                 sTri selection, si bCom = true commande deja livrée, vVal1 & vVals cest suivant
   Dim res As Result
   
   Select Case sTri
-    Case "nom"                  'recherche des commandes par nom
-      vVal1 = "%" & vVal1 & "%"
-      res = connect.ccon.Exec("SELECT * FROM commande WHERE nom LIKE &1 AND comlivre=&2", vVal1, bCom)
-    Case "num"                    'recherche des commandes par numéro
-      res = connect.ccon.Exec("SELECT * FROM commande WHERE numclient=&1 AND comlivre=&2", vVal1, bCom)
-    Case "tou"                    'recherche des commandes par numéro de tournée
-      If sVal2 < vVal1 Then sVal2 = vVal1
-      res = connect.ccon.Exec("SELECT * FROM commande WHERE numtourne>= &1 and numtourne<=&2 AND comlivre=&3", vVal1, sVal2, bCom)
-  Case "all"                      'recherche de toutes les commandes 
-    res = connect.ccon.Exec("SELECT * FROM commande WHERE comlivre=&1", bCom)
+  
+    Case "tou"                    'recherche des commandes par numéro de tournée, nom et livrées
+      If sVal2 < vVal1 Then Swap sVal2, vVal1
+       nom = "%" & nom & "%"
+      res = connect.ccon.Exec("SELECT * FROM commande WHERE numtourne>= &1 and numtourne<=&2 AND comlivre=&3 AND nom LIKE &4", vVal1, sVal2, bCom, nom)
                                     'gere les camions par date
   Case "date"
     res = connect.ccon.Exec("SELECT * FROM commandeparcamion WHERE datecam=&1", vVal1)

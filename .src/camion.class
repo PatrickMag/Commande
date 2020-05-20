@@ -21,6 +21,7 @@ Private $lNumcam As Long
 Private $lnumcom As Long
 Private $poid As Integer
 Private $vol As Float
+Private $timer As Timer
 
 Property Read Nbclient As Integer
 Property Read Nbtourne As Integer
@@ -91,6 +92,9 @@ Public Sub _new(sChoix As String, lIdcom As Long, Optional lId As Long, dDte As 
   Datecom.Value = ca.datecam
   Labelcam.Text = ca.comnumcam
   Labelchauf.Text = ca.cnumchauf
+  $timer = New Timer As "MyTimer"
+  $timer.Delay = 5000
+  $timer.Enabled = True
   
 End
 
@@ -300,6 +304,13 @@ Dim res As Result
 
 End
 
+Public Sub MyTimer_Timer()
+
+  ajoudescom($lNumcam)
+  ajoudestourne($lNumcam)
+
+End
+
 Private Sub affbouton(Optional s As String)
   
   If $lnumcom = 0 Then
@@ -331,8 +342,9 @@ End
 Private Sub ajoudescom(lId As Long)
 
   Dim i As Integer
-  
+  Dim ind As Integer
 
+  ind = ListBox1.Index
   $resligcpc = $ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcpc=&1", lId)
  
   If $resligcpc.Available Then
@@ -348,7 +360,7 @@ Private Sub ajoudescom(lId As Long)
       $resligcpc.MoveNext
     Next
     couleur($resligcpc.Count)
-    ListBox1.Index = 0
+    ListBox1.Index = ind
     affbouton
   Else
     ListBox1.Clear
@@ -359,7 +371,9 @@ End
 Private Sub ajoudestourne(lId As Long)
   
   Dim i As Integer
+  Dim ind As Integer
 
+  ind = ListBox2.Index
   $resligtourpc = $ccon.Exec("SELECT * FROM lignetournepcam WHERE idcpc=&1", lId) 
   ListBox2.Clear
     If $resligtourpc.Available Then
@@ -369,7 +383,7 @@ Private Sub ajoudestourne(lId As Long)
         AffTou($resligtourpc!idnumtourne)
         $resligtourpc.MoveNext
       Next
-      ListBox2.Index = 0
+      ListBox2.Index = ind
     Else
       ListBox2.Clear
     Endif

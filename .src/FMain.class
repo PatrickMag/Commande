@@ -7,7 +7,7 @@ Private co As Commande
 
 Private $datejour As DateChooser
 Private $dte As Date
-
+Private $timer As Timer
 
 Public Sub form_Open()
 
@@ -45,22 +45,32 @@ Public Sub form_Open()
   
   affiche
   affrenseignement(0)
+  $timer = New Timer As "MyTimer"
+  $timer.Delay = 5000
+  $timer.Enabled = True
   
 End
 
-Public Sub Textnom_Activate()
+Public Sub MyTimer_Timer()
+
   
-  $res = Utils.RecCom("nom", Radiocomliv.Value, Textnom.Text)
-  GridView1.Rows.Count = $res.count
-  GridView1.Row = 0
+  If Checkattrib.Value Then
+    $res = Utils.RecCom("camexist", Radiocomliv.Value)
+  Else
+    affiche
+  Endif
+
+End
+
+Public Sub Textnom_Change()
+  
+  affiche
   
 End
 
-Public Sub Textnum_Activate()
+Public Sub Textnum_Change()
   
-  $res = Utils.RecCom("num", Radiocomliv.Value, Textnum.Text)
-  GridView1.Rows.Count = $res.count
-  GridView1.Row = 0
+  affiche
 
 End
 
@@ -76,20 +86,16 @@ Public Sub Checkattrib_Click()
   
 End
 
-Public Sub Texttinf_Activate()
+Public Sub Texttinf_Change()
   
-  $res = Utils.RecCom("tou", Radiocomliv.Value, Texttinf.Text, Texttsup.Text)
-  GridView1.Rows.Count = $res.count
-  GridView1.Row = 0
+  affiche
 
   
 End
 
-Public Sub Texttsup_Activate()
+Public Sub Texttsup_Change()
   
-  $res = Utils.RecCom("tou", Radiocomliv.Value, Texttinf.Text, Texttsup.Text)
-  GridView1.Rows.Count = $res.count
-  GridView1.Row = 0
+  affiche
   
 End
 
@@ -241,7 +247,7 @@ End
 Public Sub Butsup_Click()
 
   co.SupCom(GridView1[GridView1.Row, 7].Text)
-  Textnom_Activate
+  Textnom_Change
   
 End
 
@@ -443,11 +449,8 @@ End
 
 Private Sub affiche()
   
-  $res = Utils.RecCom("all", False)
+  $res = Utils.RecCom("tou", Radiocomliv.Value, Texttinf.Text, Texttsup.Text, Textnom.Text)
   GridView1.Rows.Count = $res.Count
-  GridView1.Row = 0
-  GridView1.Refresh
-  Wait 0.01
   
 End
 

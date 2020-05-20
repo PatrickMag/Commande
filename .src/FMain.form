@@ -54,6 +54,7 @@
         { !Texttinf TextBox
           MoveScaled(10,5,10,3)
           #Public = True
+          Text = ("00000")
         }
         { Label8 Label
           MoveScaled(1,9,3,3)
@@ -61,6 +62,7 @@
         }
         { Texttsup TextBox
           MoveScaled(10,9,10,3)
+          Text = ("ZZZZZ")
         }
         { Checkattrib CheckBox
           MoveScaled(27,6,20,2.6667)
