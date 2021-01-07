@@ -367,7 +367,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
       $lab.y = 270
       $lab.Height = 30
       $lab.Width = 150
-      $lab.Background = Color.Red
+      If $res!solde <= 0 Then $lab.Background = Color.Green Else $lab.Background = Color.Red
       $lab.Text = "Solde = " & Format($res!solde, "0.00")
       $lab.Alignment = Align.Center
     Endif

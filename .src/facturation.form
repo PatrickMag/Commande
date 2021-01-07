@@ -15,32 +15,32 @@
     Alignment = Align.Center
   }
   { Butrlc Button
-    MoveScaled(68,14,35,5)
+    MoveScaled(49,14,35,5)
     Text = ("Remise de la livraison en commande")
     Picture = Picture["icon:/medium/clear"]
   }
   { butfac Button
-    MoveScaled(68,19,35,5)
+    MoveScaled(49,19,35,5)
     Enabled = False
     Text = ("Facturation de la commande")
     Picture = Picture["icon:/medium/exec"]
   }
   { Button3 Button
-    MoveScaled(68,32,35,5)
+    MoveScaled(49,32,35,5)
     Text = ("Sortie")
     Picture = Picture["icon:/medium/quit"]
   }
   { Butsupcam Button
-    MoveScaled(68,24,35,5)
+    MoveScaled(49,24,35,5)
     Text = ("Suppression du camion")
     Picture = Picture["icon:/medium/delete"]
   }
   { Label2 Label
-    MoveScaled(67,4,7,3)
+    MoveScaled(49,4,7,3)
     Text = ("Date :")
   }
   { DateBox1 DateBox
-    MoveScaled(85,4,21,3)
+    MoveScaled(62,4,21,3)
   }
   { TabStrip1 TabStrip
     MoveScaled(0,38,134,33)
@@ -106,7 +106,7 @@
       }
     }
     { ScrollView1 ScrollView
-      MoveScaled(0,3,132,26)
+      MoveScaled(1,3,132,26)
       Arrangement = Arrange.Vertical
     }
     Index = 0
@@ -120,5 +120,21 @@
     MoveScaled(110,72,11,4)
     Alignment = Align.Right
     ReadOnly = True
+  }
+  { Panel3 Panel
+    MoveScaled(89,4,37,33)
+    Arrangement = Arrange.Vertical
+    Border = Border.Plain
+    { Label4 Label
+      MoveScaled(0,1,37,4)
+      Background = &HDFFFF7&
+      Text = ("Commentaires")
+      Alignment = Align.Center
+    }
+    { comm TextArea
+      MoveScaled(1,6,36,19)
+      Expand = True
+      ReadOnly = True
+    }
   }
 }

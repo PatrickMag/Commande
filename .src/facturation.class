@@ -36,6 +36,7 @@ Public Sub TreeView1_Activate()
   rescom = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", Val(TreeView1.Current.Key))
   $rescli = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_code=&1", Val(rescom!numclient))
   ScrollView1.Children.Clear
+  comm.Text = rescom!commentaire
   If $rescli.Available Then
     resligne = connect.ccon.Exec("SELECT * FROM lignedecommande WHERE idligne=&1", Val(TreeView1.Current.Key))
     If resligne.Available Then
