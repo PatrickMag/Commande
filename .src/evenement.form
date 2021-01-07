@@ -5,6 +5,7 @@
   Text = ("Gestion des évenements")
   { GridView1 GridView
     MoveScaled(0,2,121,41)
+    Sorted = True
   }
   { Panel1 Panel
     MoveScaled(2,45,118,6)

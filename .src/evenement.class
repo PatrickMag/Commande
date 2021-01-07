@@ -34,7 +34,7 @@ End
 
 Public Sub entreprise_Click()
   
-  If chauffeurs.Value Then $gest = New Gesteven(GridView1, "", "E")
+  If entreprise.Value Then $gest = New Gesteven(GridView1, "", "E")
 
 End
 

@@ -86,13 +86,14 @@ Public Sub $gridview1_Activate()
   If Not $gridview1 Then Return
   aff = New Affeven(Val($gridview1[$gridview1.Row, 0].Text), "A") 
   aff.ShowModal
+  Stop Event
   affiche()
 
 End
 
 Public Sub affiche(Optional type As String = $choix, Optional cle As String = $cle)
   
-  $res = connect.ccon.Exec($req, type, cle)
+  $res = connect.ccon.Exec($req & " ORDER BY num ", type, cle)
   If $res.Available Then
     $gridview1.Rows.Count = $res.Count
   Else
@@ -105,31 +106,33 @@ End
 Private Sub demar()
   
   Dim res As Result
-  Dim dte As Date
+  Dim dte, dte1 As Date
   Dim ok As Boolean
-  Dim i As Integer
+  Dim i, j As Integer
   Dim win As Window
   Dim GridView1 As GridView
+  Dim coul As Integer = Color.Red
   
   res = connect.ccon.Exec("SELECT * FROM evenement")
   If res.Available Then
     win = New Window
-    win.Height = 300
-    win.Width = 700
+    win.Height = 600
+    win.Width = 1300
     GridView1 = New GridView(win)
     entete(GridView1)
-    GridView1.Expand = True
-    gridview1.AutoResize = True
-    GridView1.Height = 300
-    GridView1.Width = 700
+    GridView1.Height = win.Height
+    GridView1.Width = win.Width 
     GridView1.x = 0
     GridView1.y = 0
     Repeat
-      dte = DateAdd(res!date, gb.Year, res!periodicite)
-      dte = DateAdd(dte, gb.Month, res!perioderap * -1)
+      dte1 = DateAdd(res!date, gb.Year, res!periodicite)
+      dte = DateAdd(dte1, gb.Month, res!perioderap * -1)
       If Format(Now, "yyyymmdd") > Format(dte, "yyyymmdd") Then
         ok = True
         gridview1.Rows.Count = i + 1
+        For j = 0 To 6
+          If Format(Now, "yyyymmdd") >= Format(dte1, "yyyymmdd") Then gridview1[i, j].Background = coul
+        Next
         GridView1[i, 0].Alignment = Align.Left
         gridview1[i, 0].Text = res!id
         GridView1[i, 1].Alignment = Align.Left
@@ -166,11 +169,11 @@ Private Sub entete($gridview1 As GridView)
   $GridView1.Columns[6].Title = "Tel"
 
   $GridView1.Columns[0].Width = 50
-  $GridView1.Columns[1].Width = 180
+  $GridView1.Columns[1].Expand = True
   $GridView1.Columns[2].Width = 220
   $GridView1.Columns[3].Width = 100
   $GridView1.Columns[4].Width = 100
-  $GridView1.Columns[5].Width = 220
+  $GridView1.Columns[5].Expand = True
   $GridView1.Columns[6].Width = 100
   
   $GridView1.Columns[0].Alignment = Align.Center

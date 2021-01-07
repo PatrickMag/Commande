@@ -103,7 +103,7 @@ End
 Public Sub bar_modif()
 
   If $rescha.Available Then
-    $rescha = connect.ccon.Edit("chauffeur", "idchauffeur=&1 FOR UPDATE", $rescha!idchauffeur)
+    $rescha = connect.ccon.Edit("chauffeur", "idchauffeur=&1 ", $rescha!idchauffeur)
  Else
    Stop Event
   Endif
@@ -116,9 +116,9 @@ Public Sub bar_quitter()
 
 End
 
-Public Sub bar_valide(creer As Boolean, annul As Boolean)
+Public Sub bar_valide(creer As Boolean, modif As Boolean)
 
-  If creer Then valide
+  If creer Or modif Then valide
 
 End
 
