@@ -3,13 +3,13 @@
 { Report Report
   #MoveScaled(0,0,111,91)
   Font = Font["13"]
-  Margin = ReportMargin["Top:5mm;Bottom:5mm;Left:5mm;Right:5mm"]
+  Padding = ReportPadding["Top:5mm;Bottom:5mm;Left:5mm;Right:5mm"]
   Index = 0
   Text = ("EDITION DES TOURNÉES")
   { entete ReportLabel
     #MoveScaled(1,1,109,4)
     Fixed = True
-    Font = Font["Bold,Italic,12"]
+    Font = Font["Sans Serif,Bold,Italic,12"]
     Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
     Background = ReportBrush["#DFDFDF"]
     Alignment = Align.Center

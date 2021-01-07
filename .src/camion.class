@@ -609,6 +609,7 @@ Public Sub edit_Click()
   
   If Not ca.cnumchauf Or Not ca.comnumcam Then Return
   ed = New Edittourn(Me, ca.datecam)
+  ptr.FullPage = False
   ptr.OutputFile = User.Home & "/tmp/tourne.pdf"
   ed.Print(ptr)
   Desktop.Open(User.Home & "/tmp/tourne.pdf")

@@ -128,6 +128,7 @@ Public Sub _new(cam As Camion, dte As Date)
         lab.Width = "30mm"
         lab.Alignment = Align.Center
         lab.Border = ReportBorder["Right:1pt #000000"]
+        lab.Font = Font["Serif,11"]
         lab.Text = "Quantité"
         
         lab = New ReportLabel(rph)
