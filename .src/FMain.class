@@ -53,12 +53,7 @@ End
 
 Public Sub MyTimer_Timer()
 
-  
-  If Checkattrib.Value Then
-    $res = Utils.RecCom("camexist", Radiocomliv.Value)
-  Else
-    affiche
-  Endif
+  affiche
 
 End
 
@@ -139,24 +134,15 @@ Public Sub GridView1_Data(Row As Integer, Column As Integer)
 End
 '                             Fenetre de gestion des commandes
 Public Sub GridView1_Activate()
-  Dim win As Window
-  Dim pan As Panel
+
   Dim cl As Client
   
-  win = New Window
-  win.AutoResize = True
-  win.Arrangement = Arrange.Horizontal
-  pan = New Panel(win)
-  pan.AutoResize = True
-  pan.Border = Border.Raised
-  pan.Arrangement = Arrange.Horizontal
-  
-  cl = New Client(CLong(GridView1[GridView1.Row, 7].Text), win)
-
-  win.Show
+  cl = New Client(CLong(GridView1[GridView1.Row, 7].Text), Null)
+  cl.Show
   affiche
   
 End
+
 '                       Affichage des renseignements commande selectionnée
 Public Sub GridView1_Click()
 
@@ -223,18 +209,12 @@ End
 
 '                               Gestion des bouttons 
 Public Sub Butcreer_Click()
-Dim win As New Window
 
-  cl = New Client(0, win)
-  
-  win.Center
-  win.Width = 1016
-  win.Height = 384
-  win.AutoResize = True
-
-  win.Arrangement = Arrange.vertical
-  win.ShowModal
+  cl = New Client(0, Null)
+  cl.AutoResize = True
+  cl.ShowModal
   affiche
+  
 End
 
 
@@ -449,8 +429,18 @@ End
 
 Private Sub affiche()
   
-  $res = Utils.RecCom("tou", Radiocomliv.Value, Texttinf.Text, Texttsup.Text, Textnom.Text)
-  GridView1.Rows.Count = $res.Count
+  If Checkattrib.Value Then
+    $res = Utils.RecCom("camexist", Radiocomliv.Value)
+  Else
+    $res = Utils.RecCom("tou", Radiocomliv.Value, Texttinf.Text, Texttsup.Text, Textnom.Text)
+  Endif
+  If $res.Available Then
+    GridView1.Rows.Count = $res.Count
+  Else 
+    GridView1.Rows.Count = 0
+  Endif
+  GridView1.Refresh
+  Wait 0.001
   
 End
 

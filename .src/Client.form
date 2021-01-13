@@ -2,7 +2,6 @@
 
 { Form Form
   MoveScaled(0,0,127,70)
-  Border = False
   Arrangement = Arrange.Row
   AutoResize = True
   { Panel1 Panel
@@ -259,7 +258,7 @@
           Picture = Picture["icon:/medium/open"]
         }
         { Butext Button
-          MoveScaled(16,1,18.75,3)
+          MoveScaled(16,1,18.7778,3)
           Text = ("Extrait de compte")
           Picture = Picture["icon:/medium/archive"]
         }

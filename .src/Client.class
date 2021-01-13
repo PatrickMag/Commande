@@ -77,10 +77,10 @@ Public Sub _new(id As Long)
   
 End
 
-Public Sub form_Close()
+Public Sub Form_Close()
 
   Try $win.Close
-
+   
 End
 
 Public Sub saisie_keypress()
@@ -208,10 +208,9 @@ End
 
 Public Sub Buttonqte_Click()
 
-  Try Me.Parent.Delete
-    
+  Me.Close
+  
 End
-
 
 Public Sub ButRech_Click()
 
