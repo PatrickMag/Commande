@@ -37,6 +37,7 @@ Public Struct Comencour
   poid As Integer
   volume As Float
   tipp As String
+  codecoul As Integer           ''code couleur
   
 End Struct
 
@@ -223,6 +224,7 @@ Private Sub affectres()
   '----------------------------------------------------------------------
   $rescomande!commentaire = com.commentaire
   $rescomande!comencours = com.encours
+  $rescomande!codecoul = com.codecoul
   
 End
 
@@ -249,5 +251,6 @@ Private Sub affecstruc()
   com.adressel = $rescomande!adressel
   com.cpl = $rescomande!cpl
   com.villel = $rescomande!villel
+  com.codecoul = $rescomande!codecoul
   
 End

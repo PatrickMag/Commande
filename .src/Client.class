@@ -83,6 +83,21 @@ Public Sub Form_Close()
    
 End
 
+Public Sub codecoul_Click()
+
+  Select Case codecoul.Index
+    Case 0
+      codecoul.Foreground = Color.Black
+    Case 1
+      codecoul.Foreground = Color.Red
+    Case 2
+      codecoul.Foreground = Color.Blue
+    Case 3
+      codecoul.Foreground = Color.Orange
+  End Select
+
+End
+
 Public Sub saisie_keypress()
 
   If Key.code = Key.Enter Or Key.code = Key.Return Or Key.code = Key.Tab Or Key.Code = Key.Down Then
@@ -107,6 +122,7 @@ Public Sub saisie_gotfocus()
   Try $vancval = Last.Value
 
 End
+
 Public Sub textnumcl_GotFocus() 
   
   $sncli = textnumcl.Text
@@ -152,6 +168,7 @@ Public Sub ButVal_Click()
   co.com.telport = Textport.Text
   co.com.tipp = Texttipp.Text
   co.com.fraisfac = Utils.totobs(frfac.Text)
+  co.com.codecoul = codecoul.Foreground
   
   If $bDch Then
     lab = New Label(panel8)
@@ -322,7 +339,9 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
     textNom2.Text = $res1!nom
     TextVil2.Text = $res1!ville
     textTou.Text = $res1!tourne
-    Try Texttipp.Text = $res1!tipp
+    If $res1!tipp Then 
+      Try Texttipp.Text = $res1!tipp
+    Endif
   Endif
   '                                                           Gere la fenetre observation ds le fichier client laurux
   If $res!cli_obs Or Round($res!solde, -2) <> 0 Then
@@ -421,7 +440,19 @@ Private Sub afficheclient()
   Textfixe.Text = co.com.telfixe
   Textport.Text = co.com.telport
   Texttipp.Text = co.com.tipp
+  Select Case co.com.codecoul
+    Case Color.Black
+      codecoul.Text = codecoul[0].Text
+    Case Color.Red
+      codecoul.Text = codecoul[1].Text
+    Case Color.Blue
+      codecoul.Text = codecoul[2].Text
+    Case Color.Orange
+      codecoul.Text = codecoul[3].Text
+  End Select
+  codecoul_Click()
   afficheincid
+  
 End
 
 Private Sub affichenb()

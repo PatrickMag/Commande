@@ -49,6 +49,11 @@ Public Sub form_Open()
   $timer.Delay = 5000
   $timer.Enabled = True
   
+  Catch
+    Message.Error(Error.Text, "OK")
+    base.ShowModal
+    Me.Close
+    
 End
 
 Public Sub MyTimer_Timer()
@@ -104,6 +109,7 @@ Public Sub GridView1_Data(Row As Integer, Column As Integer)
   If fent = Int(row / 2) Then GridView1.Data.Background = Color.Background - 50
   
   $res.MoveTo(row)
+  GridView1.Data.Foreground = $res!codecoul
   Select Case Column
     Case 0
        GridView1.Data.Text = $res!numclient

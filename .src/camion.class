@@ -6,7 +6,10 @@ Private combocnc As ComboBox
 Private combocam As ComboBox
 Private combomatap As ComboBox
 Private dtelivr As DateBox
+
 Private ob As GridView
+Private $coul As Integer
+Private $ind As Integer
 
 Private $ccon As New Connection
                                     'test pour afficher les bouttons + & -
@@ -158,7 +161,7 @@ End
 Public Sub SupCam(lNumc As Long, numtourne As String)
   Dim res As Result
   
-  If $resligcpc!idcomcl = $lnumcom Then $bExist = False
+  If $resligcpc.Available And If $resligcpc!idcomcl = $lnumcom Then $bExist = False
   $ccon.Begin
   $ccon.Delete("lignecomparcamion", "idcpc=&1 AND idcomcl=&2", $lNumcam, lNumc)
   $ccon.Commit
@@ -169,8 +172,9 @@ Public Sub SupCam(lNumc As Long, numtourne As String)
     $ccon.Begin
     $ccon.Delete("lignetournepcam", "idcpc=&1 AND idnumtourne=&2", $lNumcam, numtourne)
     $ccon.Commit
-    ajoudestourne($lNumcam)
   Endif
+  ajoudestourne($lNumcam)
+  
  
 End
 
@@ -198,13 +202,13 @@ Private Sub AffCam(lNumcom As Long, id As Integer)
   ListBox1.Add(res!nom)
   If lNumcom = $lnumcom Then          'change la couleur si commande courrante
     ob[id, 0].Background = Color.Cyan
-    ob[id, 0].Text = ListBox1[id].text
   Endif
     
   If res!comencours Then
-    ob[id, 0].Background = Color.Red
-    ob[id, 0].Text = ListBox1[id].text
+    ob[id, 0].Background = Color.Green
   Endif
+  ob[id, 0].Foreground = res!codecoul
+  ob[id, 0].Text = ListBox1[id].text
   
   $poid += res!poid
   $vol += res!volume
@@ -345,12 +349,13 @@ Private Sub ajoudescom(lId As Long)
   Dim ind As Integer
 
   ind = ListBox1.Index
+  If ind = -1 Then ind = 0
   $resligcpc = $ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcpc=&1", lId)
  
+  ListBox1.Clear
   If $resligcpc.Available Then
     $poid = 0
     $vol = 0
-    ListBox1.Clear
     Valuenbc.Value = $resligcpc.Count
     ob = ListBox1.Children[0]
     $resligcpc.MoveFirst
@@ -361,9 +366,9 @@ Private Sub ajoudescom(lId As Long)
     Next
     couleur($resligcpc.Count)
     ListBox1.Index = ind
+    $coul = Color.White
+    ob[ind, 0].Background = Color.Gray
     affbouton
-  Else
-    ListBox1.Clear
   Endif
   
 End
@@ -524,19 +529,11 @@ End
 Public Sub ListBox1_Activate()
 
   Dim cl As Client
-  Dim res As Result
   
-  win = New Window
-  win.AutoResize = True
-  win.Border = False
-  win.Border = Border.Etched
-  win.Height = 100
-  win.Width = 250
-  win.Arrangement = Arrange.Vertical
   $resligcpc.MoveTo(ListBox1.Index)
-  cl = New Client($resligcpc!idcomcl, win)
-   
-  win.Show
+  cl = New Client($resligcpc!idcomcl, Null)
+  cl.Show
+  
 End
 
 Public Sub ListBox1_MouseDrag()
@@ -547,7 +544,7 @@ Public Sub ListBox1_MouseDrag()
         'envoie le n° du camion et le n) de lacommande à glisser
   ctr = Str($lNumcam) & "/" & Str($resligcpc!idcomcl)
   ListBox1.Drag(ctr)
-  'petit probleme d'affichage de la sourie dans client.class
+  'petit probleme d'affichage de la souris dans client.class
 End
 
 Public Sub ListBox1_MouseUp()
@@ -556,6 +553,14 @@ Public Sub ListBox1_MouseUp()
   
 End
 
+Public Sub ListBox1_Click()
+  
+  ob[$ind, 0].Background = $coul
+  $coul = ob[ob.Row, 0].Background
+  ob[ob.Row, 0].Background = Color.Gray
+  $ind = ob.Row
+  
+End
 
 Public Sub ListBox1_Drop()
   

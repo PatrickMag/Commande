@@ -1,19 +1,20 @@
 [Bookmarks]
 commande=[223]
-FMain=[397]
+FMain=[397,450]
 Client=[485]
 
 [Breakpoints]
-Count=2
-Breakpoint[1]="base.196"
-Breakpoint[2]="facturation.175"
+Count=3
+Breakpoint[1]="affeven.57"
+Breakpoint[2]="base.210"
+Breakpoint[3]="facturation.253"
 
 [DebugWindow]
 Count=4
-DebugWindow[1]="$totvol"
-DebugWindow[2]="$totvol[\"400\"]"
-DebugWindow[3]="volume"
-DebugWindow[4]="$totvol[\"401\"]"
+DebugWindow[1]="res"
+DebugWindow[2]="Me.Parent"
+DebugWindow[3]="$resligcpc"
+DebugWindow[4]="Me.Parent.Children"
 
 [DebugWindow/$datejour]
 Geometry=[47,14,256,320]
@@ -22,7 +23,7 @@ Geometry=[47,14,256,320]
 Geometry=[67,242,288,360]
 
 [DebugWindow/$res]
-Geometry=[67,532,288,360]
+Geometry=[67,533,288,360]
 
 [DebugWindow/$resart]
 Geometry=[47,14,256,320]
@@ -44,6 +45,9 @@ Geometry=[43,14,256,320]
 
 [DebugWindow/$reslco]
 Geometry=[47,14,256,320]
+
+[DebugWindow/$resligcpc]
+Geometry=[85,555,288,360]
 
 [DebugWindow/$totvol]
 Geometry=[67,27,288,360]
@@ -79,7 +83,13 @@ Geometry=[53,20,256,320]
 Geometry=[53,20,256,320]
 
 [DebugWindow/Me]
-Geometry=[43,14,256,320]
+Geometry=[67,30,367,360]
+
+[DebugWindow/Me.Parent]
+Geometry=[103,555,288,360]
+
+[DebugWindow/Me.Parent.Children]
+Geometry=[85,485,288,360]
 
 [DebugWindow/Object]
 Geometry=[47,14,256,320]
@@ -150,6 +160,9 @@ Geometry=[47,14,256,320]
 [DebugWindow/combomatap]
 Geometry=[57,19,256,320]
 
+[DebugWindow/connect.ccon]
+Geometry=[67,27,288,360]
+
 [DebugWindow/fr]
 Geometry=[47,42,256,320]
 
@@ -163,10 +176,25 @@ Geometry=[43,14,256,320]
 Geometry=[43,14,256,320]
 
 [DebugWindow/res]
-Geometry=[47,14,256,320]
+Geometry=[67,30,288,360]
 
 [DebugWindow/res.Connection]
-Geometry=[49,20,256,320]
+Geometry=[85,45,288,360]
+
+[DebugWindow/res.Connection.Collations]
+Geometry=[103,63,288,360]
+
+[DebugWindow/res.Connection.Databases]
+Geometry=[103,63,288,360]
+
+[DebugWindow/res.Connection.SQL]
+Geometry=[103,63,288,360]
+
+[DebugWindow/res.Connection.Tables]
+Geometry=[103,63,288,360]
+
+[DebugWindow/res.Fields]
+Geometry=[85,45,288,360]
 
 [DebugWindow/rescam]
 Geometry=[47,14,256,320]
@@ -212,23 +240,27 @@ Path="Commande.gambas"
 DoNotIncrementVersion=True
 
 [OpenFile]
-Active=8
+Active=4
 File[1]=".src/FMain.form"
-File[2]=".src/FMain.class:35.185"
-File[3]=".src/base.form"
-File[4]=".src/evenement.form"
-File[5]=".src/evenement.class:0.54"
-File[6]=".src/gesteven.class:0.0"
-Count=11
-File[7]=".src/affeven.form"
-File[8]=".src/affeven.class:0.194"
-File[9]=".src/Fchauffeur.form"
-File[10]=".src/Fchauffeur.class:9.31"
-File[11]=".connection/Commande.connection"
+File[2]=".src/FMain.class:20.107"
+File[3]=".src/Utils.module:45.153"
+File[4]=".src/Client.form"
+File[5]=".src/Client.class:2.454"
+Count=13
+File[6]=".src/camion.form"
+File[7]=".src/camion.class:38.204"
+File[8]=".connection/Commande.connection"
+File[9]=".src/lignearticle.class:15.556"
+File[10]=".src/base.form"
+File[11]=".src/base.class:3.213"
+File[12]=".src/commande.class:37.253"
+File[13]=".src/saisie.class:42.51"
 
 [Watches]
-Count=3
+Count=5
 Watch[1]="reportpclient.dataindex"
 Watch[2]="last"
 Watch[3]="last.datacount"
+Watch[4]="connect.ccon.lastinsertid"
+Watch[5]="modif"
 

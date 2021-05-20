@@ -206,6 +206,9 @@ Public Sub Button4_Click()
     "tel CHAR(14)," &
     "PRIMARY KEY (id)) ")
     
+    Try connect.ccon.Exec("ALTER TABLE commande ADD codecoul INTEGER DEFAULT " & Color.Black)
+    Try connect.ccon.Exec("ALTER TABLE commandeparcamion MODIFY mataprem VARCHAR(12)")
+    Try connect.ccon.Exec("ALTER TABLE datedelivraison MODIFY mataprem VARCHAR(12)")
     Print Error.Text
 
 End

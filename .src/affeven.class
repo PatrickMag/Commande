@@ -56,6 +56,7 @@ Public Sub _new(id As Integer, choix As String)
   Endif
   If id = 0 Then
     $res = connect.ccon.Create("evenement")
+    Print connect.ccon.LastInsertId
   Endif
   Crech.Columns.Count = 2
   
