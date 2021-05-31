@@ -16,6 +16,9 @@
     { Evenements Menu
       Text = ("Fiche évenements")
     }
+    { postit Menu
+      Text = ("Post it")
+    }
     { bases Menu
       Text = ("Base")
     }

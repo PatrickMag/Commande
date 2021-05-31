@@ -367,7 +367,7 @@ Private Sub ajoudescom(lId As Long)
     couleur($resligcpc.Count)
     ListBox1.Index = ind
     $coul = Color.White
-    ob[ind, 0].Background = Color.Gray
+    ob[ind, 0].Background = Color.Background + 20
     affbouton
   Endif
   
@@ -557,7 +557,7 @@ Public Sub ListBox1_Click()
   
   ob[$ind, 0].Background = $coul
   $coul = ob[ob.Row, 0].Background
-  ob[ob.Row, 0].Background = Color.Gray
+  ob[ob.Row, 0].Background = Color.Background + 20
   $ind = ob.Row
   
 End

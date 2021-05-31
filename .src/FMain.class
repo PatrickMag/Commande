@@ -12,6 +12,9 @@ Private $timer As Timer
 Public Sub form_Open()
 
   Dim ev As Gesteven
+  Dim res As Result
+  Dim TextArea1 As TextArea
+  Dim x, y As Integer
   
   Connect.Connection
   connect.connect_laurux
@@ -45,6 +48,30 @@ Public Sub form_Open()
   
   affiche
   affrenseignement(0)
+  'on affiche les post it
+  res = connect.ccon.Exec("SELECT * FROM postites")
+  If res.Available Then
+    Repeat
+      win = New Window
+      win.Height = 320
+      win.Width = 370
+      x += 50
+      y += 50
+      win.x = x
+      win.y = y
+      win.Tag = "1"
+      TextArea1 = New TextArea(win)
+      TextArea1.Width = win.Width
+      TextArea1.Height = win.Height
+      TextArea1.x = 0
+      TextArea1.y = 0
+      TextArea1.Background = &HFFFFDF&
+      TextArea1.Text = res!texte
+      win.Text = Left(TextArea1.Text, 15)
+      win.Show
+    Until res.MoveNext()
+  Endif
+  'mise en place du timer
   $timer = New Timer As "MyTimer"
   $timer.Delay = 5000
   $timer.Enabled = True
@@ -54,6 +81,16 @@ Public Sub form_Open()
     base.ShowModal
     Me.Close
     
+End
+
+Public Sub form_Close()
+
+  Dim win As Window
+  
+  For Each win In Windows
+    If Not IsNull(win) Then win.Close
+  Next
+  
 End
 
 Public Sub MyTimer_Timer()
@@ -240,7 +277,7 @@ End
 Public Sub Button4_Click()
 
   Try connect.ccon.Close
-  Quit
+  Me.Close
 
 End
 
@@ -486,3 +523,9 @@ Public Sub Evenements_Click()
 End
 
 
+
+Public Sub postit_Click()
+
+  postite.Show()
+
+End

@@ -9,5 +9,6 @@ IgnoreCharset=False
 DisplayMetadata=False
 RememberTemplate=False
 Database="commande"
-Requests=["truncate lignetournepcam\n\n\n"]
+Requests=["SELECT * FROM commande WHERE numtourne>= '' and numtourne<='ZZZZZ' AND comlivre= False AND nom LIKE '%%'\n\n\n"]
+NoPassword=False
 

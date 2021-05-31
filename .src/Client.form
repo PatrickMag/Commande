@@ -223,7 +223,7 @@
         { codecoul ComboBox
           MoveScaled(28,0,20,3)
           ReadOnly = True
-          List = [("Normale"), ("En panne"), ("A la date"), ("Chauffeur")]
+          List = [("Normale"), ("En panne"), ("A la date"), ("Chauffeur"), ("Non attribué")]
         }
         { RadioButton1 RadioButton
           MoveScaled(0,0,25,3)

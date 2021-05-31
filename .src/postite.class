@@ -1,0 +1,118 @@
+' Gambas class file
+
+Private $restext As Result
+Private $res As Result
+Private $selec As Boolean 
+
+Public Sub _new()
+
+  Dim bs As Barselection
+  
+  bs = New Barselection("001110010", Panel1) As "bar"
+  GridView1.Columns.count = 2
+  GridView1.Columns[0].Title = "N°" 
+  GridView1.Columns[1].Title = "Texte"
+  
+  $restext = connect.ccon.Exec("SELECT * FROM postites")
+  GridView1.Rows.Count = $restext.Count
+  
+End
+'gestion du gridview
+Public Sub GridView1_Data(Row As Integer, Column As Integer)
+
+  $restext.MoveTo(Row)
+  If row Mod 2 = 0 Then GridView1.Data.Background = Color.Background - 50 Else GridView1.Data.Background = Color.Background
+  Select Case Column
+    Case 0
+      GridView1.Data.Text = $restext!id
+    Case 1
+      GridView1.Data.Text = $restext!texte
+  End Select
+
+End
+
+Public Sub GridView1_Click()
+
+  Dim res As Result
+  
+  res = connect.ccon.Exec("SELECT * FROM postites WHERE ID=&1", GridView1[GridView1.Row, 0].Text)
+  If res.Available Then 
+    TextArea1.Text = res!texte
+    $selec = True 
+  Endif
+
+End
+'gestion de la sélection
+Public Sub bar_creer()
+
+  connect.ccon.Begin
+  $res = connect.ccon.Create("postites")
+  TextArea1.Clear
+  TextArea1.Select
+  
+End
+
+Public Sub bar_suprimer()
+
+  If Not $selec Then Stop Event
+  
+End
+
+Public Sub bar_modif()
+
+  If $selec Then
+    connect.ccon.Begin
+    $res = connect.ccon.Edit("postites", "id=&1 ", GridView1[GridView1.Row, 0].Text)
+  Else
+    Stop Event
+  Endif
+
+End
+
+Public Sub bar_quitter()
+
+  Me.Close
+
+End
+
+Public Sub bar_valide(creer As Boolean, modif As Boolean)
+
+  If creer Or modif Then 
+    valide
+  Else
+    connect.ccon.Begin
+    connect.ccon.Delete("postites", "id=&1", GridView1[GridView1.Row, 0].Text)
+    connect.ccon.Commit
+    affiche
+  Endif
+
+End
+
+Public Sub bar_annule(creer As Boolean, annul As Boolean)
+
+  connect.ccon.Rollback
+  TextArea1.Clear
+  GridView1.Clear
+  affiche
+  
+End
+
+Private Sub valide()
+  
+  $res!texte = TextArea1.Text
+  $res.Update
+  connect.ccon.Commit
+  affiche
+  
+End
+
+Private Sub affiche()
+
+  $restext = connect.ccon.Exec("SELECT * FROM postites")
+  GridView1.Clear
+  GridView1.Rows.Count = $restext.count
+  $selec = False
+  TextArea1.Clear
+  
+End
+

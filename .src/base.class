@@ -142,19 +142,19 @@ Public Sub Button3_Click()
     "datelivr DATE," &
     "mataprem char(2)," &
     "datecommentaire TEXT," &
-    "PRIMARY KEY (idlivraison,datelivr))")
+    "PRIMARY KEY (idlivraison,datelivr)) ENGINE=InnoDB")
      Print Error.Text
   'correspondance des commandes et des camions
   Try con.Exec("CREATE TABLE lignecomparcamion" &
     " (idcpc INTEGER," &
     "idcomcl INTEGER," &
-    "PRIMARY KEY (idcpc,idcomcl))")
+    "PRIMARY KEY (idcpc,idcomcl)) ENGINE=InnoDB")
      Print Error.Text
   'correspondance des tourées et des cammions
   Try con.Exec("CREATE TABLE lignetournepcam" &
     " (idcpc INTEGER," &
     "idnumtourne char(15)," &
-    "PRIMARY KEY (idcpc,idnumtourne))")
+    "PRIMARY KEY (idcpc,idnumtourne)) ENGINE=InnoDB")
      Print Error.Text
   'ligne article
   Try con.Exec("CREATE TABLE lignedecommande" &
@@ -169,20 +169,9 @@ Public Sub Button3_Click()
     "txtva DECIMAL(5,2)," &
     "remise DECIMAL(8,2)," &
     "pxamp DECIMAL(9,3)," &
-    "PRIMARY KEY (idligne,numligne))")
-    'evenements
-    Try con.Exec("CREATE TABLE evenement" &
-    " (id int NOT NULL AUTO_INCREMENT," &
-    "type CHAR(1)," &
-    "num CHAR(10)," &
-    "nom CHAR(35)," &
-    "periodicite INTEGER," &
-    "perioderap INTEGER," &
-    "date DATE," &
-    "fournisseur CHAR(35)," &
-    "tel CHAR(14)," &
-    "PRIMARY KEY (id))")
-    
+    "PRIMARY KEY (idligne,numligne)) ENGINE=InnoDB")
+
+    Button4_Click()
     Print Error.Text
     Me.Mouse = Mouse.Default
     
@@ -204,11 +193,16 @@ Public Sub Button4_Click()
     "date DATE," &
     "fournisseur CHAR(35)," &
     "tel CHAR(14)," &
-    "PRIMARY KEY (id)) ")
+    "PRIMARY KEY (id)) ENGINE=InnoDB")
     
     Try connect.ccon.Exec("ALTER TABLE commande ADD codecoul INTEGER DEFAULT " & Color.Black)
     Try connect.ccon.Exec("ALTER TABLE commandeparcamion MODIFY mataprem VARCHAR(12)")
     Try connect.ccon.Exec("ALTER TABLE datedelivraison MODIFY mataprem VARCHAR(12)")
+    
+    Try connect.ccon.Exec("CREATE TABLE postites " &
+    "(id int NOT NULL AUTO_INCREMENT," &
+    "texte TEXT," &
+    "PRIMARY KEY (id)) ENGINE=InnoDB")
     Print Error.Text
 
 End

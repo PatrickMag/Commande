@@ -4,20 +4,19 @@ FMain=[397,450]
 Client=[485]
 
 [Breakpoints]
-Count=3
+Count=2
 Breakpoint[1]="affeven.57"
-Breakpoint[2]="base.210"
-Breakpoint[3]="facturation.253"
+Breakpoint[2]="facturation.253"
 
 [DebugWindow]
-Count=4
+Count=1
 DebugWindow[1]="res"
-DebugWindow[2]="Me.Parent"
-DebugWindow[3]="$resligcpc"
-DebugWindow[4]="Me.Parent.Children"
 
 [DebugWindow/$datejour]
 Geometry=[47,14,256,320]
+
+[DebugWindow/$gridview1.Parent]
+Geometry=[67,30,288,360]
 
 [DebugWindow/$gridview1[$gridview1.Row, 0]]
 Geometry=[67,242,288,360]
@@ -61,6 +60,15 @@ Geometry=[1547,45,288,360]
 [DebugWindow/DateBox1]
 Geometry=[43,14,256,320]
 
+[DebugWindow/Desktop.Windows]
+Geometry=[67,30,288,360]
+
+[DebugWindow/FMain(Me.Window).Children]
+Geometry=[103,66,367,360]
+
+[DebugWindow/FMain(Me.Window).Window]
+Geometry=[103,66,366,360]
+
 [DebugWindow/GridView1]
 Geometry=[67,143,288,360]
 
@@ -85,11 +93,26 @@ Geometry=[53,20,256,320]
 [DebugWindow/Me]
 Geometry=[67,30,367,360]
 
+[DebugWindow/Me.Children]
+Geometry=[85,48,367,360]
+
+[DebugWindow/Me.Children[0]]
+Geometry=[103,66,367,360]
+
+[DebugWindow/Me.Controls]
+Geometry=[85,48,367,360]
+
 [DebugWindow/Me.Parent]
 Geometry=[103,555,288,360]
 
 [DebugWindow/Me.Parent.Children]
 Geometry=[85,485,288,360]
+
+[DebugWindow/Me.Texttinf]
+Geometry=[85,48,367,360]
+
+[DebugWindow/Me.Window]
+Geometry=[85,48,367,360]
 
 [DebugWindow/Object]
 Geometry=[47,14,256,320]
@@ -135,6 +158,9 @@ Geometry=[63,27,256,320]
 
 [DebugWindow/TreeView1.Item]
 Geometry=[57,168,256,320]
+
+[DebugWindow/Windows]
+Geometry=[67,30,288,360]
 
 [DebugWindow/c]
 Geometry=[57,19,256,320]
@@ -240,21 +266,21 @@ Path="Commande.gambas"
 DoNotIncrementVersion=True
 
 [OpenFile]
-Active=4
+Active=10
 File[1]=".src/FMain.form"
-File[2]=".src/FMain.class:20.107"
-File[3]=".src/Utils.module:45.153"
+File[2]=".src/Utils.module:45.153"
+File[3]=".src/gesteven.class:57.71"
 File[4]=".src/Client.form"
-File[5]=".src/Client.class:2.454"
+File[5]=".src/commande.class:37.253"
 Count=13
-File[6]=".src/camion.form"
-File[7]=".src/camion.class:38.204"
-File[8]=".connection/Commande.connection"
-File[9]=".src/lignearticle.class:15.556"
-File[10]=".src/base.form"
-File[11]=".src/base.class:3.213"
-File[12]=".src/commande.class:37.253"
-File[13]=".src/saisie.class:42.51"
+File[6]=".src/postite.form"
+File[7]=".src/Fchauffeur.form"
+File[8]=".src/Fchauffeur.class:2.120"
+File[9]=".src/FMain.class:21.75"
+File[10]=".src/postite.class:23.84"
+File[11]=".src/base.form"
+File[12]=".src/base.class:27.168"
+File[13]=".src/barselection.class:2.149"
 
 [Watches]
 Count=5

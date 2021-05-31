@@ -185,7 +185,11 @@ Public Sub bout_click()
       Endif
     Case 5
         afficheval
-        Raise suprimer()
+        abandon = Raise suprimer()
+        If abandon Then 
+        efface
+        affichechoix($schoix, $oobj)
+      Endif
     Case 6
         Raise suivant()
     Case 7

@@ -94,6 +94,8 @@ Public Sub codecoul_Click()
       codecoul.Foreground = Color.Blue
     Case 3
       codecoul.Foreground = Color.Orange
+    Case 4
+      codecoul.Foreground = Color.Green
   End Select
 
 End
@@ -449,6 +451,8 @@ Private Sub afficheclient()
       codecoul.Text = codecoul[2].Text
     Case Color.Orange
       codecoul.Text = codecoul[3].Text
+    Case Color.Green
+      codecoul.Text = codecoul[4].Text
   End Select
   codecoul_Click()
   afficheincid
