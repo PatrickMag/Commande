@@ -9,8 +9,9 @@ Breakpoint[1]="affeven.57"
 Breakpoint[2]="facturation.253"
 
 [DebugWindow]
-Count=1
+Count=2
 DebugWindow[1]="res"
+DebugWindow[2]="ListBox1"
 
 [DebugWindow/$datejour]
 Geometry=[47,14,256,320]
@@ -90,6 +91,22 @@ Geometry=[53,20,256,320]
 [DebugWindow/Last.Report]
 Geometry=[53,20,256,320]
 
+[DebugWindow/ListBox1]
+ShowHidden=True
+Geometry=[67,30,256,320]
+
+[DebugWindow/ListBox1.Children]
+Geometry=[83,46,256,320]
+
+[DebugWindow/ListBox1.Children[0]]
+Geometry=[99,62,256,320]
+
+[DebugWindow/ListBox1.Columns]
+Geometry=[83,46,256,320]
+
+[DebugWindow/ListBox1._Container]
+Geometry=[83,46,256,320]
+
 [DebugWindow/Me]
 Geometry=[67,30,367,360]
 
@@ -159,6 +176,9 @@ Geometry=[63,27,256,320]
 [DebugWindow/TreeView1.Item]
 Geometry=[57,168,256,320]
 
+[DebugWindow/Valuenbc]
+Geometry=[67,30,256,320]
+
 [DebugWindow/Windows]
 Geometry=[67,30,288,360]
 
@@ -198,11 +218,14 @@ Geometry=[57,19,256,320]
 [DebugWindow/nbcam]
 Geometry=[43,14,256,320]
 
+[DebugWindow/ob]
+Geometry=[67,30,256,320]
+
 [DebugWindow/pxht]
 Geometry=[43,14,256,320]
 
 [DebugWindow/res]
-Geometry=[67,30,288,360]
+Geometry=[67,30,290,370]
 
 [DebugWindow/res.Connection]
 Geometry=[85,45,288,360]
@@ -266,27 +289,30 @@ Path="Commande.gambas"
 DoNotIncrementVersion=True
 
 [OpenFile]
-Active=10
+Active=9
 File[1]=".src/FMain.form"
 File[2]=".src/Utils.module:45.153"
 File[3]=".src/gesteven.class:57.71"
 File[4]=".src/Client.form"
 File[5]=".src/commande.class:37.253"
-Count=13
+Count=15
 File[6]=".src/postite.form"
 File[7]=".src/Fchauffeur.form"
 File[8]=".src/Fchauffeur.class:2.120"
-File[9]=".src/FMain.class:21.75"
+File[9]=".src/FMain.class:2.97"
 File[10]=".src/postite.class:23.84"
 File[11]=".src/base.form"
-File[12]=".src/base.class:27.168"
+File[12]=".src/base.class:31.163"
 File[13]=".src/barselection.class:2.149"
+File[14]=".src/camion.form"
+File[15]=".src/camion.class:2.220"
 
 [Watches]
-Count=5
+Count=6
 Watch[1]="reportpclient.dataindex"
 Watch[2]="last"
 Watch[3]="last.datacount"
 Watch[4]="connect.ccon.lastinsertid"
 Watch[5]="modif"
+Watch[6]="$ind"
 

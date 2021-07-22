@@ -59,7 +59,7 @@
       { Panel4 Panel
         MoveScaled(1,1,19,16)
         Arrangement = Arrange.Horizontal
-        { ListBox1 ListBox
+        { ListBox1 GridView
           MoveScaled(0,0,12,15.8889)
           Drop = True
           ScrollBar = Scroll.Both

@@ -50,6 +50,7 @@ Public Sub _new(sChoix As String, lIdcom As Long, Optional lId As Long, dDte As 
 
   
   ouvreconnection
+  ListBox1.Columns.Count = 1
 
                   'si lIdcom =>id table commande est à 0 c'est que la création vient de Fmain sinon vient de client
   Select Case sChoix
@@ -199,16 +200,17 @@ Private Sub AffCam(lNumcom As Long, id As Integer)
   Dim res As Result
   
   res = $ccon.Exec("SELECT * FROM commande WHERE idcom=&1", lNumcom)
-  ListBox1.Add(res!nom)
+'  ListBox1.Rows.Count = res.Count
+  listbox1[id, 0].Text = res!nom
   If lNumcom = $lnumcom Then          'change la couleur si commande courrante
-    ob[id, 0].Background = Color.Cyan
+    listbox1[id, 0].Background = Color.Cyan
   Endif
     
   If res!comencours Then
-    ob[id, 0].Background = Color.Green
+    listbox1[id, 0].Background = Color.Green
   Endif
-  ob[id, 0].Foreground = res!codecoul
-  ob[id, 0].Text = ListBox1[id].text
+  listbox1[id, 0].Foreground = res!codecoul
+'  listbox1[id, 0].Text = ListBox1[id].text
   
   $poid += res!poid
   $vol += res!volume
@@ -300,7 +302,7 @@ Public Sub Butmoins_Click()
 
 Dim res As Result
 
-  $resligcpc.MoveTo(ListBox1.Index)
+  $resligcpc.MoveTo(ListBox1.row)
   res = $ccon.Exec("SELECT * FROM commande WHERE idcom=&1", $resligcpc!idcomcl) 
   If res.Available Then SupCam($resligcpc!idcomcl, res!numtourne)
   affbouton
@@ -310,8 +312,18 @@ End
 
 Public Sub MyTimer_Timer()
 
-  ajoudescom($lNumcam)
-  ajoudestourne($lNumcam)
+  $rescpc = $ccon.Exec("SELECT * FROM commandeparcamion WHERE idncomcam=&1", $lNumcam)
+  If $rescpc.Available Then
+    affectstru
+    Labelcam.Text = ca.comnumcam
+    Labelchauf.Text = ca.cnumchauf
+    Labelmatam.Text = ca.mataprem
+    Datecom.Value = ca.datecam
+    ajoudescom($lNumcam)
+    ajoudestourne($lNumcam)
+  Else
+    Me.Close
+  Endif
 
 End
 
@@ -348,16 +360,17 @@ Private Sub ajoudescom(lId As Long)
   Dim i As Integer
   Dim ind As Integer
 
-  ind = ListBox1.Index
+  ind = ListBox1.Row
   If ind = -1 Then ind = 0
   $resligcpc = $ccon.Exec("SELECT * FROM lignecomparcamion WHERE idcpc=&1", lId)
  
   ListBox1.Clear
+  ListBox1.Rows.Count = $resligcpc.Count
   If $resligcpc.Available Then
     $poid = 0
     $vol = 0
     Valuenbc.Value = $resligcpc.Count
-    ob = ListBox1.Children[0]
+'    ob = ListBox1.Children[0]
     $resligcpc.MoveFirst
     For i = 0 To $resligcpc.Max
       AffCam($resligcpc!idcomcl, i)
@@ -365,9 +378,12 @@ Private Sub ajoudescom(lId As Long)
       $resligcpc.MoveNext
     Next
     couleur($resligcpc.Count)
-    ListBox1.Index = ind
-    $coul = Color.White
-    ob[ind, 0].Background = Color.Background + 20
+
+    If ind > listbox1.Rows.max Then ind = listbox1.Rows.Max
+    ListBox1.row = ind
+   $coul = Color.White
+
+    listbox1[ind, 0].Background = Color.Background + 20
     affbouton
   Endif
   
@@ -530,7 +546,7 @@ Public Sub ListBox1_Activate()
 
   Dim cl As Client
   
-  $resligcpc.MoveTo(ListBox1.Index)
+  $resligcpc.MoveTo(ListBox1.row)
   cl = New Client($resligcpc!idcomcl, Null)
   cl.Show
   
@@ -540,7 +556,7 @@ Public Sub ListBox1_MouseDrag()
   Dim ctr As String
   
   Me.Parent.Mouse = Mouse.Pointing
-  $resligcpc.MoveTo(ListBox1.Index)
+  $resligcpc.MoveTo(ListBox1.row)
         'envoie le n° du camion et le n) de lacommande à glisser
   ctr = Str($lNumcam) & "/" & Str($resligcpc!idcomcl)
   ListBox1.Drag(ctr)
@@ -555,10 +571,10 @@ End
 
 Public Sub ListBox1_Click()
   
-  ob[$ind, 0].Background = $coul
-  $coul = ob[ob.Row, 0].Background
-  ob[ob.Row, 0].Background = Color.Background + 20
-  $ind = ob.Row
+  Try listbox1[$ind, 0].Background = $coul
+  $coul = listbox1[listbox1.Row, 0].Background
+  listbox1[listbox1.Row, 0].Background = Color.Background + 20
+  $ind = listbox1.Row
   
 End
 
