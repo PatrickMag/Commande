@@ -346,7 +346,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
     Endif
   Endif
   '                                                           Gere la fenetre observation ds le fichier client laurux
-  If $res!cli_obs Or Round($res!solde, -2) <> 0 Then
+  If $res!cli_obs Or Round($res!solde, -2) <> 0 And IsNull(pan) Then
     pan = New Panel(Panel1)
     pan.NoTabFocus = False
     pan.Ignore = True

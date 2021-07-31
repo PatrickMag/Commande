@@ -40,7 +40,7 @@
           Text = ("mat/am")
         }
         { Datecom DateBox
-          MoveScaled(12,0,14,3)
+          MoveScaled(12,0,16,3)
           Enabled = False
         }
       }
@@ -62,7 +62,6 @@
         { ListBox1 GridView
           MoveScaled(0,0,12,15.8889)
           Drop = True
-          ScrollBar = Scroll.Both
         }
         { ListBox2 ListBox
           MoveScaled(12,0,7,15.8889)
