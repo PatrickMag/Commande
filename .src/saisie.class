@@ -2,7 +2,6 @@
 
 Private $bCreer As Boolean
 Private $lNumcom As Long
-Private $ccon As New Connection
 Private $scrolcam As Container
 Private $resdte As Result
 
@@ -14,23 +13,22 @@ Public Sub _new(sChoix As String, dte As Date, lNumcom As Long, cam As Container
   
   $scrolcam = cam
   $lNumcom = lNumcom
-  ouvreconnection
                                    'combobox peut venir d'un fichier 
   ComboBox1.Add("MATIN")
   ComboBox1.Add("APREM")
   ComboBox1.Add("JOUR")
        
-  $ccon.Begin
+  Connect.ccon.Begin
   Select Case sChoix
     Case "ouvrir"
-      $resdte = $ccon.edit("datedelivraison", "idlivraison=&1 AND datelivr=&2", lNumcom, dte)
+      $resdte = Connect.ccon.edit("datedelivraison", "idlivraison=&1 AND datelivr=&2", lNumcom, dte)
       DateBox1.Value = dte
       TextArea1.Text = $resdte!datecommentaire
       ComboBox1.Current.Text = $resdte!mataprem
       $bCreer = False
      
     Case "creer"
-      $resdte = $ccon.Create("datedelivraison")
+      $resdte = Connect.ccon.Create("datedelivraison")
       $resdte!idlivraison = $lNumcom
       $resdte!datelivr = dte
       DateBox1.Value = dte
@@ -41,18 +39,13 @@ Public Sub _new(sChoix As String, dte As Date, lNumcom As Long, cam As Container
   End Select
 End
 
-Private Sub ouvreconnection()                  'ouvre la connection $ccon
-  $ccon = Connect.ccon
-  
-End
-
 Public Sub Butval_Click()
   
   $resdte!mataprem = ComboBox1.Current.Text
   $resdte!datecommentaire = TextArea1.Text
   $resdte.Update
-  $ccon.Commit
-  $resdte = $ccon.edit("datedelivraison", "idlivraison=&1 AND datelivr=&2", $lNumcom, DateBox1.Value)
+  Connect.ccon.Commit
+  $resdte = Connect.ccon.edit("datedelivraison", "idlivraison=&1 AND datelivr=&2", $lNumcom, DateBox1.Value)
   If $bCreer Then
     Butsup.Enabled = True
     Butcam.Enabled = True
@@ -66,9 +59,9 @@ Public Sub Butsup_Click()
   
   qst = Message.Delete("Etes-vous sur de vouloir supprimer cette date ?", "OUI", "NON")
   If qst = 1 Then
-    $ccon.Rollback
-    $ccon.Delete("datedelivraison", "idlivraison=&1 AND datelivr=&2", $lNumcom, DateBox1.Value)
-    $ccon.Commit
+    Connect.ccon.Rollback
+    Connect.ccon.Delete("datedelivraison", "idlivraison=&1 AND datelivr=&2", $lNumcom, DateBox1.Value)
+    Connect.ccon.Commit
     
     Me.Close
 '   

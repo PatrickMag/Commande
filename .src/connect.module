@@ -1,6 +1,6 @@
 ' Gambas module file
 
-Public ccon As New Connection
+Public ccon As Connection
 Public cconlaurux As Connection
 
 Public Sub Connection()
