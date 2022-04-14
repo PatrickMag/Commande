@@ -604,7 +604,7 @@ Public Sub ListBox1_Drop()
   If lnumcam <> 0 Then
     cms = Me.Parent.Children
     i = 0
-    While cms[i].tag <> lnumcam
+    While cms[i].tag <> lnumcam Or cms.Count = i
       Inc i
     Wend
   

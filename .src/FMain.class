@@ -9,6 +9,8 @@ Private $datejour As DateChooser
 Private $dte As Date
 Private $timer As Timer
 
+Private $JourFer As Integer[] = [11, 2512, 15, 85, 1111, 147, 158, 2122023, 1322024, 1842022, 2652022, 1852023, 952024, 562022, 2852023, 1952024, 1042023, 142024, 662022, 29520230, 2052024]          ''jours fériers
+
 Public Sub form_Open()
 
   Dim ev As Gesteven
@@ -293,6 +295,16 @@ Public Sub Butprepa_Click()
   win.Width = 500
   $datejour.Expand = True
   win.ShowModal
+
+End
+
+Public Sub dte_data(Value As Date)
+
+  Dim fr, fr1 As Integer
+  
+  fr = Val(Str(Day(value)) & Str(Month(value)))
+  fr1 = Val(Str(Day(value)) & Str(Month(value)) & Str(Year(value)))
+  If $JourFer.Exist(fr) Or $JourFer.Exist(fr1) Then $datejour.Data.Background = Color.Red
 
 End
 

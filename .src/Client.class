@@ -79,6 +79,7 @@ End
 
 Public Sub Form_Close()
 
+  connect.ccon.Commit
   Try $win.Close
    
 End
