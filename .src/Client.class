@@ -140,6 +140,15 @@ Public Sub textnumcl_LostFocus()
   
 End
 
+Public Sub Calc_Click()
+
+  Dim c As Calc
+  
+  c = New Calc
+  C.Show
+  c.Raise
+
+End
 Public Sub ButVal_Click()
 
   Dim lab As New Label(Panel8)

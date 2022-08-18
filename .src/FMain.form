@@ -105,28 +105,34 @@
         Picture = Picture["icon:/medium/add"]
       }
       { Butmod Button
-        MoveScaled(28,3,15,4)
+        MoveScaled(22,3,15,4)
         ToolTip = ("Modifier une commande")
         Expand = True
         AutoResize = True
         Picture = Picture["icon:/medium/edit"]
       }
       { Butsup Button
-        MoveScaled(44,3,21,4)
+        MoveScaled(38,3,21,4)
         ToolTip = ("Supprimer une commande")
         Expand = True
         AutoResize = True
         Picture = Picture["icon:/medium/delete"]
       }
       { Butprepa Button
-        MoveScaled(67,2,12,4)
+        MoveScaled(61,2,12,4)
         ToolTip = ("Preparation des tournées")
         Expand = True
         AutoResize = True
         Picture = Picture["icon:/medium/calendar"]
       }
+      { Calc Button
+        MoveScaled(76,2,10,5)
+        Expand = True
+        AutoResize = True
+        Picture = Picture["icon:/22/computer"]
+      }
       { Button4 Button
-        MoveScaled(81,2,16,6)
+        MoveScaled(87,2,16,6)
         ToolTip = ("Quitter")
         Expand = True
         AutoResize = True

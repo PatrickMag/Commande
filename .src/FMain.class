@@ -283,6 +283,15 @@ Public Sub Button4_Click()
 
 End
 
+Public Sub Calc_Click()
+
+  Dim c As Calc
+  
+  c = New Calc
+  C.Show
+  c.Raise
+
+End
 '                                               Prepaqration des tournées---------------------
 '                       choix de la date de tournée
 

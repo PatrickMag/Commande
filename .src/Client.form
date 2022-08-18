@@ -329,5 +329,10 @@
         Text = ("Solde du compte :")
       }
     }
+    { Calc Button
+      MoveScaled(102,38,9,3)
+      Ignore = True
+      Picture = Picture["icon:/22/computer"]
+    }
   }
 }

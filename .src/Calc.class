@@ -1,0 +1,212 @@
+' Gambas class file
+
+Create Static
+Inherits Window
+Export
+
+Private $tb As TextBox
+
+Public Enum zero, un, deux, trois, quatre, cinq, six, sept, huit, neuf, egal, mult, divi, soust, addit, virgul, retour, efface
+
+Property Font As Font
+Property Padding As Integer
+
+Event resultat(Value As Float)     ''Envoie le resultat
+Event formule(Value As String)      ''Envoie l'oppération compléte
+Event touche(value As Integer)         ''Envoie le code de chaque touche 
+
+Public Sub _new()
+
+  Dim pan As Panel
+  Dim lab As Label
+  Dim but As Button
+  Dim i As Integer
+  
+  'on dessine la calculatrice, celle ci peut être soit dans une form soit seule dans une fenêtre, elle est redimentionable.
+  Me.Padding = 5
+  Me.Arrangement = Arrange.Vertical
+  Me.Text = "Calculatrice"
+  'si fenetre la calculatrice fera 1/4 de l'écran
+  If IsNull(Me.Parent) Then
+    Me.h = Desktop.H / 4
+    Me.w = Desktop.W / 4
+  Endif
+  $tb = New TextBox(Me) As "affiche"
+  $tb.Text = "0"
+  $tb.Expand = True
+  
+  pan = New Panel(Me)
+  pan.Arrangement = Arrange.Horizontal
+  pan.Padding = 5
+  pan.Expand = True
+  'on peut certainement factoriser le code si dessous
+  For i = 7 To 9
+    but = New Button(pan) As "clavier"
+    but.Text = Str(i)
+    but.Tag = i
+    but.Expand = True
+  Next
+  but = New Button(pan) As "clavier"
+  but.Text = "+"
+  but.tag = addit
+  but.Expand = True
+  
+  pan = New Panel(Me)
+  pan.Arrangement = Arrange.Horizontal
+  pan.Padding = 5
+  pan.Expand = True
+  
+  For i = 4 To 6
+    but = New Button(pan) As "clavier"
+    but.Text = Str(i)
+    but.Tag = i
+    but.Expand = True
+    but.Show
+  Next
+  but = New Button(pan) As "clavier"
+  but.Text = "-"
+  but.tag = soust
+  but.Expand = True
+  
+  pan = New Panel(Me)
+  pan.Arrangement = Arrange.Horizontal
+  pan.Padding = 5
+  pan.Expand = True
+  
+  For i = 1 To 3
+    but = New Button(pan) As "clavier"
+    but.Text = Str(i)
+    but.Tag = i
+    but.Expand = True
+  Next
+  but = New Button(pan) As "clavier"
+  but.Text = "*"
+  but.tag = mult
+  but.Expand = True
+  
+  pan = New Panel(Me)
+  pan.Arrangement = Arrange.Horizontal
+  pan.Padding = 5
+  pan.Expand = True
+  but = New Button(pan) As "clavier"
+  but.Text = "0"
+  but.tag = zero
+  but.Expand = True
+  but = New Button(pan) As "clavier"
+  but.Text = ","
+  but.tag = virgul
+  but.Expand = True
+  but = New Button(pan) As "clavier"
+  but.Text = "%"
+  but.tag = divi
+  but.Expand = True
+  
+  pan = New Panel(Me)
+  pan.Arrangement = Arrange.Horizontal
+  pan.Padding = 5
+  pan.Expand = True
+  lab = New Label(pan)
+  lab.Expand = True
+  but = New Button(pan) As "clavier"
+  but.Picture = Picture["icon:/22/clear"]
+  but.tag = retour
+  but.Expand = True
+  but = New Button(pan) As "clavier"
+  but.Text = "C"
+  but.tag = efface
+  but.Expand = True
+  but = New Button(pan) As "clavier"
+  but.Text = "="
+  but.tag = egal
+  but.Expand = True
+  
+End
+
+Public Sub clavier_click()
+
+  $tb.SetFocus
+  Select Case Last.tag
+    Case 0 To 9
+      Desktop.SendKeys(Str(Last.tag))    '$tb recoit la touche last.tab
+    Case mult
+       Desktop.SendKeys("*")
+     Case divi
+        Desktop.SendKeys("/")
+     Case soust
+        Desktop.SendKeys("-")
+     Case addit
+        Desktop.SendKeys("+")
+      Case efface
+        $tb.Clear
+      Case retour
+         Desktop.SendKeys("[BackSpace]")
+      Case virgul
+        Desktop.SendKeys(".")
+      Case egal
+        calcul()
+  End Select
+  
+End
+
+Public Sub affiche_keypress()
+
+  Select Case Key.Code
+    Case Key.Enter, Key.Return, Asc("=")
+      calcul()
+    Case Else
+      Raise touche(Key.code)
+  End Select
+
+End
+
+Private Sub calcul()
+  
+  Dim r As Float
+  
+  If $tb.Text Match "=" Then Return
+  $tb.Text = Replace($tb.Text, ",", ".")
+  r = Eval($tb.Text)      ' Evalue l'expression contenu dans $tb, toutes les expressions sont permisent (ex : 10 mod 2), ouvre la porte à l'utilisation de variables
+  Raise formule($tb.Text)
+  $tb.Text &= " = " & r
+  Raise resultat(r)
+  
+  Catch 
+    Message.Error("Il y a une erreur dans votre expression " & Error.Text)
+    
+End
+
+
+Private Function Font_Read() As Font
+
+  Return Super.Font
+
+End
+
+Private Sub Font_Write(Value As Font)
+'on surcharge la class Font pour modifié tous les objets 
+  Dim obj As Object
+  
+  For Each obj In Me.Children
+    Try obj.Font = value
+  Next
+
+End
+
+Private Function Padding_Read() As Integer
+
+  Return Super.Padding
+
+End
+
+Private Sub Padding_Write(Value As Integer)
+'on surcharge le padding des panels
+  Dim obj As Object
+  
+  For Each obj In Me.Children
+    If Object.Class(obj).Name = "Panel" Then
+      obj.Padding = value
+    Endif
+  Next
+  Super.Padding = value
+
+End
