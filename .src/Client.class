@@ -181,6 +181,7 @@ Public Sub ButVal_Click()
   co.com.tipp = Texttipp.Text
   co.com.fraisfac = Utils.totobs(frfac.Text)
   co.com.codecoul = codecoul.Foreground
+  co.com.poste = Left(User.Name, 20)
   
   If $bDch Then
     lab = New Label(panel8)

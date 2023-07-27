@@ -203,6 +203,10 @@ Public Sub Button4_Click()
     "(id int NOT NULL AUTO_INCREMENT," &
     "texte TEXT," &
     "PRIMARY KEY (id)) ENGINE=InnoDB")
+    
+    Try connect.ccon.Exec("ALTER TABLE commande MODIFY datedecommande DATETIME")
+    Try connect.ccon.Exec("ALTER TABLE commande ADD poste VARCHAR(20)")
+    
     Print Error.Text
 
 End

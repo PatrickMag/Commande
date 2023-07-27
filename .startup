@@ -12,6 +12,7 @@ gb.db
 gb.db.form
 gb.db.mysql
 gb.desktop
+gb.eval
 gb.settings
 gb.mysql
 gb.report2

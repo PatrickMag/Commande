@@ -36,6 +36,7 @@ Public Struct Comencour
   volume As Float
   tipp As String
   codecoul As Integer           ''code couleur
+  poste As String
   
 End Struct
 
@@ -214,6 +215,7 @@ Private Sub affectres()
   $rescomande!commentaire = com.commentaire
   $rescomande!comencours = com.encours
   $rescomande!codecoul = com.codecoul
+  $rescomande!poste = com.poste
   
 End
 
@@ -241,5 +243,6 @@ Private Sub affecstruc()
   com.cpl = $rescomande!cpl
   com.villel = $rescomande!villel
   com.codecoul = $rescomande!codecoul
+  com.poste = $rescomande!poste
   
 End

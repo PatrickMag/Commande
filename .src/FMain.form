@@ -78,6 +78,7 @@
       }
       { GridView1 GridView
         MoveScaled(0,14,147,41)
+        Sorted = True
       }
       { Panelvue Panel
         MoveScaled(61,0,71,14)

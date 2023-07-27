@@ -9,9 +9,7 @@ Breakpoint[1]="affeven.57"
 Breakpoint[2]="facturation.253"
 
 [DebugWindow]
-Count=2
-DebugWindow[1]="res"
-DebugWindow[2]="ListBox1"
+Count=0
 
 [DebugWindow/$datejour]
 Geometry=[47,14,256,320]
@@ -93,7 +91,7 @@ Geometry=[53,20,256,320]
 
 [DebugWindow/ListBox1]
 ShowHidden=True
-Geometry=[67,30,256,320]
+Geometry=[72,30,288,360]
 
 [DebugWindow/ListBox1.Children]
 Geometry=[83,46,256,320]
@@ -200,6 +198,9 @@ Geometry=[47,14,256,320]
 [DebugWindow/cam]
 Geometry=[47,278,256,320]
 
+[DebugWindow/cms]
+Geometry=[72,30,288,360]
+
 [DebugWindow/com]
 Geometry=[47,14,256,320]
 
@@ -225,7 +226,7 @@ Geometry=[67,30,256,320]
 Geometry=[43,14,256,320]
 
 [DebugWindow/res]
-Geometry=[67,30,290,370]
+Geometry=[72,30,290,370]
 
 [DebugWindow/res.Connection]
 Geometry=[85,45,288,360]
@@ -289,30 +290,34 @@ Path="Commande.gambas"
 DoNotIncrementVersion=True
 
 [OpenFile]
-Active=9
+Active=11
 File[1]=".src/FMain.form"
-File[2]=".src/Utils.module:45.153"
-File[3]=".src/gesteven.class:57.71"
+File[2]=".src/Utils.module:2.155"
+File[3]=".src/gesteven.class:10.66"
 File[4]=".src/Client.form"
-File[5]=".src/commande.class:37.253"
-Count=15
+File[5]=".src/commande.class:0.234"
+Count=18
 File[6]=".src/postite.form"
 File[7]=".src/Fchauffeur.form"
-File[8]=".src/Fchauffeur.class:2.120"
-File[9]=".src/FMain.class:2.97"
-File[10]=".src/postite.class:23.84"
-File[11]=".src/base.form"
-File[12]=".src/base.class:31.163"
-File[13]=".src/barselection.class:2.149"
-File[14]=".src/camion.form"
-File[15]=".src/camion.class:2.220"
+File[8]=".src/Fchauffeur.class:19.15"
+File[9]=".src/FMain.class:20.15"
+File[10]=".src/facturation.class:36.308"
+File[11]=".src/Client.class:6.346"
+File[12]=".src/base.form"
+File[13]=".src/base.class:4.208"
+File[14]=".src/connect.module:0.43"
+File[15]=".src/Edittourn.report"
+File[16]=".src/Edittourn.class:29.31"
+File[17]=".src/camion.form"
+File[18]=".src/camion.class:2.241"
 
 [Watches]
-Count=6
+Count=7
 Watch[1]="reportpclient.dataindex"
 Watch[2]="last"
 Watch[3]="last.datacount"
 Watch[4]="connect.ccon.lastinsertid"
 Watch[5]="modif"
 Watch[6]="$ind"
+Watch[7]="GridView1[GridView1.Row]"
 

@@ -9,7 +9,7 @@ Private $datejour As DateChooser
 Private $dte As Date
 Private $timer As Timer
 
-Private $JourFer As Integer[] = [11, 2512, 15, 85, 1111, 147, 158, 2122023, 1322024, 1842022, 2652022, 1852023, 952024, 562022, 2852023, 1952024, 1042023, 142024, 662022, 29520230, 2052024]          ''jours fériers
+Private $JourFer As Integer[] = [11, 2512, 15, 85, 1111, 147, 158, 2122023, 1322024, 1842022, 2652022, 1852023, 952024, 562022, 2952023, 1952024, 1042023, 142024, 662022, 29520230, 2052024]          ''jours fériers
 
 Public Sub form_Open()
 
@@ -27,7 +27,7 @@ Public Sub form_Open()
   ev = New Gesteven(GridView1, "", "D")
   
   co = New Commande(0)
-  GridView1.Columns.count = 8
+  GridView1.Columns.count = 9
   GridView1.Columns[0].Title = "N° Cient" 
   GridView1.Columns[1].Title = "Nom"
   GridView1.Columns[2].Title = "Adresse"
@@ -36,14 +36,19 @@ Public Sub form_Open()
   GridView1.Columns[5].Title = "En cours"
   GridView1.Columns[6].Title = "N° tournée"
   GridView1.Columns[7].Title = "idcom"
+  GridView1.Columns[8].Title = "Poste"
   GridView1.Columns[0].Width = 150
   GridView1.Columns[1].Width = 220
   GridView1.Columns[2].Width = 220
   GridView1.Columns[3].Width = 220
-  GridView1.Columns[4].Width = 100
+  GridView1.Columns[4].Width = 150
   GridView1.Columns[5].Width = 100
   GridView1.Columns[6].Width = 100
   GridView1.Columns[7].Width = 0
+  GridView1.Columns[8].Width = 120
+  For i As Integer = 0 To GridView1.Columns.Max
+    GridView1.Columns[i].Alignment = Align.Center
+  Next
   GridView1.Header = GridView.Horizontal
   GridView1.Mode = Select.Single
   GridView1.ScrollBar = Scroll.Both
@@ -163,17 +168,20 @@ Public Sub GridView1_Data(Row As Integer, Column As Integer)
       GridView1.Data.Text = $res!ville
       GridView1.Data.Alignment = Align.Left
     Case 4
-       GridView1.Data.Text = Format($res!datedecommande, "dd.mm.yyyy")
-       GridView1.Data.Alignment = Align.Left
+       GridView1.Data.Text = Format($res!datedecommande, "dd.mm.yyyy hh:nn")
+       GridView1.Data.Alignment = Align.Center
     Case 5 
       GridView1.Data.Text = $res!comencours
-      GridView1.Data.Alignment = Align.Left
+      GridView1.Data.Alignment = Align.Center
     Case 6
       GridView1.Data.Text = $res!numtourne
       GridView1.Data.Alignment = Align.Left
     Case 7
        GridView1.Data.Text = $res!idcom
        GridView1.Data.Alignment = Align.Left
+    Case 8
+        GridView1.Data.Text = $res!poste
+        GridView1.Data.Alignment = Align.Left
     End Select
   
 End
