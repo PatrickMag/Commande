@@ -251,6 +251,30 @@ Public Sub _new(cam As Camion, dte As Date)
       lab.text = volume.lib
     
     Next
+    rph = New ReportHBox(Me)
+    lab = New ReportLabel(rph)
+    lab.Alignment = Align.Left
+    lab.Height = "3mm"
+    lab.Width = "120mm"
+    lab.Font = Font["Serif,6"]
+    lab.text = " UN 1202, HUILE DE CHAUFFE LEGERE,3,GEIII,(D/E)"
+    
+    rph = New ReportHBox(Me)
+    lab = New ReportLabel(rph)
+    lab.Alignment = Align.Left
+    lab.Height = "3mm"
+    lab.Width = "120mm"
+    lab.Font = Font["Serif,6"]
+    lab.text = " UN 1202, CARBURANT DIESEL,3,GEIII,(D/E)"
+    
+    rph = New ReportHBox(Me)
+    lab = New ReportLabel(rph)
+    lab.Alignment = Align.Left
+    lab.Height = "3mm"
+    lab.Width = "120mm"
+    lab.Font = Font["Serif,6"]
+    lab.text = " O Véhicule citerne vide, derniere marchandise chargée :"
+
   Endif
 
 End
