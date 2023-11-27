@@ -1,0 +1,40 @@
+' Gambas class file
+
+Private $respar As Result
+
+Public Sub _new()
+
+  $respar = connect.ccon.Exec("SELECT * FROM jourconge")
+  If $respar.Available Then
+    jconge.Text = $respar!conge
+    jrtt.Text = $respar!rtt
+    jsol.Text = $respar!solidarite
+    dte.Value = $respar!date
+  Endif
+  
+End
+
+Public Sub Button1_Click()
+
+  connect.ccon.Begin
+  $respar = connect.ccon.Edit("jourconge")
+  $respar!conge = jconge.Value
+  $respar!rtt = jrtt.Value
+  $respar!solidarite = jsol.Value
+  $respar!date = dte.Value
+  $respar.Update
+  connect.ccon.Commit
+  
+End
+
+Public Sub Button2_Click()
+
+  Me.Close
+
+End
+
+Public Sub Form_Close()
+
+  Button1_Click()
+
+End

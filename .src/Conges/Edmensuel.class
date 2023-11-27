@@ -1,0 +1,104 @@
+' Gambas class file
+
+Private $rescha As Result
+Private $resnb As Result
+Private $dte As Date
+
+Private $ed As Editconges
+Private $pan As ReportPanel
+
+Public Sub _new()
+
+  $rescha = connect.ccon.Exec("SELECT * FROM chauffeur")
+  If $rescha.Available Then
+    Repeat
+      ListView1.Add($rescha!idchauffeur, $rescha!nom & " " & $rescha!prenom)
+    Until $rescha.MoveNext()
+  Endif
+  
+End
+
+Public Sub edit_Click()
+
+  Dim m, a As Integer
+  Dim ptr As New Printer
+  
+  If Not IsNumber(mois.Text) Or Not IsNumber(anne.Text) Then Return
+  m = Val(mois.Text)
+  If m < 1 Or m > 12 Then
+    mois.SetFocus
+    Return
+  Endif
+  a = Val(anne.Text)
+  If a < 2000 Or a > 2099 Then
+    anne.SetFocus
+    Return
+  Endif
+  $rescha.MoveFirst()
+  If $rescha.Available Then
+    If oui.Value Then
+      Repeat
+        $ed = New Editconges($rescha!idchauffeur)
+        If $ed.conge(Date(a, m, 1)) Then
+          If CheckBox1.Value Then $ed.recap() Else $ed.recap(False)
+          ptr.FullPage = False
+          ptr.OutputFile = User.Home & "/tmp/" & $rescha!nom & "_" & $rescha!prenom & ".pdf"
+          $ed.Print(ptr)
+          Desktop.Open(ptr.OutputFile)
+        Endif 
+      Until $rescha.MoveNext()
+    Else
+      $ed = New Editconges(nume.Text)
+      If $ed.conge(Date(a, m, 1)) Then
+        If CheckBox1.Value Then $ed.recap() Else $ed.recap(False)
+        ptr.FullPage = False
+        ptr.OutputFile = User.Home & "/tmp/" & $rescha!nom & "_" & $rescha!prenom & ".pdf"
+        $ed.Print(ptr)
+        Desktop.Open(ptr.OutputFile)
+      Endif
+    Endif
+  Endif
+
+End
+
+Public Sub rech_Click()
+
+  ListView1.Visible = Not ListView1.Visible
+
+End
+
+Public Sub ListView1_Click()
+
+  nume.Text = ListView1.Current.Key
+  nom.Text = ListView1.Current.Text
+  ListView1.Visible = False
+
+End
+
+Public Sub ListView1_KeyPress()
+
+  If Key.Code = Key.Esc Then ListView1.Visible = False
+
+End
+
+Public Sub nume_LostFocus()
+
+  Dim res As Result
+  
+  If nume.Text Then
+    res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", nume.Text)
+    If res.Available Then
+      nom.Text = res!nom
+    Else
+      Message.Error("Salarié innexistant")
+      nume.SetFocus
+    Endif
+  Endif
+
+End
+
+Public Sub quit_Click()
+
+  Me.Close
+
+End

@@ -1,0 +1,50 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,46)
+  Text = ("Paramètrage des congés")
+  { Label1 Label
+    MoveScaled(0,1,64,3)
+    Text = ("Nombres de jours acquis par mois de travail")
+    Alignment = Align.Center
+  }
+  { jconge TextValueBox
+    MoveScaled(29,5,6.6667,3.3333)
+    Alignment = Align.Right
+    Format = "0.#####"
+  }
+  { Label2 Label
+    MoveScaled(0,10,64,3)
+    Text = ("Nombres de RTT acquis par mois de travail")
+    Alignment = Align.Center
+  }
+  { jrtt TextValueBox
+    MoveScaled(29,14,6.6667,3.3333)
+    Alignment = Align.Right
+    Format = "0.#####"
+  }
+  { Label3 Label
+    MoveScaled(0,28,64,3)
+    Text = ("Date de début de période")
+    Alignment = Align.Center
+  }
+  { dte DateBox
+    MoveScaled(22,33,21,3)
+  }
+  { Button1 Button
+    MoveScaled(6,41,10,3)
+    Picture = Picture["icon:/22/save"]
+  }
+  { Button2 Button
+    MoveScaled(47,41,10,3)
+    Picture = Picture["icon:/22/quit"]
+  }
+  { Label4 Label
+    MoveScaled(1,19,63,3)
+    Text = ("Jour  solidarité")
+    Alignment = Align.Center
+  }
+  { jsol TextValueBox
+    MoveScaled(30,23,6,3.3333)
+  }
+}

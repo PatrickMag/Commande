@@ -1,0 +1,34 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,40)
+  Text = ("Mise à jour annuelle")
+  { Label1 Label
+    MoveScaled(3,9,15,3)
+    Text = ("Date de départ : ")
+  }
+  { dtdep DateBox
+    MoveScaled(32,9,16.6667,3)
+    ReadOnly = True
+  }
+  { Label2 Label
+    MoveScaled(3,19,19,3)
+    Text = ("Nouvelle date :")
+  }
+  { dtnouv DateBox
+    MoveScaled(32,19,16.6667,3)
+  }
+  { Button1 Button
+    MoveScaled(2,31,12,7)
+    Text = ("MAJ")
+    Picture = Picture["icon:/32/apply"]
+  }
+  { Button2 Button
+    MoveScaled(50,33,8,4)
+    Picture = Picture["icon:/22/quit"]
+  }
+  { Panel1 Panel
+    MoveScaled(9,23,3,2)
+    Visible = False
+  }
+}

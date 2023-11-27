@@ -1,0 +1,170 @@
+' Gambas class file
+
+Private $rescha As Result
+Private $comp As New Comptage[]
+Private $dt As String
+Private $ind As Integer = -1
+
+Public Sub _new()
+  
+  $rescha = connect.ccon.Exec("SELECT * FROM chauffeur")
+  If $rescha.Available Then
+    Repeat
+      ListView1.Add($rescha!idchauffeur, $rescha!nom & " " & $rescha!prenom)
+    Until $rescha.MoveNext()
+  Endif
+  
+End
+
+
+Public Sub saisie_Click()
+
+  Dim comp As Comptage
+  Dim m, a As Integer
+  Dim obj As Object
+
+  If valid.Visible = True Then
+    If Message.Question("Voulez vous abandonner votre saisie ?", "Oui", "Non") = 2 Then Return 
+    For Each obj In ScrollView1.Children
+      Try obj.delete
+    Next
+  Endif
+  If Not IsNumber(mois.Text) Or Not IsNumber(anne.Text) Then
+    mois.SetFocus
+    Return
+  Endif
+  $comp.Clear
+  m = Val(mois.Text)
+  a = Val(anne.Text)
+  If m < 1 Or m > 12 Then
+    mois.SetFocus
+    Return
+  Endif
+  If a < 2020 Or a > 2100 Then
+    anne.SetFocus
+  Endif
+  mois.Text = Format(m, "00")
+  anne.Text = Format(a, "0000")
+  $rescha.MoveFirst()
+  If $rescha.Available Then
+    $dt = mois.Text & anne.Text
+    If nume.Text Then
+      comp = New Comptage(ScrollView1, nume.Text, $dt) As "comp"
+        comp.Tag = $rescha.Index
+        $comp.Add(comp)
+    Else
+      Repeat
+        comp = New Comptage(ScrollView1, $rescha!idchauffeur, $dt) As "comp"
+        comp.Tag = $rescha.Index
+        $comp.Add(comp)
+      Until $rescha.MoveNext()
+    Endif
+    valid.Visible = True
+    Panel1.Visible = True
+  Endif
+End
+
+Public Sub comp_change(ind As Integer)
+
+  
+  $ind = ind
+
+End
+
+Public Sub valid_Click()
+
+  Dim comp As Comptage
+  Dim res As Result
+  Dim id As String
+  Dim dte As Date
+   
+  For Each comp In $comp
+    id = comp.nemploye
+    dte = Date(comp.anne, comp.mois, 1)
+    connect.ccon.Exec("DELETE FROM conges WHERE idchauffeur=&1 AND dte=&2", id, dte)
+    connect.ccon.Begin
+    res = connect.ccon.Create("conges")
+    res!idchauffeur = id
+    res!dte = dte
+    res!jour_conges = comp.litcheck(comptage.conges)
+    res!jour_rtt = comp.litcheck(comptage.rtt)
+    res!jour_maladie = comp.litcheck(comptage.maladies)
+    res!jour_ticket = comp.litcheck(comptage.tickets)
+    res!jour_resto = comp.litcheck(comptage.restos)
+    res.Update
+    comp.Delete
+  Next
+  connect.ccon.Commit
+  $comp.Clear
+  ScrollView1.Refresh
+  Wait 0.001
+  valid.Visible = False
+  
+End
+
+Public Sub masque_Click()
+
+  If $ind > -1 Then
+    $comp[$ind].Delete
+    $comp.Extract($ind)
+    $ind = -1
+    ScrollView1.Refresh
+    Wait 0.001
+  Endif
+  
+End
+
+Public Sub supp_Click()
+
+  Dim dte As Date
+  
+  dte = Date($comp[$ind].anne, $comp[$ind].mois, 1)
+  If $ind > -1 Then
+    connect.ccon.Exec("DELETE FROM conges WHERE idchauffeur=&1 AND dte=&2", $comp[$ind].nemploye, dte)
+    masque_Click()
+  Endif
+
+End
+
+Public Sub Button1_Click()
+
+  Me.Close
+
+End
+
+
+Public Sub rech_Click()
+
+  ListView1.Visible = Not ListView1.Visible
+
+End
+
+Public Sub ListView1_Click()
+
+  nume.Text = ListView1.Current.Key
+  nom.Text = ListView1.Current.Text
+  ListView1.Visible = False
+
+End
+
+Public Sub ListView1_KeyPress()
+
+  If Key.Code = Key.Esc Then ListView1.Visible = False
+
+End
+
+Public Sub nume_LostFocus()
+
+  Dim res As Result
+  
+  If nume.Text Then
+    res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", nume.Text)
+    If res.Available Then
+      nom.Text = res!nom
+    Else
+      Message.Error("Salarié innexistant")
+      nume.SetFocus
+    Endif
+  Endif
+
+End

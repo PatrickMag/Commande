@@ -1,0 +1,167 @@
+' Gambas class file
+
+
+Private $bs As Barselection
+Private $rescha As Result
+Private $respar As Result
+
+Public Sub _new()
+
+  
+  $bs = New Barselection("110101110", Panel1) As "bar"
+  $rescha = connect.ccon.Exec("SELECT * FROM chauffeur")
+  $respar = connect.ccon.Exec("SELECT * FROM jourconge")
+  bar_premier()
+  DateBox1.Value = $respar!date
+  
+End
+
+Private Sub affiche()
+  
+  If $rescha!rtt Then affrtt(True) Else affrtt(False)
+  nume.Text = $rescha!idchauffeur
+  nom.Text = $rescha!nom & " " & $rescha!prenom
+  jcong.Value = $rescha!jour_conges
+  jrtt.Value = $rescha!jour_rtt
+  anc.Value = $rescha!ancien
+  jsold.Value = $respar!solidarite
+  jmar.Value = $rescha!mariage
+  jdc.Value = $rescha!dece
+  jnai.Value = $rescha!naissance
+  jaut.Value = $rescha!conge_exptionnel
+  dptot.Value = $rescha!jour_conges + $rescha!mariage + $rescha!dece + $rescha!naissance + $rescha!conge_exptionnel + $rescha!ancien - $respar!solidarite
+  
+End
+
+Private Sub affrtt(value As Boolean)
+  
+  Label4.Visible = value
+  jrtt.Visible = value
+  Label22.Visible = value
+  crtt.Visible = value
+  Label22.Visible = value
+  crtt.Visible = value
+  rttpri.Visible = value
+  rttres.Visible = value
+  totcr.Visible = value
+  
+End
+
+Public Sub calc_lostfocus()
+
+  dptot.Value = jcong.Value - jsold.Value + jmar.Value + jdc.Value + jnai.Value + jaut.Value + anc.Value
+
+End
+
+Public Sub bar_precedant()
+
+  If Not $rescha.MovePrevious() Then affiche
+
+End
+
+Public Sub bar_suivant()
+
+  If Not $rescha.MoveNext() Then affiche
+
+End
+
+Public Sub bar_premier()
+
+  If Not $rescha.MoveFirst() Then affiche
+
+End
+
+Public Sub bar_dernier()
+
+  If $rescha.Available Then
+    If Not $rescha.MoveLast() Then affiche
+  Endif
+  
+End
+
+Public Sub bar_modif()
+
+  If $rescha.Available Then
+    connect.ccon.Begin
+  Else
+    Stop Event
+  Endif
+
+End
+
+Public Sub bar_valide(creer As Boolean, modif As Boolean)
+
+  If $rescha.Available Then
+    $rescha = connect.ccon.Edit("chauffeur", "idchauffeur=&1 ", $rescha!idchauffeur)
+    $rescha!jour_conges = jcong.Value 
+    $rescha!jour_rtt = jrtt.Value
+    $rescha!ancien = anc.Value
+    $rescha!mariage = jmar.Value 
+    $rescha!dece = jdc.Value
+    $rescha!naissance = jnai.Value 
+    $rescha!conge_exptionnel = jaut.Value
+    $rescha.Update
+    connect.ccon.Commit
+ Else
+   Stop Event
+  Endif
+  $rescha = connect.ccon.Exec("SELECT * FROM chauffeur")
+  If $rescha.Available Then affiche()
+
+End
+
+Public Sub bar_quitter()
+
+  Me.Close
+
+End
+
+
+Public Sub bcal_Click()
+
+  Dim comp As Comptage
+  Dim res As Result
+  Dim dt As String
+  Dim win As Window
+  Dim scr As ScrollView
+  Dim conga, rtta, congp, rttp As Float
+  Dim mala As Float[]
+  
+  res = connect.ccon.Exec("SELECT * FROM conges WHERE idchauffeur=&1 and dte BETWEEN &2 AND &3", $rescha!idchauffeur, DateBox1.Value, Now)
+  If res.Available Then
+    win = New Window
+    win.x = Me.x + Me.W
+    win.y = Me.y
+    win.w = Me.W
+    win.h = Me.h / 2
+    win.Show
+    scr = New ScrollView(win)
+    scr.h = Me.h / 2
+    scr.Arrangement = Arrange.Vertical
+    conga = dptot.Value 
+    If $rescha!rtt Then 
+      rtta = jrtt.Value
+    Endif
+    Repeat
+      dt = Format(Month(res!dte), "00") & Format(Year(res!dte), "0000")
+      comp = New Comptage(scr, $rescha!idchauffeur, dt)
+      conga += $respar!conge
+      congp += comp.nbconge
+      rtta += $respar!rtt
+      rttp += comp.nbrtt
+    Until res.MoveNext()
+    cacq.Text = Format(conga, "0.00")
+    crtt.Text = Format(rtta, "0.00")
+    cpri.Text = Format(congp, "0.00")
+    rttpri.Text = Format(rttp, "0.00")
+    rttres.Text = Format(rtta - rttp, "0.00")
+    mala = Utils.calmal(Now, $respar!date, $rescha!idchauffeur, $respar)
+    jmal.Text = Format(mala[0], "0")
+    cmal.Text = Format(mala[1], "0")
+    rest.Text = Format(conga - congp - Round(mala[1], 0), "0.00")
+    rfp.Text = Format(jcong.Value - congp, "0.00")
+    totcr.Text = Format(Val(rest.Text) + Val(rttres.Text), "0.00")
+    
+  Endif
+
+End

@@ -186,3 +186,54 @@ Public Function totobs(txt As String) As Float
   Return somme
   
 End
+
+Public Function calmal(dte As Date, dtdeb As Date, idchauffeur As String, respar As Result) As Float[]        ''calcul les arrêts maladie sur 1 année flottante
+  
+  Dim res As Result
+  Dim dt, ch As String
+  Dim totmal, conge As Float
+  Dim i As Integer
+  
+  If calcjour(dte, idchauffeur) Then
+    res = connect.ccon.Exec("SELECT * FROM conges WHERE idchauffeur=&1 and dte BETWEEN &2 AND &3", idchauffeur, dtdeb, dte)
+    If res.Available Then
+      Repeat
+        totmal += litjour(res!jour_maladie)
+      Until res.MoveNext()
+    Endif
+    conge = (totmal / 30) * respar!conge
+    conge += (totmal / 30) * respar!rtt
+  Endif
+  Return [totmal, conge]
+  
+End
+
+Private Function calcjour(dte As Date, idchauffeur As String) As Boolean
+  
+  Dim dte1 As Date
+  Dim res As Result
+  Dim ch As String
+  Dim totmal As Float
+  
+  dte1 = DateAdd(dte, gb.Month, -12)
+  res = connect.ccon.Exec("SELECT * FROM conges WHERE idchauffeur=&1 and dte BETWEEN &2 AND &3", idchauffeur, dte1, Now)
+  If res.Available Then
+  Repeat
+    totmal += litjour(res!jour_maladie)
+    If totmal > 30 Then Return True 
+  Until res.MoveNext()
+  Endif
+  Return False
+  
+End
+
+Private Function litjour(ch As String) As Float
+  
+  Dim totmal As Float
+  
+  For i As Integer = 0 To ch.Len - 1
+    If ch[i] = "1" Then totmal += 1
+  Next
+  Return totmal
+  
+End

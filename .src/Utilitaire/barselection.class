@@ -10,7 +10,7 @@ Private $oobj As Object
 Property Read estcreer As Boolean
 Property Read estmodif As Boolean
 
-Event precedent()
+Event precedant()
 Event suivant()
 Event premier()
 Event dernier()
@@ -166,7 +166,7 @@ Public Sub bout_click()
     Case 1
       Raise premier()
     Case 2
-      Raise precedent()
+      Raise precedant()
     Case 3
       $bcreer = True
       afficheval

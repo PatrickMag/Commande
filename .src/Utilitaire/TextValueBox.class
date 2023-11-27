@@ -1,0 +1,86 @@
+' Gambas class file
+
+Export
+Inherits TextBox
+
+Public Const _Properties As String = "*,Value,Format=0"
+Public Const _DrawWith As String = "TextBox"
+
+Private $value As Float
+Private $format As String
+Private $suivant As Control
+
+Property Value As Float
+Property Format As String
+Property Suivant As Control
+
+Public Sub _new()
+
+  Dim obs As Observer
+  
+  obs = New Observer(Me) As "TextValueBox"
+
+End
+
+Private Function Value_Read() As Float
+
+  Return $value
+
+End
+
+Private Sub Value_Write(Value As Float)
+
+  If $format Then
+    Me.Text = Format(value, $format)
+  Else
+    Me.Text = Str(Value)
+  Endif
+
+End
+
+Private Function Format_Read() As String
+
+  Return $format
+
+End
+
+Private Sub Format_Write(Value As String)
+
+  Me.Text = Format($value, Value)
+  $format = Value
+
+End
+
+Private Function Suivant_Read() As Control
+
+  Return $suivant
+
+End
+
+Private Sub Suivant_Write(Value As Control)
+
+  $suivant = Value
+
+End
+
+Public Sub TextValueBox_Change()
+
+  If Not IsNumber(Replace(Me.Text, ".", ",")) Then
+    Stop Event
+    Return
+  Else
+    $value = Val(Replace(Me.Text, ".", ","))
+  Endif
+
+End
+
+Public Sub TextValueBox_LostFocus()
+
+  If $format Then 
+    Me.Text = Format($value, $format)
+  Else
+    Me.Text = Str($value)
+  Endif
+  If Not IsNull($suivant) Then $suivant.SetFocus
+
+End

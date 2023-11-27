@@ -1,0 +1,76 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,182,64)
+  Text = ("Saisie des congés")
+  { Frame1 Frame
+    MoveScaled(5,2,92,10)
+    Text = ("Période à saisire")
+    { mois TextBox
+      MoveScaled(15,5,8,3)
+      MaxLength = 2
+    }
+    { Label1 Label
+      MoveScaled(29,5,9,3)
+      Text = ("Année :")
+    }
+    { anne TextBox
+      MoveScaled(44,5,12,3)
+      MaxLength = 4
+    }
+    { Label2 Label
+      MoveScaled(2,5,9,3)
+      Text = ("Mois :")
+    }
+    { saisie Button
+      MoveScaled(62,5,10,3)
+      Text = ("Saisie")
+      Picture = Picture["icon:/16/add"]
+    }
+  }
+  { ScrollView1 ScrollView
+    MoveScaled(0,19,181,42)
+    Arrangement = Arrange.Vertical
+  }
+  { valid Button
+    MoveScaled(142,14,22,4)
+    Visible = False
+    Text = ("Valider la saisie")
+    Picture = Picture["icon:/32/apply"]
+  }
+  { Panel1 Panel
+    MoveScaled(27,13,42,5)
+    Visible = False
+    { masque Button
+      MoveScaled(1,1,18,3)
+      Text = ("Masquer cette saisie")
+    }
+    { supp Button
+      MoveScaled(20,1,20,3)
+      Text = ("Supprimer cette saisie")
+    }
+  }
+  { Button1 Button
+    MoveScaled(167,14,13,4)
+    Text = ("Quitter")
+    Picture = Picture["icon:/32/quit"]
+  }
+  { Label3 Label
+    MoveScaled(77,14,7,3)
+    Text = ("N° : ")
+  }
+  { nume TextBox
+    MoveScaled(88,14,7,3)
+  }
+  { rech Button
+    MoveScaled(96,14,4,3)
+    Picture = Picture["icon:/22/find"]
+  }
+  { nom Label
+    MoveScaled(101,14,24,3)
+  }
+  { ListView1 ListView
+    MoveScaled(127,0,14,19)
+    Visible = False
+  }
+}

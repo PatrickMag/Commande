@@ -1,0 +1,68 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,68,66)
+  Text = ("Recap mensuel")
+  { Label1 Label
+    MoveScaled(4,4,10,3)
+    Text = ("Mois :")
+  }
+  { Label2 Label
+    MoveScaled(4,10,7,4)
+    Text = ("Année :")
+  }
+  { mois TextBox
+    MoveScaled(24,5,9,3)
+  }
+  { anne TextBox
+    MoveScaled(24,11,9,3)
+  }
+  { edit Button
+    MoveScaled(14,59,14,5)
+    Text = ("Edition")
+    Picture = Picture["icon:/32/print"]
+  }
+  { quit Button
+    MoveScaled(32,59,13,5)
+    Text = ("Quitter")
+    Picture = Picture["icon:/32/quit"]
+  }
+  { CheckBox1 CheckBox
+    MoveScaled(5,17,18,2)
+    Text = ("Récapitulatif")
+    Value = CheckBox.True
+  }
+  { Frame1 Frame
+    MoveScaled(4,21,58,10)
+    Text = ("Pour tous les salariés¨")
+    { oui RadioButton
+      MoveScaled(3,5,14,3)
+      Expand = True
+      Text = ("Oui")
+      Value = True
+    }
+    { non RadioButton
+      MoveScaled(38,5,14,3)
+      Expand = True
+      Text = ("Non ")
+    }
+  }
+  { Label3 Label
+    MoveScaled(5,33,7,3)
+    Text = ("N° : ")
+  }
+  { nume TextBox
+    MoveScaled(16,33,7,3)
+  }
+  { ListView1 ListView
+    MoveScaled(29,37,14,19)
+    Visible = False
+  }
+  { rech Button
+    MoveScaled(24,33,4,3)
+    Picture = Picture["icon:/22/find"]
+  }
+  { nom Label
+    MoveScaled(29,33,24,3)
+  }
+}

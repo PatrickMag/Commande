@@ -20,7 +20,8 @@ Public Sub form_Open()
   
   Connect.Connection
   connect.connect_laurux
-  If Not connect.ccon.Tables.Exist("evenement") Then
+  res = connect.ccon.Exec("SELECT * FROM commande LIMIT 1")
+  If Not res.Fields.Exist("poste") Then
     Message.Warning("Veuillez mettre à jour votre base de donnée")
     base.ShowModal
   Endif
@@ -79,9 +80,9 @@ Public Sub form_Open()
     Until res.MoveNext()
   Endif
   'mise en place du timer
-  $timer = New Timer As "MyTimer"
-  $timer.Delay = 5000
-  $timer.Enabled = True
+  ' $timer = New Timer As "MyTimer"
+  ' $timer.Delay = 5000
+  ' $timer.Enabled = True
   
   Catch
     Message.Error(Error.Text, "OK")
@@ -556,5 +557,41 @@ End
 Public Sub postit_Click()
 
   postite.Show()
+
+End
+
+Public Sub Saisie_Click()
+
+  saiconge.Show
+
+End
+
+Public Sub editionm_Click()
+
+  Edmensuel.Show
+
+End
+
+Public Sub repo_Click()
+
+  saireport.ShowModal
+
+End
+
+Public Sub editiona_Click()
+
+  Edannuel.Show
+
+End
+
+Public Sub prm_Click()
+
+  paramconge.Show
+
+End
+
+Public Sub maj_Click()
+
+  majan.Show
 
 End

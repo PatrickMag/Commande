@@ -1,0 +1,311 @@
+' Gambas class file
+
+Private $idchauffeur As String
+Private $jmois As Integer
+Private $rescha As Result
+Private $dte As Date
+
+Public totconge As Float
+Public totrtt As Float
+Public totmaladi As Integer
+Public totticket As Integer
+
+Public Sub _new(idchauffeur As String)
+
+  $rescha = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", idchauffeur)
+  If $rescha.Available Then
+    nom.Text = $rescha!nom & " " & $rescha!prenom
+    $idchauffeur = idchauffeur
+  Endif
+  
+End
+
+Public Sub conge(dte As Date) As Boolean
+
+  Dim rescong As Result
+  Dim i As Integer
+  Dim pan, pan1 As ReportPanel
+  Dim lab As ReportLabel
+  Dim ch As String
+  Dim w As Float
+  
+  totconge = 0
+  totrtt = 0
+  totticket = 0
+  totmaladi = 0
+  $dte = dte
+  dat.Text = Format(dte, "mm.yyyy")
+  rescong = connect.ccon.Exec("SELECT * FROM conges WHERE idchauffeur=&1 AND dte=&2", $idchauffeur, dte)
+  If rescong.Available Then
+    $jmois = DateDiff(dte, DateAdd(dte, gb.Month, 1), gb.Day)
+    w = 200 / ($jmois + 2)
+    pan = New ReportPanel(corp)
+    pan.Arrangement = Arrange.Horizontal
+    pan.Border = ReportBorder["Top:1pt #000000"]
+    lab = New ReportLabel(pan)
+    lab.Text = Left(Format(dte, "mmmm"), 4)
+    lab.Border = ReportBorder["Right:1pt #000000"]
+    lab.Expand = True
+    For i = 1 To $jmois 
+      lab = New ReportLabel(pan)
+      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Text = Format(i, "00")
+      lab.Alignment = Align.Center
+      lab.expand = True
+    Next
+    lab = New ReportLabel(pan)
+    lab.Expand = True
+    
+    pan = New ReportPanel(corp)
+    pan.Arrangement = Arrange.Horizontal
+    lab = New ReportLabel(pan)
+    lab.Expand = True
+    lab.Border = ReportBorder["Right:1pt #000000"]
+    lab.Text = Format(dte, "yyyy")
+    For i = 1 To $jmois 
+      lab = New ReportLabel(pan)
+      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.expand = True
+      lab.Text = Left(Format(Date(Year(dte), Month(dte), i), "dddd"), 4)
+    Next
+    lab = New ReportLabel(pan)
+    lab.Expand = True
+    lab.Text = "Tot."
+  
+    pan = New ReportPanel(corp)
+    pan.Arrangement = Arrange.Horizontal
+    lab = New ReportLabel(pan)
+    lab.Text = "Cong"
+    lab.Expand = True
+    lab.Border = ReportBorder["Right:1pt #000000"]
+    ch = rescong!jour_conges
+    For i = 0 To ($jmois - 1) * 2 Step 2
+      pan1 = New ReportPanel(pan)
+      pan1.Expand = True
+      pan1.Border = ReportBorder["Right:1pt #000000"]
+      pan1.Arrangement = Arrange.Horizontal
+      lab = New ReportLabel(pan1)
+      lab.expand = True
+      If ch[i] = "1" Then 
+        lab.Text = "X"
+        totconge += 0.5
+       Else 
+        lab.Text = " " 
+      Endif
+      lab = New ReportLabel(pan1)
+      lab.expand = True
+      If ch[i + 1] = "1" Then 
+        lab.Text = "X"
+        totconge += 0.5
+      Else 
+        lab.Text = " " 
+      Endif
+    Next
+    lab = New ReportLabel(pan)
+    lab.Expand = True
+    lab.Alignment = Align.Right
+    lab.Text = Format(totconge, "0.00")
+    
+    If $rescha!rtt Then
+      ch = rescong!jour_rtt
+      pan = New ReportPanel(corp)
+      pan.Arrangement = Arrange.Horizontal
+      lab = New ReportLabel(pan)
+      lab.Text = "RTT "
+      lab.Expand = True
+      lab.Border = ReportBorder["Right:1pt #000000"]
+      For i = 0 To ($jmois - 1) * 2 Step 2
+        pan1 = New ReportPanel(pan)
+        pan1.Expand = True
+        pan1.Border = ReportBorder["Right:1pt #000000"]
+        pan1.Arrangement = Arrange.Horizontal
+        lab = New ReportLabel(pan1)
+        lab.expand = True
+        If ch[i] = "1" Then 
+          lab.Text = "X"
+          totrtt += 0.5
+         Else 
+          lab.Text = " " 
+        Endif
+        lab = New ReportLabel(pan1)
+        lab.expand = True
+        If ch[i + 1] = "1" Then 
+          lab.Text = "X"
+          totrtt += 0.5
+         Else 
+          lab.Text = " " 
+        Endif
+      Next
+      lab = New ReportLabel(pan)
+      lab.Expand = True
+      lab.Alignment = Align.Right
+      lab.Text = Format(totrtt, "0.00")
+    Endif
+    
+    ch = rescong!jour_maladie
+    pan = New ReportPanel(corp)
+    pan.Arrangement = Arrange.Horizontal
+    lab = New ReportLabel(pan)
+    lab.Text = "Mala"
+    lab.Expand = True
+    lab.Border = ReportBorder["Right:1pt #000000"]
+    For i = 0 To $jmois - 1
+      lab = New ReportLabel(pan)
+      lab.Expand = True
+      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Alignment = Align.Center
+      If ch[i] = "1" Then 
+       lab.Text = "X"
+       totmaladi += 1
+      Else 
+       lab.Text = " " 
+      Endif
+    Next
+    lab = New ReportLabel(pan)
+    lab.Expand = True
+    lab.Alignment = Align.Right
+    lab.Text = Format(totmaladi, "0")
+    
+    If $rescha!panier Then
+      ch = rescong!jour_resto
+      pan = New ReportPanel(corp)
+      pan.Arrangement = Arrange.Horizontal
+      lab = New ReportLabel(pan)
+      lab.Expand = True
+      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Text = "Rest"
+      For i = 0 To $jmois - 1
+        lab = New ReportLabel(pan) 
+        lab.Expand = True
+        lab.Border = ReportBorder["Right:1pt #000000"]
+        lab.Alignment = Align.Center
+        If ch[i] = "1" Then 
+         lab.Text = "X"
+        Else 
+         lab.Text = " " 
+        Endif
+      Next
+      lab = New ReportLabel(pan)
+      lab.Expand = True
+  
+      ch = rescong!jour_ticket
+      pan = New ReportPanel(corp)
+      pan.Arrangement = Arrange.Horizontal
+      lab = New ReportLabel(pan)
+      lab.Expand = True
+      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Text = "Tick"
+      For i = 0 To $jmois - 1
+        lab = New ReportLabel(pan)
+        lab.Expand = True
+        lab.Border = ReportBorder["Right:1pt #000000"]
+        lab.Alignment = Align.Center
+        If ch[i] = "1" Then 
+          lab.Text = "X"
+          totticket += 1
+        Else 
+          lab.Text = " " 
+        Endif
+      Next
+      lab = New ReportLabel(pan)
+      lab.Expand = True
+      lab.Alignment = Align.Right
+      lab.Text = Format(totticket, "0")
+    Endif
+  Else
+    Return False
+  Endif
+  Return True
+
+End
+
+Public Sub recap(Optional ok As Boolean = True)
+
+  Dim rescong As Result
+  Dim respar As Result
+  Dim mal As Float[]
+  Dim ms As Integer
+  
+  If Not ok Then
+    reprecap.Border = ReportBorder[""]
+    ReportLabel2.Text = " "
+    ReportLabel10.Text = " "
+    ReportLabel2.Text = " "
+    ReportLabel12.Text = " "
+    ReportLabel3.Text = " "
+    ReportLabel14.Text = " "
+    ReportLabel16.Text = " "
+    ReportLabel18.Text = " "
+    ReportLabel20.Text = " "
+    ReportLabel4.Text = " "
+    ReportLabel5.Text = " "
+    ReportLabel7.Text = " "
+    rest.Text = " "
+    ReportLabel21.Text = " "
+    ReportLabel3.Text = " "
+    ReportLabel22.Text = " "
+    Return
+  Endif
+  respar = connect.ccon.Exec("SELECT * FROM jourconge")
+  rescong = connect.ccon.Exec("SELECT * FROM conges WHERE idchauffeur=&1 AND dte BETWEEN &2 AND &3", $rescha!idchauffeur, respar!date, DateAdd(respar!date, gb.Year, 1))
+  If rescong.Available Then
+    ms = rescong.Count
+    totconge = 0
+    totrtt = 0
+    totticket = 0
+    Repeat
+      totconge += totj(rescong!jour_conges, comptage.conges)
+      totrtt += totj(rescong!jour_rtt, comptage.rtt)
+      totticket = totj(rescong!jour_ticket, comptage.tickets)
+    Until rescong.MoveNext()
+      mal = Utils.calmal(Now, respar!date, $rescha!idchauffeur, respar)
+      totmaladi = Round(mal[1], 0)
+  Endif
+  
+  jconge.Text = $rescha!jour_conges
+  jsol.Text = respar!solidarite
+  mariage.Text = $rescha!mariage
+  dece.Text = $rescha!dece
+  nais.Text = $rescha!naissance
+  autre.Text = $rescha!conge_exptionnel
+  caquis.Text = Format($rescha!jour_conges - respar!solidarite + $rescha!mariage + $rescha!dece + $rescha!naissance + $rescha!conge_exptionnel + $rescha!ancien + (ms * respar!conge), "0.00")
+  cpris.Text = Format(totconge, "0.00")
+  anci.Text = $rescha!ancien
+  cmala.Text = totmaladi
+  jmala.Text = mal[0]
+  
+  restap.Text = Format(Val(caquis.Text) - totconge - totmaladi, "0.00")
+  rfp.Text = Format($rescha!jour_conges - totconge, "0.00")
+  
+  If $rescha!rtt Then
+    rttpris.Text = Format(totrtt, "0.00")
+    jrtt.Text = Format($rescha!jour_rtt, "0.00")
+    rttacq.Text = Format($rescha!jour_rtt + (ms * respar!rtt), "0.00")
+    restrtt.Text = Format(Val(rttacq.Text) - totrtt, "0.00")
+    totcr.Text = Format(Val(restrtt.Text) + Val(restap.Text))
+  Else
+    ReportLabel21.Text = " "
+    ReportLabel3.Text = " "
+  Endif
+
+End
+
+Private Function totj(ch As String, type As Integer) As Float
+  
+  Dim i As Integer
+  Dim tot As Float
+  
+  For i = 0 To ch.Len - 1
+    If ch[i] = "1" Then
+      Select Case type
+        Case comptage.conges, comptage.rtt
+          tot += 0.5
+        Case Else
+          tot += 1
+      End Select
+    Endif
+  Next
+  Return tot
+  
+End
+

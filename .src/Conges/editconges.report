@@ -1,0 +1,378 @@
+# Gambas Form File 3.0
+
+{ Report Report
+  #MoveScaled(0,0,135,113)
+  Orientation = Printer.Landscape
+  Index = 0
+  Text = ("")
+  { ReportHBox1 ReportHBox
+    #MoveScaled(1,1,133,5)
+    Fixed = True
+    { ReportLabel1 ReportLabel
+      #MoveScaled(1,1,23,3)
+      Expand = True
+      Text = ("ÉDITION DES CONGÉS  ")
+    }
+    { nom ReportLabel
+      #MoveScaled(24,1,33,3)
+      Expand = True
+      Alignment = Align.Center
+    }
+    { dat ReportLabel
+      #MoveScaled(57,1,34,3)
+      Expand = True
+      Alignment = Align.Right
+    }
+  }
+  { corp ReportPanel
+    #MoveScaled(1,6,133,35)
+    AutoResize = True
+    Arrangement = Arrange.Vertical
+  }
+  { reprecap ReportPanel
+    #MoveScaled(1,41,133,64)
+    Padding = ReportPadding["Top:4mm;Bottom:4mm"]
+    Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
+    Arrangement = Arrange.Vertical
+    { ReportPanel1 ReportPanel
+      #MoveScaled(1,1,131,4)
+      Height = "4mm"
+      Arrangement = Arrange.Horizontal
+      { ReportLabel2 ReportLabel
+        #MoveScaled(1,1,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Jours de congé n-1:")
+      }
+      { jconge ReportLabel
+        #MoveScaled(35,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Format = "0.00"
+        Alignment = Align.Right
+      }
+      { ReportLabel3 ReportLabel
+        #MoveScaled(87,1,25,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Text = ("Jours de RTT n-1 :")
+      }
+      { jrtt ReportLabel
+        #MoveScaled(113,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Format = "0.00"
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel6 ReportPanel
+      #MoveScaled(2,6,129,4)
+      Arrangement = Arrange.Horizontal
+      { ReportLabel10 ReportLabel
+        #MoveScaled(0,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Jour Soidarité :")
+      }
+      { jsol ReportLabel
+        #MoveScaled(33,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+      { ReportLabel11 ReportLabel
+        #MoveScaled(48,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+      }
+      { rttpri3 ReportLabel
+        #MoveScaled(65,1,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel12 ReportPanel
+      #MoveScaled(1,12,130,4)
+      Arrangement = Arrange.Horizontal
+      { ReportLabel22 ReportLabel
+        #MoveScaled(0,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Ancienneté :")
+      }
+      { anci ReportLabel
+        #MoveScaled(33,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+      { ReportLabel23 ReportLabel
+        #MoveScaled(48,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+      }
+      { rttpri1 ReportLabel
+        #MoveScaled(65,1,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel7 ReportPanel
+      #MoveScaled(1,18,132,5)
+      Arrangement = Arrange.Horizontal
+      { ReportLabel12 ReportLabel
+        #MoveScaled(0,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Mariage :")
+      }
+      { mariage ReportLabel
+        #MoveScaled(33,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+      { ReportLabel13 ReportLabel
+        #MoveScaled(48,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+      }
+      { rttpri4 ReportLabel
+        #MoveScaled(65,1,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel8 ReportPanel
+      #MoveScaled(1,23,126,5)
+      Arrangement = Arrange.Horizontal
+      { ReportLabel14 ReportLabel
+        #MoveScaled(0,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Décès :")
+      }
+      { dece ReportLabel
+        #MoveScaled(33,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+      { ReportLabel15 ReportLabel
+        #MoveScaled(48,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+      }
+      { rttpri5 ReportLabel
+        #MoveScaled(65,1,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel9 ReportPanel
+      #MoveScaled(1,29,130,4)
+      Arrangement = Arrange.Horizontal
+      { ReportLabel16 ReportLabel
+        #MoveScaled(0,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Naissance :")
+      }
+      { nais ReportLabel
+        #MoveScaled(33,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+      { ReportLabel17 ReportLabel
+        #MoveScaled(48,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+      }
+      { rttpri6 ReportLabel
+        #MoveScaled(65,1,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel10 ReportPanel
+      #MoveScaled(1,33,130,4)
+      Arrangement = Arrange.Horizontal
+      { ReportLabel18 ReportLabel
+        #MoveScaled(0,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Autre :")
+      }
+      { autre ReportLabel
+        #MoveScaled(33,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+      { ReportLabel19 ReportLabel
+        #MoveScaled(48,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+      }
+      { rttpri7 ReportLabel
+        #MoveScaled(65,1,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel11 ReportPanel
+      #MoveScaled(1,37,130,4)
+      Padding = ReportPadding["Top:3mm"]
+      Arrangement = Arrange.Horizontal
+      { ReportLabel20 ReportLabel
+        #MoveScaled(0,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Congés acquis : ")
+      }
+      { caquis ReportLabel
+        #MoveScaled(33,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Format = "0.00"
+        Alignment = Align.Right
+      }
+      { ReportLabel21 ReportLabel
+        #MoveScaled(48,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Text = ("RTT acquis")
+      }
+      { rttacq ReportLabel
+        #MoveScaled(65,1,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Format = "0.00"
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel2 ReportPanel
+      #MoveScaled(1,42,133,4)
+      Height = "4mm"
+      AutoResize = True
+      Arrangement = Arrange.Horizontal
+      { ReportLabel4 ReportLabel
+        #MoveScaled(2,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Congés pris : ")
+      }
+      { cpris ReportLabel
+        #MoveScaled(35,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+      { ReportLabel6 ReportLabel
+        #MoveScaled(50,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+      }
+      { rttpris ReportLabel
+        #MoveScaled(67,1,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel3 ReportPanel
+      #MoveScaled(1,47,131,4)
+      Height = "4mm"
+      Arrangement = Arrange.Horizontal
+      { ReportLabel5 ReportLabel
+        #MoveScaled(0,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Maldie :")
+      }
+      { cmala ReportLabel
+        #MoveScaled(33,0,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+      { jmala ReportLabel
+        #MoveScaled(48,0,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+      { rttpri2 ReportLabel
+        #MoveScaled(65,0,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel4 ReportPanel
+      #MoveScaled(1,52,131,5)
+      Arrangement = Arrange.Horizontal
+      { rest ReportLabel
+        #MoveScaled(0,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Reste a prendre : ")
+      }
+      { restap ReportLabel
+        #MoveScaled(33,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Format = "0.00"
+        Alignment = Align.Right
+      }
+      { ReportLabel8 ReportLabel
+        #MoveScaled(48,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+      }
+      { restrtt ReportLabel
+        #MoveScaled(65,1,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Format = "0.00"
+        Alignment = Align.Right
+      }
+    }
+    { ReportPanel5 ReportPanel
+      #MoveScaled(1,58,130,5)
+      Arrangement = Arrange.Horizontal
+      { ReportLabel7 ReportLabel
+        #MoveScaled(0,0,18,3)
+        Padding = ReportPadding["Left:4mm;Right:6mm"]
+        Expand = True
+        Text = ("Reste fin de période :")
+      }
+      { rfp ReportLabel
+        #MoveScaled(33,1,12,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Format = "0.00"
+        Alignment = Align.Right
+      }
+      { ReportLabel9 ReportLabel
+        #MoveScaled(48,1,13,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+      }
+      { totcr ReportLabel
+        #MoveScaled(65,1,16,3)
+        Padding = ReportPadding["Right:6mm"]
+        Expand = True
+        Alignment = Align.Right
+      }
+    }
+  }
+  Index = 0
+}

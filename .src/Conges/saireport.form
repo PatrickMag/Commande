@@ -1,0 +1,202 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,84)
+  Text = ("Saisie des reports")
+  { Label1 Label
+    MoveScaled(1,2,6,2)
+    Text = ("N°  :")
+  }
+  { nume TextBox
+    MoveScaled(7,2,12,3)
+    ReadOnly = True
+  }
+  { nom Label
+    MoveScaled(26,2,27,3)
+  }
+  { Label2 Label
+    MoveScaled(7,7,21,3)
+    Text = ("Date début de période :")
+  }
+  { DateBox1 DateBox
+    MoveScaled(33,7,17,3)
+  }
+  { Frame1 Frame
+    MoveScaled(3,11,60,36)
+    Text = ("Début de période")
+    { Label3 Label
+      MoveScaled(1,3,14.7778,3)
+      Text = ("Jours de congé :")
+    }
+    { Label4 Label
+      MoveScaled(38,3,11,3)
+      Text = ("Jours RTT :")
+    }
+    { Label5 Label
+      MoveScaled(1,7,15,3)
+      Text = ("Jour solidarité :")
+    }
+    { anc TextValueBox calc
+      Name = "anc"
+      MoveScaled(25,11,7.7778,3)
+      Alignment = Align.Right
+    }
+    { Label6 Label
+      MoveScaled(1,15,13,3)
+      Text = ("Mariage :")
+    }
+    { jmar TextValueBox calc
+      Name = "jmar"
+      MoveScaled(25,15,7.7778,3)
+      Alignment = Align.Right
+    }
+    { Label7 Label
+      MoveScaled(1,19,11,3)
+      Text = ("Décès :")
+    }
+    { jdc TextValueBox calc
+      Name = "jdc"
+      MoveScaled(25,19,7.7778,3)
+      Alignment = Align.Right
+    }
+    { Label8 Label
+      MoveScaled(1,23,11,3)
+      Text = ("Naissance :")
+    }
+    { jnai TextValueBox calc
+      Name = "jnai"
+      MoveScaled(25,23,7.7778,3)
+      Alignment = Align.Right
+    }
+    { Label9 Label
+      MoveScaled(1,27,8,3)
+      Text = ("Autre : ")
+    }
+    { jaut TextValueBox calc
+      Name = "jaut"
+      MoveScaled(25,27,7.7778,3)
+      Alignment = Align.Right
+    }
+    { Label10 Label
+      MoveScaled(1,32,9,3)
+      Text = ("Total")
+    }
+    { dptot TextValueBox
+      MoveScaled(25,31,8,4)
+      Enabled = False
+      Alignment = Align.Right
+      Format = "0.00"
+    }
+    { bcal Button
+      MoveScaled(40,28,12,5)
+      Text = ("Calcul")
+      Picture = Picture["icon:/32/star"]
+    }
+    { Label12 Label
+      MoveScaled(1,11,12,3)
+      Text = ("Ancienneté :")
+    }
+    { jcong TextValueBox calc
+      Name = "jcong"
+      MoveScaled(25,3,8,3)
+      Alignment = Align.Right
+      Format = "0.00"
+    }
+    { jrtt TextValueBox calc
+      Name = "jrtt"
+      MoveScaled(50,3,8,3)
+      Alignment = Align.Right
+      Format = "0.00"
+    }
+    { jsold TextValueBox calc
+      Name = "jsold"
+      MoveScaled(25,7,8,3)
+      Alignment = Align.Right
+    }
+  }
+  { Frame2 Frame
+    MoveScaled(2,49,60,24)
+    Text = ("Reste a prendre")
+    { Label11 Label
+      MoveScaled(1,3,17,3)
+      Text = ("Congés acquis : ")
+    }
+    { cacq Label
+      MoveScaled(25,3,10,3)
+      Alignment = Align.Right
+      Border = Border.Plain
+    }
+    { Label13 Label
+      MoveScaled(1,7,14,3)
+      Text = ("Congés pris : ")
+    }
+    { cpri Label
+      MoveScaled(25,7,10,3)
+      Alignment = Align.Right
+      Border = Border.Plain
+    }
+    { Label15 Label
+      MoveScaled(1,15,15,3)
+      Text = ("Reste a prendre :")
+    }
+    { rest Label
+      MoveScaled(25,15,10,3)
+      Alignment = Align.Right
+      Border = Border.Plain
+    }
+    { Label17 Label
+      MoveScaled(1,19,18,3)
+      Text = ("Reste fin de période :")
+    }
+    { rfp Label
+      MoveScaled(25,19,10,3)
+      Alignment = Align.Right
+      Border = Border.Plain
+    }
+    { Label19 Label
+      MoveScaled(1,11,14,3)
+      Text = ("Maladie : ")
+    }
+    { cmal Label
+      MoveScaled(25,11,10,3)
+      Alignment = Align.Right
+      Border = Border.Plain
+    }
+    { crtt Label
+      MoveScaled(50,3,10,3)
+      Alignment = Align.Right
+      Border = Border.Plain
+    }
+    { Label22 Label
+      MoveScaled(38,3,9,3)
+      Text = ("RTT :")
+    }
+    { rttpri Label
+      MoveScaled(50,7,10,3)
+      Alignment = Align.Right
+      Border = Border.Plain
+    }
+    { rttres Label
+      MoveScaled(50,15,10,3)
+      Alignment = Align.Right
+      Border = Border.Plain
+    }
+    { totcr Label
+      MoveScaled(50,19,10,3)
+      Alignment = Align.Right
+      Border = Border.Plain
+    }
+    { jmal Label
+      MoveScaled(38,11,10,3)
+      Alignment = Align.Right
+      Border = Border.Plain
+    }
+  }
+  { Panel1 Panel
+    MoveScaled(3,76,58,6)
+    Arrangement = Arrange.Horizontal
+  }
+  { Panel2 Panel
+    MoveScaled(60,4,2,4)
+  }
+}

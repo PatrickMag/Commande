@@ -8,7 +8,7 @@
   { Fichier Menu
     Text = ("Fichier")
     { chauffeur Menu
-      Text = ("Fiche chauffeur")
+      Text = ("Fiche salarié")
     }
     { camion Menu
       Text = ("Fiche camion")
@@ -21,6 +21,27 @@
     }
     { bases Menu
       Text = ("Base")
+    }
+  }
+  { Conges Menu
+    Text = ("Congés")
+    { Saisie Menu
+      Text = ("Saisie des congés")
+    }
+    { editionm Menu
+      Text = ("Editition mensuel")
+    }
+    { editiona Menu
+      Text = ("Edition annuelle")
+    }
+    { repo Menu
+      Text = ("Saisie des reports")
+    }
+    { maj Menu
+      Text = ("Mise à jour")
+    }
+    { prm Menu
+      Text = ("Paramètres")
     }
   }
   { Panel2 Panel

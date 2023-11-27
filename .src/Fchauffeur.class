@@ -3,10 +3,24 @@
 Private $bs As Barselection
 Private $rescha As Result
 Private $gchau As Gesteven
+Private $che As New CheckBox[]
+
+Public Enum dimanche, lundi, mardi, mercredi, jeudi, vendredi, samedi
+Public jours As String[] = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
+
 
 Public Sub _new()
 
+  Dim che As CheckBox
+  Dim i As Integer
+  
   $bs = New Barselection("111111110", Panel1) As "bar"
+  For i = 0 To 6
+    che = New CheckBox(jtr)
+    che.Text = jours[i]
+    che.Expand = True
+    $che.Add(che)
+  Next
   affprem
   
 End
@@ -24,10 +38,19 @@ End
 Private Sub affiche()
   
   Dim geven As Gesteven
+  Dim i As Integer
   
   Textnum.Text = $rescha!idchauffeur
   Textnom.Text = $rescha!nom
   Textpren.Text = $rescha!prenom
+  Dateemb.Value = $rescha!dtemb
+  Datenais.Value = $rescha!dtnais
+  secu.Text = $rescha!nss
+  panier.Value = CBool($rescha!panier)
+  rtt.Value = CBool($rescha!rtt)
+  For i = 0 To 6
+    $che[i].Value = CBool($rescha[jours[i]])
+  Next
   If Not $gchau Then
     $gchau = New Gesteven(GridView1, Textnum.Text, "C")
   Else
@@ -38,9 +61,19 @@ End
 
 Private Sub valide()
   
+  Dim i As Integer
+  
   $rescha!idchauffeur = Textnum.Text
   $rescha!nom = Textnom.Text
   $rescha!prenom = Textpren.Text
+  $rescha!dtemb = Dateemb.Value
+  $rescha!dtnais = Datenais.Value
+  $rescha!nss = secu.Text
+  $rescha!panier = panier.Value
+  $rescha!rtt = rtt.Value
+  For i = 0 To 6
+    $rescha[jours[i]] = $che[i].Value
+  Next
   
   $rescha.Update
   connect.ccon.Commit
@@ -53,6 +86,8 @@ Private Sub mablanc()
   Textnum.Clear
   Textnom.Clear
   Textpren.Clear
+  secu.Clear
+  
   
 End
 

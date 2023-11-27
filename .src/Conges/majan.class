@@ -1,0 +1,62 @@
+' Gambas class file
+
+Private $respar As Result
+
+Public Sub _new()
+
+  $respar = connect.ccon.Exec("SELECT * FROM jourconge")
+  If $respar.Available Then
+    dtdep.Value = $respar!date
+    dtnouv.Value = DateAdd($respar!date, gb.Year, 1)
+  Endif
+
+End
+
+Public Sub Button1_Click()
+
+  Dim com As Comptage
+  Dim rescha, rescon, res As Result
+  Dim totcong, totrtt As Float
+  Dim cong As Float[]
+  
+  rescha = connect.ccon.Exec("SELECT * FROM chauffeur")
+  If rescha.Available Then
+    Application.Busy += 1
+    connect.ccon.Begin
+    Repeat
+      rescon = connect.ccon.Exec("SELECT * FROM conges WHERE idchauffeur=&1 AND dte BETWEEN &2 AND &3", rescha!idchauffeur, dtdep.Value, dtnouv.Value)
+      If rescon.Available Then
+        totcong = rescha!jour_conges + rescha!ancien + rescha!conge_exptionnel + rescha!mariage + rescha!dece + rescha!naissance - $respar!solidarite
+        totrtt = rescha!jour_rtt
+        Repeat
+          com = New Comptage(Panel1, rescha!idchauffeur, Format(rescon!dte, "mmyyyy"))
+          totcong = totcong - com.nbconge + $respar!conge
+          totrtt = totrtt - com.nbrtt + $respar!rtt
+        Until rescon.MoveNext()
+        cong = Utils.calmal(dtnouv.Value, dtdep.Value, rescha!idchauffeur, $respar)
+        totcong -= Round(cong[1], 0)
+        res = connect.ccon.Edit("chauffeur", "idchauffeur=&1", rescha!idchauffeur)
+        res!jour_conges = totcong
+        If res!rtt Then res!jour_rtt = totrtt
+        res!conge_exptionnel = 0
+        res!mariage = 0
+        res!dece = 0
+        res!naissance = 0
+        res.Update
+      Endif
+    Until rescha.MoveNext()
+    res = connect.ccon.Edit("jourconge")
+    res!date = dtnouv.Value
+    res.Update
+    connect.ccon.Commit
+    Application.Busy -= 1
+  Endif
+  Me.Close
+  
+End
+
+Public Sub Button2_Click()
+
+  Me.Close
+
+End

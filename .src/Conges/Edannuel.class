@@ -1,0 +1,102 @@
+' Gambas class file
+
+Private $rescha As Result
+Private $resconge As Result
+Private $respar As Result
+
+Public Sub _new()
+
+  $respar = connect.ccon.Exec("SELECT * FROM jourconge")
+  If $respar.Available Then
+    dtdep.Value = $respar!date
+    dtfin.Value = DateAdd($respar!date, gb.Month, 11)
+  Endif
+  
+  $rescha = connect.ccon.Exec("SELECT * FROM chauffeur")
+  If $rescha.Available Then
+    Repeat
+      ListView1.Add($rescha!idchauffeur, $rescha!nom & " " & $rescha!prenom)
+    Until $rescha.MoveNext()
+  Endif
+
+End
+
+
+
+Public Sub edit_Click()
+
+  If oui.Value Then
+    $rescha.MoveFirst()
+    Repeat
+      Impr($rescha!idchauffeur)
+    Until $rescha.MoveNext()
+  Else
+    Impr(nume.Text)
+  Endif
+  
+
+End
+
+Private Sub Impr(idchauffeur As String)
+  
+  Dim dte As Date
+  Dim m, a As Integer
+  Dim ptr As New Printer
+  Dim ed As Editconges
+  
+  $resconge = connect.ccon.Exec("SELECT * FROM conges WHERE idchauffeur=&1 AND dte BETWEEN &2 AND &3", idchauffeur, dtdep.Value, dtfin.Value)
+  If $resconge.Available Then
+    ed = New Editconges(idchauffeur)
+    Repeat
+      If ed.conge($resconge!dte) Then
+        If CheckBox1.Value Then ed.recap() Else ed.recap(False)
+      Endif 
+    Until $resconge.MoveNext()
+    ptr.FullPage = False
+    ptr.OutputFile = User.Home & "/tmp/" & idchauffeur & ".pdf"
+    ed.Print(ptr)
+    Desktop.Open(ptr.OutputFile)
+  Endif
+End
+
+Public Sub rech_Click()
+
+  ListView1.Visible = Not ListView1.Visible
+
+End
+
+Public Sub ListView1_Click()
+
+  nume.Text = ListView1.Current.Key
+  nom.Text = ListView1.Current.Text
+  ListView1.Visible = False
+
+End
+
+Public Sub ListView1_KeyPress()
+
+  If Key.Code = Key.Esc Then ListView1.Visible = False
+
+End
+
+Public Sub nume_LostFocus()
+
+  Dim res As Result
+  
+  If nume.Text Then
+    res = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", nume.Text)
+    If res.Available Then
+      nom.Text = res!nom
+    Else
+      Message.Error("Salarié innexistant")
+      nume.SetFocus
+    Endif
+  Endif
+
+End
+
+Public Sub quit_Click()
+
+  Me.Close
+
+End

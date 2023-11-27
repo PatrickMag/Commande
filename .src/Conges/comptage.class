@@ -1,0 +1,399 @@
+' Gambas class file
+
+Inherits Expander
+
+Public Enum janvier, fevrier, mars, avril, mai, juin, juillet, aout, setptembre, octobre, novrembre, decembre
+Public moi As String[] = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"]
+
+Public Enum conges, rtt, maladies, restos, tickets
+
+Private $checkcong As New CheckBox[]
+Private $checkrtt As New CheckBox[]
+Private $checkmala As New CheckBox[]
+Private $checkresto As New CheckBox[]
+Private $checkticke As New CheckBox[]
+Private $labtot As New Label[5]
+Private $tab As New Integer[7]
+
+Private $jmois As Integer
+Private $jrtt As Float
+Private $jconge As Float
+Private $jticket As Integer
+Private $jmaladie As Integer
+Private $jresto As Integer
+Private $expconge As Expander
+
+Private $rescha As Result
+Private $resnb As Result
+Private $dte As Date
+
+Private $w As Integer
+Private $h As Integer
+
+Property Read nbjoursmois As Integer
+Property Read nbrtt As Float
+Property Read nbconge As Float
+Property Read nbticket As Integer
+Property Read nbjourmaladie As Float
+Property Read nemploye As String
+Property Read mois As String
+Property Read anne As String
+
+Event change(ind As Integer)
+
+Public Sub _new(idchauffeur As String, dte As String)
+
+  $dte = Date(Right(dte, 4), Val(Left(dte, 2)), 1)
+  $jmois = DateDiff($dte, DateAdd($dte, gb.Month, 1), gb.Day)
+  $h = Me.Parent.Font.H
+  Me.H = 325
+  Me.w = 1660
+  Me.Parent.w = 1650
+  
+  $rescha = connect.ccon.Exec("SELECT * FROM chauffeur WHERE idchauffeur=&1", idchauffeur)
+  If Not $rescha.Available Then Error.Raise("Chauffeur innexistant :" & idchauffeur)
+  $resnb = connect.ccon.Exec("SELECT * FROM conges WHERE idchauffeur=&1 AND  dte=&2", idchauffeur, $dte)
+  
+  If $rescha!Lundi Then $tab[1] = 1
+  If $rescha!Mardi Then $tab[2] = 1
+  If $rescha!Mercredi Then $tab[3] = 1
+  If $rescha!Jeudi Then $tab[4] = 1
+  If $rescha!Vendredi Then $tab[5] = 1
+  If $rescha!Samedi Then $tab[6] = 1
+  
+End
+
+Public Sub _ready()
+
+  creaexp()
+
+End
+
+Private Sub creaexp() As Expander
+  
+  Dim i, j, nb As Integer
+  Dim pan, pan1 As Panel
+  Dim lab As Label
+  Dim ch As CheckBox
+  Dim w As Float
+  Dim sep As Separator
+  
+  j = $jmois * 2
+  Me.Animated = True
+  Me.Arrangement = Arrange.Vertical
+  Me.Text = $rescha!idchauffeur & " " & $rescha!nom & " " & $rescha!prenom
+  w = 1650 / ($jmois + 2) 
+  
+  pan = New Panel(Me)
+  pan.H = $h
+  pan.Arrangement = Arrange.Horizontal
+  lab = New Label(pan)
+  
+  lab.Width = w
+  lab.Height = $h
+  lab.Text = Left(Format($dte, "mmmm"), 4)
+  For i = 1 To $jmois 
+    lab = New Label(pan)
+    lab.Width = w
+    lab.Height = $h
+    lab.Text = Format(i, "00")
+    lab.Alignment = Align.Center
+    lab.Border = Border.Solid
+  Next
+  lab = New Label(pan)
+  lab.w = w
+  pan = New Panel(Me)
+  pan.h = $h
+  pan.Arrangement = Arrange.Horizontal
+  lab = New Label(pan)
+  lab.w = w
+  lab.h = $h
+  lab.Text = Format($dte, "yyyy")
+  Lab.h = $h
+  For i = 1 To $jmois 
+    lab = New Label(pan)
+    lab.w = w
+    lab.h = $h
+    lab.Text = Left(Format(Date(Year($dte), Month($dte), i), "dddd"), 4)
+    lab.Border = Border.Solid
+  Next
+  lab = New Label(pan)
+  lab.w = w
+  lab.h = $h
+  lab.Text = "Tot."
+  
+  pan = New Panel(Me)
+  pan.h = $h
+  pan.Arrangement = Arrange.Horizontal
+  lab = New Label(pan)
+  lab.w = w
+  lab.h = $h
+  lab.Text = "Cong"
+  For i = 1 To $jmois
+    pan1 = New Panel(pan)
+    pan1.h = $h
+    pan1.w = w
+    pan1.Arrangement = Arrange.Horizontal
+    ch = New CheckBox(pan1) As "checkcong"
+    ch.Expand = True
+    $checkcong.Add(ch)
+    ch = New CheckBox(pan1) As "checkcong"
+    ch.Expand = True
+    $checkcong.Add(ch)
+  Next
+  lab = New Label(pan)
+  lab.w = w
+  $labtot[conges] = lab
+  If $resnb.Available Then afcheck($checkcong, $resnb!jour_conges)
+  
+  If $rescha!rtt Then
+    nb += 1
+    pan = New Panel(Me)
+    pan.h = $h
+    pan.Arrangement = Arrange.Horizontal
+    lab = New Label(pan)
+    lab.W = w
+    lab.h = $h
+    lab.Text = "Rtt"
+    For i = 1 To $jmois
+      pan1 = New Panel(pan)
+      pan1.h = $h
+      pan1.w = w
+      pan1.Arrangement = Arrange.Horizontal
+      ch = New CheckBox(pan1) As "checkrtt"
+      ch.Expand = True
+      $checkrtt.Add(ch)
+      ch = New CheckBox(pan1) As "checkrtt"
+      ch.Expand = True
+      $checkrtt.Add(ch)
+    Next
+    lab = New Label(pan)
+    lab.w = w
+    $labtot[rtt] = lab
+    If $resnb.Available Then afcheck($checkrtt, $resnb!jour_rtt)
+  Endif
+  
+  pan = New Panel(Me)
+  pan.h = $h
+  pan.Arrangement = Arrange.Horizontal
+  lab = New Label(pan)
+  lab.h = $h
+  lab.W = w
+  lab.Text = "Mala"
+  For i = 1 To $jmois
+    ch = New CheckBox(pan) As "checkmala"
+    ch.Width = w 
+    $checkmala.Add(ch)
+  Next
+  lab = New Label(pan)
+  lab.w = w
+  $labtot[maladies] = lab
+  If $resnb.Available Then afcheck($checkmala, $resnb!jour_maladie)
+  
+  If $rescha!panier Then
+    nb += 2
+    pan = New Panel(Me)
+    pan.h = $h
+    pan.Arrangement = Arrange.Horizontal
+    lab = New Label(pan)
+    lab.h = $h
+    lab.w = w
+    lab.Text = "Rest"
+    For i = 1 To $jmois
+      ch = New CheckBox(pan) As "checkrest"
+      ch.Width = w 
+      $checkresto.Add(ch)
+    Next
+    lab = New Label(pan)
+    lab.h = $h
+    lab.w = w
+    $labtot[restos] = lab
+    If $resnb.Available Then afcheck($checkresto, $resnb!jour_resto)
+    
+    pan = New Panel(Me)
+    pan.H = $h
+    pan.Arrangement = Arrange.Horizontal
+    lab = New Label(pan)
+    lab.h = $h
+    lab.w = w
+    lab.Text = "Tick"
+    For i = 1 To $jmois
+      ch = New CheckBox(pan) As "checktick"
+      ch.Width = w 
+      $checkticke.Add(ch)
+    Next
+    lab = New Label(pan)
+    lab.w = w
+    $labtot[tickets] = lab
+    If $resnb.Available Then afcheck($checkticke, $resnb!jour_ticket) Else init_ticket()
+  Endif
+  nb += 4
+  Me.h = ($h * (nb + 3))
+  
+End
+
+Public Function litcheck(type As Integer) As String
+
+  Dim tab As CheckBox[] = selecttab(type)
+  Dim i As Integer
+  Dim ch As String
+  
+  For i = 0 To tab.Max
+    If tab[i].Value Then ch &= "1" Else ch &= "0"
+  Next
+  Return ch
+  
+End
+
+Private Function selecttab(type As Integer) As CheckBox[]
+  
+  Dim tab As CheckBox[]
+  Select Case type
+    Case conges
+      tab = $checkcong
+    Case rtt
+      tab = $checkrtt
+    Case maladies
+      tab = $checkmala
+    Case tickets
+      tab = $checkticke
+    Case restos
+      tab = $checkresto
+  End Select
+  Return tab
+  
+End
+
+Private Sub afcheck(tab As CheckBox[], ch As String)
+  
+  Dim i As Integer
+  
+  For i = 0 To ch.Len - 1
+    If ch[i] = "0" Then tab[i].Value = False Else tab[i].Value = True
+  Next
+  
+End
+
+Private Sub init_ticket()
+  
+  Dim dte As Date = $dte
+  Dim i As Integer
+  Dim tab As New Integer[7]
+  
+  For i = 0 To $jmois - 1
+    $checkticke[i].Value = CBool($tab[WeekDay(dte)])
+    dte = DateAdd(dte, gb.Day, 1)
+  Next
+  
+End
+
+Private Sub majtick(ch As CheckBox, type As Integer)
+  
+  Dim ind, i As Integer
+  Dim tab As CheckBox[] = selecttab(type)
+  
+  If $checkticke.Count < 1 Then Return
+  If ch.Value And $rescha!panier Then
+    ind = tab.Find(ch)
+    Select Case type
+      Case conges, rtt
+        i = ind / 2
+        $checkticke[i].Value = False
+      Case Else
+        $checkticke[ind].Value = False
+    End Select
+  Endif
+End
+
+Public Sub checkcong_click()
+
+  If Last.value Then $jconge += 0.5 Else $jconge -= 0.5
+  $labtot[conges].Text = Format($jconge, "0.00")
+  majtick(Last, conges)
+  If Me.Tag Then Raise change(Me.Tag)
+  
+End
+
+Public Sub checkrtt_click()
+
+  If Last.value Then $jrtt += 0.5 Else $jrtt -= 0.5
+  $labtot[rtt].Text = Format($jrtt, "0.00")
+  majtick(Last, rtt)
+  If Me.Tag Then Raise change(Me.Tag)
+
+End
+
+Public Sub checkmala_click()
+
+  If Last.value Then $jmaladie += 1 Else $jmaladie -= 1
+  $labtot[maladies].Text = Format($jmaladie, "0")
+  majtick(Last, maladies)
+  If Me.Tag Then Raise change(Me.Tag)
+
+End
+
+Public Sub checkrest_click()
+
+  If Last.value Then $jresto += 1 Else $jresto -= 1
+  $labtot[restos].Text = Format($jresto, "0")
+  majtick(Last, restos)
+  If Me.Tag Then Raise change(Me.Tag)
+
+End
+
+Public Sub checktick_click()
+
+  If Last.value Then $jticket += 1 Else $jticket -= 1
+  $labtot[tickets].Text = Format($jticket, "0")
+  If Me.Tag Then Raise change(Me.Tag)
+
+End
+
+Private Function nbrtt_Read() As Float
+
+  Return $jrtt
+
+End
+
+Private Function nbticket_Read() As Integer
+
+  Return $jticket
+
+End
+
+Private Function nbjoursmois_Read() As Integer
+
+  Return $jmois
+
+End
+
+Private Function nbjourmaladie_Read() As Float
+
+  Return $jmaladie
+
+End
+
+Private Function nbconge_Read() As Float
+
+  Return $jconge
+
+End
+
+
+Private Function nemploye_Read() As String
+
+  Return $rescha!idchauffeur
+
+End
+
+Private Function mois_Read() As String
+
+  Return Format(Month($dte), "00")
+
+End
+
+Private Function anne_Read() As String
+
+  Return Format(Year($dte), "0000")
+
+End
