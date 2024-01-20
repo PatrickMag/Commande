@@ -11,7 +11,7 @@ Private $timer As Timer
 
 Private $JourFer As Integer[] = [11, 2512, 15, 85, 1111, 147, 158, 2122023, 1322024, 1842022, 2652022, 1852023, 952024, 562022, 2952023, 1952024, 1042023, 142024, 662022, 29520230, 2052024]          ''jours fériers
 
-Public Sub form_Open()
+Public Sub _new()
 
   Dim ev As Gesteven
   Dim res As Result
@@ -96,7 +96,7 @@ Public Sub form_Close()
   Dim win As Window
   
   For Each win In Windows
-    If Not IsNull(win) Then win.Close
+    If Not Object.IsValid(win) Then win.Close
   Next
   
 End
@@ -249,7 +249,7 @@ Private Sub affrenseignement(numcolonne As Integer)
    ScrollView1.Children.Clear
 
   '                   'Affichage des dates de livraison souhaitées dans le scrolview
-  res = Utils.RecCom("datelivraison", True, CLong(GridView1[numcolonne, 7].Text))
+  res = Utils.RecCom("datelivraison", True, (GridView1[numcolonne, 7].Text))
   If res.Available Then
     res.MoveFirst
     For i = 0 To res.Max

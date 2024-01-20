@@ -2,6 +2,7 @@
 
 { Form Form
   MoveScaled(0,0,152,76)
+  Font = Font["Serif,10"]
   Icon = Picture["logo.png"]
   Arrangement = Arrange.Row
   AutoResize = True
@@ -44,10 +45,9 @@
       Text = ("Paramètres")
     }
   }
-  { Panel2 Panel
+  { Panel2 ScrollView
     MoveScaled(1,1,150,76)
     Arrangement = Arrange.Vertical
-    AutoResize = True
     { Panel3 Panel
       MoveScaled(3,1,148,55)
       Arrangement = Arrange.Vertical

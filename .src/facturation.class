@@ -255,7 +255,7 @@ Public Sub butfac_Click()
    Endif
   
    resart = connect.cconlaurux.Exec("SELECT taux_tva FROM Fiches_Tvaav WHERE code_tva=&1", txtva)
-   totttc += (rescom!fraisfac * (resart!taux_tva / 100))
+   totttc += rescom!fraisfac + (rescom!fraisfac * (resart!taux_tva / 100))
    res!totalttc = Round(totttc, -2)
    res.Update
    respart.Update

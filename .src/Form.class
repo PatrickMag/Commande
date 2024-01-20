@@ -1,0 +1,25 @@
+' Gambas class file
+
+Create Static
+Export
+
+Public Sub _new()
+
+  Dim obs As Observer
+  
+  If Me.Parent Then Me.Font = Me.parent.Font
+  obs = New Observer(Me) As "form"
+End
+
+Public Sub form_KeyPress()
+
+  Dim ctrl As Boolean = Key.Control
+  
+  If Key.code = Key["+"] Then 
+    If ctrl Then Me.Font.Size += 1
+  Endif
+  If Key.Code = Key["-"] Then 
+    If ctrl Then Me.Font.Size -= 1
+  Endif
+
+End
