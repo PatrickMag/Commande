@@ -60,29 +60,30 @@ Public Sub conge(dte As Date) As Boolean
     pan.Arrangement = Arrange.Horizontal
     lab = New ReportLabel(pan)
     lab.Expand = True
-    lab.Border = ReportBorder["Right:1pt #000000"]
+    lab.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
     lab.Text = Format(dte, "yyyy")
     For i = 1 To $jmois 
       lab = New ReportLabel(pan)
-      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
       lab.expand = True
       lab.Text = Left(Format(Date(Year(dte), Month(dte), i), "dddd"), 4)
     Next
     lab = New ReportLabel(pan)
     lab.Expand = True
     lab.Text = "Tot."
-  
+    lab.Border = ReportBorder["Bottom:1pt #000000"]
+    
     pan = New ReportPanel(corp)
     pan.Arrangement = Arrange.Horizontal
     lab = New ReportLabel(pan)
     lab.Text = "Cong"
     lab.Expand = True
-    lab.Border = ReportBorder["Right:1pt #000000"]
+    lab.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
     ch = rescong!jour_conges
     For i = 0 To ($jmois - 1) * 2 Step 2
       pan1 = New ReportPanel(pan)
       pan1.Expand = True
-      pan1.Border = ReportBorder["Right:1pt #000000"]
+      pan1.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
       pan1.Arrangement = Arrange.Horizontal
       lab = New ReportLabel(pan1)
       lab.expand = True
@@ -105,6 +106,7 @@ Public Sub conge(dte As Date) As Boolean
     lab.Expand = True
     lab.Alignment = Align.Right
     lab.Text = Format(totconge, "0.00")
+    lab.Border = ReportBorder["Bottom:1pt #000000"]
     
     If $rescha!rtt Then
       ch = rescong!jour_rtt
@@ -113,11 +115,11 @@ Public Sub conge(dte As Date) As Boolean
       lab = New ReportLabel(pan)
       lab.Text = "RTT "
       lab.Expand = True
-      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
       For i = 0 To ($jmois - 1) * 2 Step 2
         pan1 = New ReportPanel(pan)
         pan1.Expand = True
-        pan1.Border = ReportBorder["Right:1pt #000000"]
+        pan1.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
         pan1.Arrangement = Arrange.Horizontal
         lab = New ReportLabel(pan1)
         lab.expand = True
@@ -140,6 +142,7 @@ Public Sub conge(dte As Date) As Boolean
       lab.Expand = True
       lab.Alignment = Align.Right
       lab.Text = Format(totrtt, "0.00")
+      lab.Border = ReportBorder["Bottom:1pt #000000"]
     Endif
     
     ch = rescong!jour_maladie
@@ -148,11 +151,11 @@ Public Sub conge(dte As Date) As Boolean
     lab = New ReportLabel(pan)
     lab.Text = "Mala"
     lab.Expand = True
-    lab.Border = ReportBorder["Right:1pt #000000"]
+    lab.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
     For i = 0 To $jmois - 1
       lab = New ReportLabel(pan)
       lab.Expand = True
-      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
       lab.Alignment = Align.Center
       If ch[i] = "1" Then 
        lab.Text = "X"
@@ -165,6 +168,7 @@ Public Sub conge(dte As Date) As Boolean
     lab.Expand = True
     lab.Alignment = Align.Right
     lab.Text = Format(totmaladi, "0")
+    lab.Border = ReportBorder["Bottom:1pt #000000"]
     
     If $rescha!panier Then
       ch = rescong!jour_resto
@@ -172,12 +176,12 @@ Public Sub conge(dte As Date) As Boolean
       pan.Arrangement = Arrange.Horizontal
       lab = New ReportLabel(pan)
       lab.Expand = True
-      lab.Border = ReportBorder["Right:1pt #000000"]
+      lab.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
       lab.Text = "Rest"
       For i = 0 To $jmois - 1
         lab = New ReportLabel(pan) 
         lab.Expand = True
-        lab.Border = ReportBorder["Right:1pt #000000"]
+        lab.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
         lab.Alignment = Align.Center
         If ch[i] = "1" Then 
          lab.Text = "X"
@@ -191,6 +195,7 @@ Public Sub conge(dte As Date) As Boolean
       ch = rescong!jour_ticket
       pan = New ReportPanel(corp)
       pan.Arrangement = Arrange.Horizontal
+      pan.Padding = ReportPadding["Bottom:5mm"]
       lab = New ReportLabel(pan)
       lab.Expand = True
       lab.Border = ReportBorder["Right:1pt #000000"]
@@ -198,7 +203,7 @@ Public Sub conge(dte As Date) As Boolean
       For i = 0 To $jmois - 1
         lab = New ReportLabel(pan)
         lab.Expand = True
-        lab.Border = ReportBorder["Right:1pt #000000"]
+        lab.Border = ReportBorder["Right:1pt #000000;Bottom:1pt #000000"]
         lab.Alignment = Align.Center
         If ch[i] = "1" Then 
           lab.Text = "X"
@@ -211,6 +216,7 @@ Public Sub conge(dte As Date) As Boolean
       lab.Expand = True
       lab.Alignment = Align.Right
       lab.Text = Format(totticket, "0")
+      lab.Border = ReportBorder["top:1pt #000000;Bottom:1pt #000000"]
     Endif
   Else
     Return False

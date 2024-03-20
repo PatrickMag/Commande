@@ -242,7 +242,7 @@ Private Sub affrenseignement(numcolonne As Integer)
   
   '                 Affichage du commentaire principal de cette commande
   If Not $res.Available Then Return
-  $res.MoveTo(numcolonne)
+  If $res.MoveTo(numcolonne) Then Return
   TextArea1.Text = $res!commentaire
   '                   Suppression des dates de livraison souhaitées dans le scrolview
  
@@ -400,7 +400,7 @@ Public Sub dte_Activate()
   but.Expand = True
   but.Text = "Retour"
   but.Picture = Picture["icon:/medium/cancel"]
- 
+  Panel2.H += 277
 End
 
 Public Sub fac_Click()

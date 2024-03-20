@@ -56,7 +56,7 @@ Public Sub _new(cam As Camion, dte As Date)
         
         nom = New ReportLabel(rp)
         nom.Font = Font["Serif,Bold,13"]
-        nom.Text = $rescmd!nom & "   "
+        nom.Text = $rescmd!noml & "   "
         'tel fixe
         rph = New ReportHBox(rp)
         lab = New ReportLabel(rph)

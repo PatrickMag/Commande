@@ -31,7 +31,7 @@
   }
   { reprecap ReportPanel
     #MoveScaled(1,41,133,64)
-    Padding = ReportPadding["Top:4mm;Bottom:4mm"]
+    Padding = ReportPadding["Top:4mm;Bottom:4mm;Left:4mm;Right:4mm"]
     Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
     Arrangement = Arrange.Vertical
     { ReportPanel1 ReportPanel
