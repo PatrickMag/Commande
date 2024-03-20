@@ -41,7 +41,7 @@ Endif
     res.MoveFirst
     GridView1.Header = GridView.Horizontal
     GridView1.ScrollBar = Scroll.Both
-    GridView1.Columns.Count = 2 + (res.Count * 3)
+    If 2 + (res.Count * 4) > 26 Then GridView1.Columns.Count = 26 Else GridView1.Columns.Count = 2 + (res.Count * 4)
     GridView1.Columns[0].Text = "Code"
     GridView1.Columns[1].Text = "Designation"
     GridView1.Columns[1].Width = 200
@@ -52,15 +52,17 @@ Endif
      Inc i
      GridView1.Columns[i].Text = "Quantité"
      Inc i
-       GridView1.Columns[i].Text = "Px HT"
-       Inc i
-       res.MoveNext
-    Until i >= 20 Or i >= GridView1.Columns.Max
+     GridView1.Columns[i].Text = "Px HT"
+     Inc i
+     GridView1.Columns[i].Text = "Px TTC"
+     Inc i
+     res.MoveNext
+    Until i >= 25 Or i >= GridView1.Columns.Max
     
     i = 0
     res.MoveFirst
     Repeat
-      res1 = connect.cconlaurux.Exec("SELECT SUM(REPLACE(qte_ligfac,',','.')) AS qte,SUM(REPLACE(netht_ligfac,',','.')) as net,code_ligfac as code, libel_ligfac as design FROM Fiches_HistoFac JOIN Fiches_HistoLigfac ON  numfac=num_ligfac WHERE datefac=&1 AND cdclifac=&2 And typel_ligfac='A' GROUP BY code_ligfac,design UNION(SELECT SUM(REPLACE(qte_ligbl,',','.')) AS qte,SUM(REPLACE(netht_ligbl,',','.')) AS net,code_ligbl as code, libel_ligbl as design FROM Fiches_Bl JOIN Fiches_Ligbl ON num_ligbl=numbl WHERE datebl=&1 AND cdclibl=&2 AND typel_ligbl='A' GROUP BY code_ligbl,design)", res!dte, $lnumcli) 
+      res1 = connect.cconlaurux.Exec("SELECT SUM(REPLACE(qte_ligfac,',','.')) AS qte,SUM(REPLACE(netht_ligfac,',','.')) as net,SUM(REPLACE(nettc_ligfac,',','.')) as ttc,code_ligfac as code, libel_ligfac as design FROM Fiches_HistoFac JOIN Fiches_HistoLigfac ON  numfac=num_ligfac WHERE datefac=&1 AND cdclifac=&2 And typel_ligfac='A' GROUP BY code_ligfac,design UNION SELECT SUM(REPLACE(qte_ligbl,',','.')) AS qte,SUM(REPLACE(netht_ligbl,',','.')) AS net, SUM(REPLACE(nettc_ligbl,',','.')) AS ttc,code_ligbl as code, libel_ligbl as design FROM Fiches_Bl JOIN Fiches_Ligbl ON num_ligbl=numbl WHERE datebl=&1 AND cdclibl=&2 AND typel_ligbl='A' GROUP BY code_ligbl,design", res!dte, $lnumcli) 
       res1.MoveFirst
       For k = 0 To res1.Max
         If GridView1.Rows.Count = 0 Then ajouart(res1!code)
@@ -71,10 +73,12 @@ Endif
           i = rechart(res1!code)
         Endif
         
-        j = 3 + (res.Index * 3)
+        j = 3 + (res.Index * 4)
         GridView1[i, j].Text = Format(res1!qte, "0.000")
         Inc j
         If res1!qte = 0 Then GridView1[i, j].Text = "0,000" Else GridView1[i, j].Text = Format(res1!net / res1!qte, "0.000")
+        Inc j
+        If res1!qte = 0 Then GridView1[i, j].Text = "0,000" Else GridView1[i, j].Text = Format(res1!ttc / res1!qte, "0.000")
         res1.MoveNext
       Next
       res.MoveNext
