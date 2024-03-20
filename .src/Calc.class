@@ -5,6 +5,7 @@ Inherits Window
 Export
 
 Private $tb As TextBox
+Private $de As New DB_Desktop
 
 Public Enum zero, un, deux, trois, quatre, cinq, six, sept, huit, neuf, egal, mult, divi, soust, addit, virgul, retour, efface
 
@@ -127,21 +128,21 @@ Public Sub clavier_click()
   $tb.SetFocus
   Select Case Last.tag
     Case 0 To 9
-      Desktop.SendKeys(Str(Last.tag))    '$tb recoit la touche last.tab
+      $de.sendkeys(Str(Last.tag))    '$tb recoit la touche last.tab
     Case mult
-       Desktop.SendKeys("*")
+       $de.sendkeys("*")
      Case divi
-        Desktop.SendKeys("/")
+        $de.sendkeys("/")
      Case soust
-        Desktop.SendKeys("-")
+        $de.sendkeys("-")
      Case addit
-        Desktop.SendKeys("+")
+        $de.sendkeys("+")
       Case efface
         $tb.Clear
       Case retour
-         Desktop.SendKeys("[BackSpace]")
+         $de.sendkeys("[BackSpace]")
       Case virgul
-        Desktop.SendKeys(".")
+        $de.sendkeys(".")
       Case egal
         calcul()
   End Select
