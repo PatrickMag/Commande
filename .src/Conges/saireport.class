@@ -129,7 +129,7 @@ Public Sub bcal_Click()
   
   res = connect.ccon.Exec("SELECT * FROM conges WHERE idchauffeur=&1 and dte BETWEEN &2 AND &3", $rescha!idchauffeur, DateBox1.Value, Now)
   If res.Available Then
-    win = New Window
+    win = New Window(Null)
     win.x = Me.x + Me.W
     win.y = Me.y
     win.w = Me.W

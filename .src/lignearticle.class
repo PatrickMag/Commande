@@ -33,7 +33,7 @@ Property Read lib As String
 Property Read qte As Float
 Property Read stcom As Float
 
-
+Private $ticpe As Ticpe
 Private $fmontantht As Float
 Private $fmontantttc As Float
 Private $fmargeart As Float
@@ -55,7 +55,7 @@ Event Down(mn As Integer)
 Event supprime(mn As Integer)
 
 
-Public Sub _new(fr As Form, choix As String, lnumcom As Long, rclient As Result, couleur As Integer, Optional nart As Variant, Optional com As Boolean = False)
+Public Sub _new(fr As Form, choix As String, lnumcom As Long, rclient As Result, couleur As Integer, ti As Ticpe, Optional nart As Variant, Optional com As Boolean = False)
 
   'défini les relations entres les textbox
   $obs = New Observer(num) As "saisie"
@@ -76,6 +76,7 @@ Public Sub _new(fr As Form, choix As String, lnumcom As Long, rclient As Result,
   montttc.Tag = [montht, num]
   ' a faire les options
   
+  $ticpe = ti
   frm = fr
   $lnumcom = lnumcom
   $rescli = rclient
@@ -100,6 +101,9 @@ Public Sub _new(fr As Form, choix As String, lnumcom As Long, rclient As Result,
 '      caisse.text = Format($res!caisse, "0")
       remise.text = Format($res!remise, "0.00")
       $ftxtva = $res!txtva
+      If $ftxtva = 0 Then
+        Message.Error("Attention la TVA sur l'article : " & num.Text & " est à 0\nRectifiez votre saisie")
+      Endif
       $fprixachat = $res!pxamp
       quantite.text = Format($res!qte, "0.000")
       pxht.text = Format($res!prix, "0.000")
@@ -385,6 +389,12 @@ Private Sub afficheart()
     num.Clear
     $snumart = ""
     num.SetFocus
+    Return
+  Endif
+  If $ticpe.Valide($snumart) Then 
+    num.SetFocus
+    num.Clear
+    $snumart = ""
     Return
   Endif
   Butboxnom.Text = $resart!art_design

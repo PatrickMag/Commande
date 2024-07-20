@@ -1,0 +1,110 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,117,60)
+  { Frame1 Frame
+    MoveScaled(2,15,114,14)
+    Text = ("TICPE régional")
+    { Label4 Label
+      MoveScaled(2,4,15,3)
+      Text = ("N° de dossier : ")
+    }
+    { ndossier TextReg
+      MoveScaled(22,4,22,3)
+      MaxLength = 14
+    }
+    { Label5 Label
+      MoveScaled(2,10,11,3)
+      Text = ("Region : ")
+    }
+    { region TextReg
+      MoveScaled(22,10,11,3)
+      Alignment = Align.Center
+      MaxLength = 2
+    }
+  }
+  { Frame2 Frame
+    MoveScaled(1,31,114,20)
+    Text = ("TICPE GNR agricole")
+    { Label6 Label
+      MoveScaled(3,6,16,3)
+      Text = ("N° d'attestation :")
+    }
+    { nattest TextReg
+      MoveScaled(21,6,22,3)
+    }
+    { Label7 Label
+      MoveScaled(3,12,14,3)
+      Text = ("Date de validité : ")
+    }
+    { dtval TextReg
+      MoveScaled(21,12,22,3)
+      Alignment = Align.Center
+      Type = TextReg.EstDate
+    }
+    { Impcli Button
+      MoveScaled(73,3,32.2222,4)
+      Text = ("Impression des clients")
+      Picture = Picture["icon:/22/print"]
+    }
+    { Brecap Button
+      MoveScaled(73,11,32.2222,4)
+      Text = ("Impression du récap")
+      Picture = Picture["icon:/22/print"]
+    }
+    { Bvalidite Button
+      MoveScaled(73,7,32.2222,4)
+      Text = ("Impression des validitées dépassées")
+      Picture = Picture["icon:/22/print"]
+    }
+    { bsup Button
+      MoveScaled(81,16,16,4)
+      Text = ("Supprimer")
+      Picture = Picture["icon:/22/delete"]
+    }
+  }
+  { Label1 Label
+    MoveScaled(1,2,10,3)
+    Text = ("N° Client : ")
+  }
+  { Ncli TextReg
+    MoveScaled(13,2,16,3)
+    Type = TextReg.EstNum
+  }
+  { brech Button
+    MoveScaled(29,2,4,3)
+    Picture = Picture["icon:/22/filter"]
+  }
+  { Label2 Label
+    MoveScaled(36,2,20,3)
+  }
+  { Label3 Label
+    MoveScaled(68,2,48,13)
+  }
+  { adr Label
+    MoveScaled(4,6,27,3)
+  }
+  { bok Button
+    MoveScaled(4,53,16,5)
+    Text = ("Valider")
+    Picture = Picture["icon:/32/apply"]
+  }
+  { bquit Button
+    MoveScaled(97,53,14,5)
+    Text = ("Quitter")
+    Picture = Picture["icon:/32/quit"]
+  }
+  { Label8 Label
+    MoveScaled(29,9,9,3)
+    Text = ("N° Siret : ")
+  }
+  { siret TextReg
+    MoveScaled(37,9,20,3)
+    Type = TextReg.EstNum
+    MaxLength = 14
+  }
+  { Bsir Button
+    MoveScaled(59,9,5,3)
+    Picture = Picture["icon:/22/apply"]
+  }
+}

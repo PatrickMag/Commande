@@ -37,7 +37,8 @@ Public Struct Comencour
   tipp As String
   codecoul As Integer           ''code couleur
   poste As String
-  
+  numdoss As String
+  adlivr As Integer
 End Struct
 
 Public com As New Comencour
@@ -207,7 +208,9 @@ Private Sub affectres()
   $rescomande!numtourne = com.numtourne
   $rescomande!telfixe = com.telfixe
   $rescomande!telport = com.telport
-  Try $rescomande!tipp = com.tipp
+  $rescomande!tipp = com.tipp
+  $rescomande!numdoss = com.numdoss
+  $rescomande!adlivr = com.adlivr
   $rescomande!fraisfac = com.fraisfac
   $rescomande!poid = com.poid
   $rescomande!volume = com.volume
@@ -229,7 +232,9 @@ Private Sub affecstruc()
   com.fraisfac = $rescomande!fraisfac
   com.poid = $rescomande!poid
   com.volume = $rescomande!volume
-  Try com.tipp = $rescomande.tipp
+  com.tipp = $rescomande!tipp
+  com.numdoss = $rescomande!numdoss
+  com.adlivr = $rescomande!adlivr
   com.commentaire = $rescomande!commentaire
   com.cp = $rescomande!cp
   com.datedecommande = $rescomande!datedecommande

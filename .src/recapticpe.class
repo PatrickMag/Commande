@@ -1,0 +1,350 @@
+' Gambas class file
+
+Private $reslig As Result
+
+Private Enum article, dates, client, dossier, livraison, siret, nom, volume, fin
+Private Enum taux_reduis, taux_plein, taux_tous
+
+Public Sub _new()
+
+  Dim ch As Chainage
+
+  ch = New Chainage([dtinf, dtsup, tfam])
+  tfam.connect = connect.cconlaurux
+  tfam.Champ = ["Fiches_Fam", "code_fam", "libell_fam"]
+  tfam.conteneur = Me
+  tfam.RechY = Label1.Y
+  tfam.RechX = tfam.X + tfam.W
+  GridView1.Columns.Count = fin
+  GridView1.Columns[article].Text = "Article"
+  GridView1.Columns[article].Alignment = Align.Center
+  GridView1.Columns[article].W = 80
+  GridView1.Columns[dates].Text = "Date"
+  GridView1.Columns[dates].Alignment = Align.Center
+  GridView1.Columns[dates].W = 80
+  GridView1.Columns[client].Text = "Client"
+  GridView1.Columns[client].Alignment = Align.Center
+  GridView1.Columns[client].W = 100
+  GridView1.Columns[dossier].Text = "Dossier"
+  GridView1.Columns[dossier].Alignment = Align.Center
+  GridView1.Columns[dossier].W = 100
+  GridView1.Columns[siret].Text = "Siret"
+  GridView1.Columns[siret].Alignment = Align.Center
+  GridView1.Columns[siret].W = 100
+  GridView1.Columns[nom].Text = "Nom"
+  GridView1.Columns[nom].Alignment = Align.Center
+  GridView1.Columns[nom].Expand = True
+  GridView1.Columns[volume].Text = "Volume"
+  GridView1.Columns[volume].Alignment = Align.Center
+  GridView1.Columns[volume].W = 150
+  GridView1.Columns[livraison].Text = "Ad Liv"
+  GridView1.Columns[siret].Alignment = Align.Center
+  GridView1.Columns[siret].W = 100
+  
+End
+
+
+Public Sub Button1_Click()
+
+  If Not tfam.Text Then Return
+  constreg()
+  somme.Value = 0
+  If $reslig.Available Then
+    GridView1.Rows.Count = $reslig.Count
+    GridView1.Refresh
+    Wait 0.001
+    $reslig.MoveFirst()
+    Repeat
+      somme.Value += $reslig!qte
+    Until $reslig.MoveNext()
+  Else
+    GridView1.Rows.Count = 0
+  Endif
+  
+End
+
+Public Sub Button2_Click()
+
+  If Not tfam.Text Then Return
+  constreg()
+  If $reslig.Available Then
+    If cimp.Value Then impres
+    If ccsv.Value Then csv
+  Endif
+  
+End
+
+Public Sub Button3_Click()
+
+  Me.Close
+
+End
+'*******Construction de la requete*******************
+Private Sub constreg()
+  
+  Dim req, cond As String
+  Dim art As String[]
+  
+  If rtreduit.Value Then art = reduit()
+  If rtplein.Value Then art = plein()
+  If rtous.Value Then art = tous()
+  
+  If Object.IsValid(art) And If art.Count > 0 Then 
+    cond = " IN(" & art.Join() & ") "
+    req = "SELECT code_ligbl AS code,fam_ligbl AS fam,REPLACE(qte_ligbl,',','.') AS qte,dte_ligbl AS dte,numagri_ligbl AS numagri,cdclibl AS ncli,numadr_ligbl AS numadr FROM Fiches_Ligbl JOIN Fiches_Bl ON numbl=num_ligbl WHERE code_ligbl " & cond & "  AND dte_ligbl BETWEEN &2 AND &3 AND fam_ligbl = &1 AND type IN('B','F') UNION ALL SELECT code_ligfac AS code,fam_ligfac AS fam,REPLACE(qte_ligfac,',','.') AS qte,dtligbl_ligfac AS dte,numagri_ligfac AS numagri,cdclifac as ncli,numadr_ligfac AS numadr FROM Fiches_HistoLigfac JOIN Fiches_HistoFac ON numfac=num_ligfac WHERE code_ligfac " & cond & "  AND dtligbl_ligfac BETWEEN &2 AND &3 AND fam_ligfac = &1 ORDER BY dte"
+    If rsomme.Value Then
+      req = "SELECT SUM(qte) as qte, code,numagri,ncli FROM (" & req & ") as a GROUP BY numagri,ncli,code ORDER BY ncli"
+    Endif
+    $reslig = connect.cconlaurux.Exec(req, tfam.Text, dtinf.dte.D, dtsup.dte.D)
+  Endif
+  
+End
+
+Private Sub tous() As String[]
+  
+  Dim res As Result
+  
+  res = connect.cconlaurux.Exec("SELECT art_code FROM Fiches_Art WHERE art_fam=&1", tfam.Text)
+  Return tabart(res)
+  
+End
+
+Private Sub plein() As String[]
+  
+  Dim res As Result
+  
+  res = connect.cconlaurux.Exec("SELECT art_code FROM Fiches_Art WHERE NOT EXISTS(SELECT code FROM Art_Tipp WHERE art_code=code AND ticpe = &1) AND art_fam = &2", ticpe.GnrAgri, tfam.Text)
+  Return tabart(res)
+  
+End
+
+Private Sub reduit() As String[]
+  
+  Dim res As Result
+
+  res = connect.cconlaurux.Exec("SELECT code AS art_code from Art_Tipp WHERE ticpe = &1", ticpe.GnrAgri)
+  Return tabart(res)
+  
+End
+
+Private Sub tabart(res As Result) As String[]
+  
+  Dim art As New String[]
+  
+  If res.Available Then
+    Repeat
+      art.Add(res!art_code)
+    Until res.MoveNext()
+  Endif
+  Return art
+  
+End
+'***visualisation
+Public Sub GridView1_Data(Row As Integer, Column As Integer)
+
+  Dim res As Result
+  
+  $reslig.MoveTo(Row)
+  GridView1.Data.Alignment = Align.Left
+  Select Case Column
+    Case Article
+      GridView1.Data.Text = $reslig!code
+    Case client
+      GridView1.Data.Text = $reslig!ncli
+    Case dossier
+      GridView1.Data.Text = $reslig!numagri
+    Case siret, nom
+      res = connect.cconlaurux.Exec("SELECT cli_nom,cli_siret FROM Fiches_Cli WHERE cli_code = &1", $reslig!ncli)
+      If res.Available Then
+        If Column = siret Then GridView1.Data.Text = res!cli_siret 
+        If Column = nom Then GridView1.Data.Text = res!cli_nom
+      Endif
+    Case volume
+      GridView1.Data.Text = Format($reslig!qte, "0.000")
+      GridView1.Data.Alignment = Align.Right
+    Case Dates
+      If $reslig.Fields.Exist("dte") Then
+        GridView1.Data.Text = LDate($reslig!dte).L
+      Endif
+    Case livraison
+      GridView1.Data.Text = $reslig!numadr
+  End Select
+
+End
+
+Public Sub GridView1_Activate()
+
+  Dim win As Window
+  Dim res As Result
+  
+  Select Case GridView1.Column
+    Case livraison 
+      win = crefen("Adresse livraison")
+      res = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE num= &1 ", GridView1.Current.Text)
+      If res.Available Then
+        lab(res!rs_soc & " " & res!nom, win)
+        lab(res!adr1, win)
+        lab(res!adr2, win)
+        lab(res!cd_ptl & " " & res!ville, win)
+        win.ShowModal
+      Endif
+    Case client
+      win = crefen("Client")
+      res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_code= &1 ", GridView1.Current.Text)
+      If res.Available Then
+        lab(res!cli_rs_soc & " " & res!cli_nom, win)
+        lab(res!cli_adr1, win)
+        lab(res!cli_adr2, win)
+        lab(res!cli_cd_ptl & " " & res!cli_ville, win)
+        win.ShowModal
+      Endif
+  End Select
+
+End
+
+Private Sub crefen(txt As String) As Window
+  
+  Dim win As New Window
+  
+  win.Arrangement = Arrange.Vertical
+  win.AutoResize = True
+  Return win
+  
+End
+
+Private Sub lab(txt As String, win As Window) As Label
+  
+  Dim lab As New Label(win)
+  
+  lab.AutoResize = True
+  lab.Padding = 3
+  lab.Text = txt
+  Return lab
+  
+End
+
+
+'****impression
+Private Sub impres()
+  
+  Dim rep As New Report
+  
+  $reslig.MoveFirst()
+  entete(rep)
+  
+  Repeat
+    ligne(rep)
+  Until $reslig.MoveNext()
+  rep.Preview
+  
+End
+
+Private Sub entete(rep As Report)
+  
+  Dim bx As New ReportHBox(rep)
+  Dim lab As ReportLabel
+  
+  bx.Height = "8mm"
+  bx.Font = Font["Serif,Blod,12"]
+  bx.Fixed = True
+  
+  lab = New ReportLabel(bx)
+  lab.Text = "Récapitulatif des mouvements de GNR"
+  lab.Alignment = Align.Center
+  lab.Expand = True
+  lab = New ReportLabel(bx)
+  lab.Text = "Le : " & LDate(Now).L
+  lab.Alignment = Align.Right
+  
+  bx = New ReportHBox(rep)
+  bx.Height = "5mm"
+  bx.Fixed = True
+  bx.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
+  lab = crelab(bx)
+  lab.Text = "Article"
+  lab.Alignment = Align.Center
+  lab = crelab(bx)
+  lab.Text = "Date"
+  lab.Alignment = Align.Center
+  lab = crelab(bx)
+  lab.Text = "N° client"
+  lab.Alignment = Align.Center
+  lab = crelab(bx)
+  lab.Text = "N° dossier"
+  lab.Alignment = Align.Center
+  lab = crelab(bx)
+  lab.Text = "Siret"
+  lab.Alignment = Align.Center
+  lab = crelab(bx)
+  lab.Text = "Raison social"
+  lab.Alignment = Align.Center
+  lab.Expand = True
+  lab = crelab(bx)
+  lab.Text = "Volume M3"
+  lab.Alignment = Align.Center
+  lab.Border = ReportBorder[""]
+  
+End
+
+Private Sub ligne(rep As Report)
+  
+  Dim bx As New ReportHBox(rep)
+  Dim lab As ReportLabel
+  Dim res As Result
+  
+  res = connect.cconlaurux.Exec("SELECT cli_nom,cli_siret FROM Fiches_Cli WHERE cli_code = &1", $reslig!ncli)
+  lab = crelab(bx)
+  lab.Text = $reslig!code
+  If rdetail.Value Then
+    lab = crelab(bx)
+    lab.Text = LDate($reslig!dte).L
+    lab.Alignment = Align.Center
+  Endif
+  lab = crelab(bx)
+  lab.Text = $reslig!ncli
+  lab = crelab(bx)
+  lab.Text = $reslig!numagri
+  lab = crelab(bx)
+  If res.Available Then lab.Text = res!cli_siret
+  lab = crelab(bx)
+  If res.Available Then lab.Text = res!cli_nom
+  lab.Expand = True
+  lab = crelab(bx)
+  lab.Text = Format($reslig!qte, "0.000")
+  lab.Alignment = Align.Right
+  
+End
+
+Private Sub crelab(bx As ReportHBox) As ReportLabel
+  
+  Dim lab As New ReportLabel(bx)
+  
+  lab.Font = Font["Serif,7"]
+  lab.Height = "4mm"
+  lab.Border = ReportBorder["Right:1pt #000000"]
+  lab.Width = "25mm"
+  Return lab
+  
+End
+
+Private Sub csv()
+  
+  Dim Hfil As File
+  Dim res, tx As Result
+  Dim taux As String
+  
+  $reslig.MoveFirst()
+  Hfil = Open User.Home & "/GNR" & LDate(Now).D & ".csv" For Write Create
+  Repeat
+    res = connect.cconlaurux.Exec("SELECT cli_nom,cli_siret FROM Fiches_Cli WHERE cli_code = &1", $reslig!ncli)
+    tx = connect.cconlaurux.Exec("SELECT * FROM Art_Tipp WHERE code=&1 AND ticpe=&2", $reslig!code, ticpe.GnrAgri)
+    If tx.Available Then taux = "Taux réduit" Else taux = "Taux plein"
+    Print #Hfil, res!cli_siret & ";" & $reslig!qte & ";" & taux
+  Until $reslig.MoveNext()
+  Hfil.Close
+  
+  Message.Info("Le fichier " & User.Home & "/GNR" & LDate(Now).D & ".csv\n a été créé avec succés")
+  
+End
+
+

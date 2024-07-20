@@ -56,7 +56,7 @@ Public Sub _new(cam As Camion, dte As Date)
         
         nom = New ReportLabel(rp)
         nom.Font = Font["Serif,Bold,13"]
-        nom.Text = $rescmd!noml & "   "
+        nom.Text = Left($rescmd!noml, 19)
         'tel fixe
         rph = New ReportHBox(rp)
         lab = New ReportLabel(rph)
@@ -82,19 +82,19 @@ Public Sub _new(cam As Camion, dte As Date)
         rpv.Expand = True
         rpv.Font = Font["Serif,11"]
         adr1 = New ReportLabel(rpv)
-        adr1.Text = $rescmd!adressel
+        adr1.Text = Left($rescmd!adressel, 29)
         adr1.Font = Font["Serif,11"]
         adr2 = New ReportLabel(rpv)
-        adr2.Text = $rescmd!adressel1
+        adr2.Text = Left($rescmd!adressel1, 29)
         adr2.Font = Font["Serif,11"]
         
         rph = New ReportHBox(rpv)
         cp = New ReportLabel(rph)
-        cp.text = $rescmd!cpl & "    "
+        cp.text = $rescmd!cpl & "  "
         cp.Font = Font["Serif,10"]
         ville = New ReportLabel(rph)
         ville.Font = Font["Serif,10"]
-        ville.text = $rescmd!villel
+        ville.text = Left($rescmd!villel, 22)
         ville.Expand = True
         'panel des commentaires
         rp = New ReportPanel(ReportPc1)

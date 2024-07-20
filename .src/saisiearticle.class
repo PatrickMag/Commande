@@ -8,6 +8,7 @@ Private $rescli As Result
 Private $reslignecom As Result
 Private $restetfac As Result
 Private $resligfac As Result
+Private $ticpe As Ticpe
 
 Private $clicreer As Boolean
 
@@ -15,20 +16,22 @@ Private $lnumcom As Long
 Private $lnumcli As Long
 Private $icouleur As Integer = &HF5FFFF&
 
-Public Sub _new(lnumcom As Long, lnumcli As Long)
+Public Sub _new(lnumcom As Long, lnumcli As Long, nadr As String)
 
   Dim res, res1, resart As Result
   Dim i, j, k As Integer
   
   $lnumcli = lnumcli
   $lnumcom = lnumcom
-
+  
   gestionligne.icompteur = 0
   $rescli = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_code=&1", $lnumcli)
   $clicreer = $rescli.Available
+  If Not nadr Then nadr = -1
+  $ticpe = New Ticpe($lnumcli, nadr)
   afficheleslignes
   If Not $reslignecom.Available Then
-    la = New Lignearticle(Me, "creer", $lnumcom, $rescli, Color.Background - 100, ScrollView1) As "ligne"
+    la = New Lignearticle(Me, "creer", $lnumcom, $rescli, Color.Background - 100, $ticpe, ScrollView1) As "ligne"
     la.Tag = gestionligne.icompteur
     Inc gestionligne.icompteur
   Else
@@ -174,7 +177,7 @@ Private Sub afficheleslignes()
   
   For i = 0 To $reslignecom.max
     couleur(i)
-    la = New Lignearticle(Me, "ouvrir", $lnumcom, $rescli, $icouleur, ScrollView1, i) As "ligne"
+    la = New Lignearticle(Me, "ouvrir", $lnumcom, $rescli, $icouleur, $ticpe, ScrollView1, i) As "ligne"
     la.Tag = $reslignecom!numligne
     gestionligne.icompteur = la.Tag
     $reslignecom.MoveNext
@@ -187,7 +190,7 @@ End
 Private Sub creerligne()
   
   couleur(la.Tag)
-  la = New Lignearticle(Me, "creer", $lnumcom, $rescli, $icouleur, ScrollView1) As "ligne"
+  la = New Lignearticle(Me, "creer", $lnumcom, $rescli, $icouleur, $ticpe, ScrollView1) As "ligne"
   la.Tag = gestionligne.icompteur
   Inc gestionligne.icompteur
  

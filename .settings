@@ -5,20 +5,37 @@ Client=[485]
 
 [Breakpoints]
 Count=2
-Breakpoint[1]="affeven.57"
-Breakpoint[2]="facturation.253"
+Breakpoint[1]="FMain.136"
+Breakpoint[2]="affeven.57"
 
 [DebugWindow]
-Count=0
+Count=2
+DebugWindow[1]="reponse"
+DebugWindow[2]="$reponse"
+
+[DebugWindow/$champ]
+Geometry=[0,30,288,360]
 
 [DebugWindow/$datejour]
 Geometry=[47,14,256,320]
+
+[DebugWindow/$grd]
+Geometry=[0,30,288,360]
 
 [DebugWindow/$gridview1.Parent]
 Geometry=[67,30,288,360]
 
 [DebugWindow/$gridview1[$gridview1.Row, 0]]
 Geometry=[67,242,288,360]
+
+[DebugWindow/$rcli]
+Geometry=[0,30,288,360]
+
+[DebugWindow/$reponse]
+Geometry=[0,30,288,360]
+
+[DebugWindow/$reponse["common"]]
+Geometry=[18,48,288,360]
 
 [DebugWindow/$res]
 Geometry=[67,533,288,360]
@@ -27,7 +44,7 @@ Geometry=[67,533,288,360]
 Geometry=[47,14,256,320]
 
 [DebugWindow/$rescli]
-Geometry=[67,27,288,360]
+Geometry=[67,30,288,360]
 
 [DebugWindow/$rescli.Fields]
 Geometry=[85,45,288,360]
@@ -43,6 +60,9 @@ Geometry=[43,14,256,320]
 
 [DebugWindow/$reslco]
 Geometry=[47,14,256,320]
+
+[DebugWindow/$reslig]
+Geometry=[0,30,288,360]
 
 [DebugWindow/$resligcpc]
 Geometry=[85,555,288,360]
@@ -81,13 +101,28 @@ Geometry=[1034,174,288,360]
 Geometry=[85,45,288,360]
 
 [DebugWindow/Last]
-Geometry=[67,27,288,360]
+Geometry=[449,95,715,360]
 
 [DebugWindow/Last.Border]
 Geometry=[53,20,256,320]
 
+[DebugWindow/Last.Children]
+Geometry=[85,48,715,360]
+
+[DebugWindow/Last.Children[0]]
+Geometry=[103,66,715,360]
+
+[DebugWindow/Last.Columns]
+Geometry=[85,48,715,360]
+
+[DebugWindow/Last.Current]
+Geometry=[467,113,715,360]
+
 [DebugWindow/Last.Report]
 Geometry=[53,20,256,320]
+
+[DebugWindow/Last.Rows]
+Geometry=[85,48,715,360]
 
 [DebugWindow/ListBox1]
 ShowHidden=True
@@ -180,6 +215,10 @@ Geometry=[67,30,256,320]
 [DebugWindow/Windows]
 Geometry=[67,30,288,360]
 
+[DebugWindow/art]
+ShowHidden=True
+Geometry=[0,78,288,360]
+
 [DebugWindow/c]
 Geometry=[57,19,256,320]
 
@@ -201,6 +240,9 @@ Geometry=[47,278,256,320]
 [DebugWindow/cms]
 Geometry=[72,30,288,360]
 
+[DebugWindow/co]
+Geometry=[0,30,288,360]
+
 [DebugWindow/com]
 Geometry=[47,14,256,320]
 
@@ -209,6 +251,9 @@ Geometry=[57,19,256,320]
 
 [DebugWindow/connect.ccon]
 Geometry=[67,27,288,360]
+
+[DebugWindow/dtval.dte]
+Geometry=[0,30,288,360]
 
 [DebugWindow/fr]
 Geometry=[47,42,256,320]
@@ -224,6 +269,16 @@ Geometry=[67,30,256,320]
 
 [DebugWindow/pxht]
 Geometry=[43,14,256,320]
+
+[DebugWindow/rcli1]
+Geometry=[0,30,288,360]
+
+[DebugWindow/reponse]
+Geometry=[0,30,288,360]
+ShowHidden=True
+
+[DebugWindow/reponse["data"]]
+Geometry=[32,232,288,360]
 
 [DebugWindow/res]
 Geometry=[72,30,290,370]
@@ -255,6 +310,9 @@ Geometry=[43,14,256,320]
 [DebugWindow/rescom]
 Geometry=[43,14,256,320]
 
+[DebugWindow/route]
+Geometry=[0,30,288,360]
+
 [DebugWindow/saisie]
 Geometry=[47,42,256,320]
 
@@ -285,31 +343,23 @@ Geometry=[67,27,288,360]
 [DebugWindow/volume]
 Geometry=[82,433,288,360]
 
+[DebugWindow/win]
+Geometry=[0,30,288,360]
+
 [Executable]
 Path="Commande.gambas"
 DoNotIncrementVersion=True
 
 [OpenFile]
-Active=11
-File[1]=".src/FMain.form"
-File[2]=".src/Utils.module:2.155"
-File[3]=".src/gesteven.class:10.66"
-File[4]=".src/Client.form"
-File[5]=".src/commande.class:0.234"
-Count=18
-File[6]=".src/postite.form"
-File[7]=".src/Fchauffeur.form"
-File[8]=".src/Fchauffeur.class:19.15"
-File[9]=".src/FMain.class:20.15"
-File[10]=".src/facturation.class:36.308"
-File[11]=".src/Client.class:6.346"
-File[12]=".src/base.form"
-File[13]=".src/base.class:4.208"
-File[14]=".src/connect.module:0.43"
-File[15]=".src/Edittourn.report"
-File[16]=".src/Edittourn.class:29.31"
-File[17]=".src/camion.form"
-File[18]=".src/camion.class:2.241"
+Active=7
+File[1]=".src/Utilitaire/verifsiret.class:7.91"
+File[2]=".src/FMain.form"
+File[3]=".src/FMain.class:2.99"
+File[4]=".src/Utilitaire/Utils.module:12.170"
+File[5]=".src/Client.form"
+Count=7
+File[6]=".src/Client.class:7.685"
+File[7]=".src/recapticpe.class:13.336"
 
 [Watches]
 Count=7

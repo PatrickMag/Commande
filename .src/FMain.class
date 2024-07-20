@@ -1,5 +1,8 @@
 ' Gambas class file
 
+Public de As New DB_Desktop         ''gere wayland
+Public vs As Verifsiret             ''verifie les procédures collectives sur societe.com
+
 Private win As New Window
 Private $res As Result
 Private cl As Client
@@ -25,6 +28,7 @@ Public Sub _new()
     Message.Warning("Veuillez mettre à jour votre base de donnée")
     base.ShowModal
   Endif
+  
   ev = New Gesteven(GridView1, "", "D")
   
   co = New Commande(0)
@@ -89,6 +93,14 @@ Public Sub _new()
     base.ShowModal
     Me.Close
     
+End 
+
+Public Sub Form_Open()
+
+  vs = New Verifsiret
+  vs.control = Textnum
+  credit.Text = "Crédit : " & Format(vs.credit, "0.00")
+  
 End
 
 Public Sub form_Close()
@@ -96,7 +108,7 @@ Public Sub form_Close()
   Dim win As Window
   
   For Each win In Windows
-    If Not Object.IsValid(win) Then win.Close
+    If Object.IsValid(win) Then win.Close
   Next
   
 End
@@ -593,5 +605,11 @@ End
 Public Sub maj_Click()
 
   majan.Show
+
+End
+
+Public Sub Menu1_Click()
+
+  SaisiTICPE.Show
 
 End

@@ -15,6 +15,9 @@ Public Sub Form_Open()
   
   Try pp.Value = Settings["opt/pp"]
   Try bois.Value = Settings["opt/bois"]
+  Try urlsoc.Text = Settings["Soc/URL"]
+  Try token.Text = Settings["Soc/token"]
+  Try nsoc.Text = Settings["Soc/soc"]
 
 End
 
@@ -55,6 +58,10 @@ Public Sub Button1_Click()
   
   Try Settings["opt/pp"] = pp.Value
   Try Settings["opt/bois"] = bois.Value
+  Settings["Soc/URL"] = urlsoc.Text
+  Settings["Soc/token"] = token.Text
+  Settings["Soc/soc"] = nsoc.Text
+  
   Settings.Save
   Me.Close
   
@@ -246,6 +253,8 @@ Public Sub Button4_Click()
     "jour_resto char(31)," &
     "PRIMARY KEY (idchauffeur,dte)) ENGINE=InnoDB")
     
+    Try connect.ccon.Exec("ALTER TABLE commande ADD numdoss CHAR(14) COLLATE utf8mb4_general_ci")
+    Try connect.ccon.Exec("ALTER TABLE commande ADD adlivr INTEGER DEFAULT -1")
     
     Print Error.Text
 

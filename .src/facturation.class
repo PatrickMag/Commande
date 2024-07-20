@@ -2,6 +2,7 @@
 
 Private ligne As Lignearticle
 Private $rescli As Result
+Private $ticpe As Ticpe
 
 Public Sub _new(nbcam As Variant)
 Dim i, j As Integer
@@ -35,6 +36,7 @@ Public Sub TreeView1_Activate()
   butfac.Enabled = True
   rescom = connect.ccon.Exec("SELECT * FROM commande WHERE idcom=&1", Val(TreeView1.Current.Key))
   $rescli = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli WHERE cli_code=&1", Val(rescom!numclient))
+  $ticpe = New Ticpe(rescom!numclient, rescom!adlivr)
   ScrollView1.Children.Clear
   comm.Text = rescom!commentaire
   If $rescli.Available Then
@@ -42,14 +44,14 @@ Public Sub TreeView1_Activate()
     If resligne.Available Then
       resligne.MoveFirst
       For i = 0 To resligne.Max
-        ligne = New Lignearticle(Me, "ouvrir", Val(TreeView1.Current.Key), $rescli, gestionligne.couleur(i), ScrollView1, i) As "ligne"
+        ligne = New Lignearticle(Me, "ouvrir", Val(TreeView1.Current.Key), $rescli, gestionligne.couleur(i), $ticpe, ScrollView1, i) As "ligne"
         ligne.Tag = i
         Inc gestionligne.icompteur
         resligne.MoveNext
       Next
       creerligne(Val(TreeView1.Current.Key))
     Else
-     ligne = New Lignearticle(Me, "creer", Val(TreeView1.Current.Key), $rescli, Color.Background - 100, ScrollView1) As "ligne"
+     ligne = New Lignearticle(Me, "creer", Val(TreeView1.Current.Key), $rescli, Color.Background - 100, $ticpe, ScrollView1) As "ligne"
      ligne.Tag = 0
      Inc gestionligne.icompteur
     Endif
@@ -111,7 +113,7 @@ Public Sub creerligne($lnumcom As Long)
   
   If ligne.numart Then
     ligne.couleur = gestionligne.couleur(ligne.Tag)
-    ligne = New Lignearticle(Me, "creer", $lnumcom, $rescli, Color.Background - 100, ScrollView1) As "ligne"
+    ligne = New Lignearticle(Me, "creer", $lnumcom, $rescli, Color.Background - 100, $ticpe, ScrollView1) As "ligne"
     ligne.Tag = gestionligne.icompteur
     Inc gestionligne.icompteur
   Endif
@@ -208,7 +210,9 @@ Public Sub butfac_Click()
      totmarge += res!mrgart_ligbl
      res!four_ligbl = resart!art_four
      res!tour_ligbl = rescom!numtourne
-     Try res!tipp_ligbl = rescom!tipp
+     res!tipp_ligbl = rescom!tipp
+     res!numagri_ligbl = rescom!numdoss
+     res!numadr_ligbl = rescom!adlivr
      res!dte_ligbl = DateBox1.Value
      resart!art_qte -= ligne.qte
      res.Update

@@ -6,6 +6,7 @@ Private $lNumcom As Long            'id commande
 Private $bDch As Boolean = True  'Affiche ou non les fenetres camions et date apres click sur validation 
 Private $cli As Rechclient        'recherche client
 Private $sncli As String
+Private $inadliv As Integer
 Private $vancval As Variant
 Private $obs As Observer
 
@@ -14,6 +15,9 @@ Private but As Button
 Private txt As TextArea
 Private $win As Window
 Private $lab As Label
+
+Private urlsoc As String      'renseignement societe.com url + mdp
+Private token As String
 
 Private DateChooser1 As DateChooser
                                           'scrolview pour affichage des camions et des dates de livraison souhaitées
@@ -74,6 +78,7 @@ Public Sub _new(id As Long)
   RadioButton1.Tag = [Texttipp, Textfixe]
   Textfixe.Tag = [RadioButton1, Textport]
   Textport.Tag = [Textfixe, butval]
+  FMain.vs.control = textnumcl
   
 End
 
@@ -149,6 +154,7 @@ Public Sub Calc_Click()
   c.Raise
 
 End
+
 Public Sub ButVal_Click()
 
   Dim lab As New Label(Panel8)
@@ -182,6 +188,8 @@ Public Sub ButVal_Click()
   co.com.fraisfac = Utils.totobs(frfac.Text)
   co.com.codecoul = codecoul.Foreground
   co.com.poste = Left(User.Name, 20)
+  If nadr.Text Then co.com.adlivr = nadr.Text Else co.com.adlivr = -1
+  co.com.numdoss = dgnr.Text
   
   If $bDch Then
     lab = New Label(panel8)
@@ -231,7 +239,7 @@ Public Sub Butart_Click()
 
   Dim saisie As Saisiearticle
   
-  saisie = New Saisiearticle($lNumcom, CLong(textnumcl.text))
+  saisie = New Saisiearticle($lNumcom, CLong(textnumcl.text), nadr.Text)
   saisie.Raise
   
 End
@@ -326,17 +334,33 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
     Return
   Endif
   
+  If $res!cli_siret Then
+    FMain.vs.siret = $res!cli_siret
+    If FMain.vs.exec(FMain.vs.existante) Then
+      Vsirecl.Background = Color.Green
+      If Not FMain.vs.insee Then Vsirecl.Text = "Insee"
+      If Not FMain.vs.rcs Then Vsirecl.Text = "RCS"
+      'If Not FMain.vs.bodacc Then Vsirecl.Text = "Bodacc"
+      If Not FMain.vs.status Then Vsirecl.Text = "Non active"
+      If FMain.vs.procedure Then Vsirecl.Text = "Procedure en cours"
+      If Vsirecl.Text Then Vsirecl.Background = Color.Red
+    Endif
+  Else
+    Vsirecl.Text = ""
+    Vsirecl.Background = Color.ButtonBackground
+  Endif
   textAdr.Text = $res!cli_adr1
   textAdr11.Text = $res!cli_adr2
   textCp.Text = $res!cli_cd_ptl
   textNom.Text = $res!cli_nom
   textnumcl.Text = Str($res!cli_code)
   textTou.Text = $res!cli_tour
-  Try Texttipp.Text = $res!cli_tipp
+  Texttipp.Text = $res!cli_tipp
   TextVil.Text = $res!cli_ville
   Textfixe.Text = $res!cli_tel_bur
   Textport.Text = $res!cli_pble
   frfac.Text = Str($res!cli_gestion)
+  dgnr.Text = $res!numagri
   
   If cleliv = -1 Then
     TextAdr2.Text = $res!cli_adr1
@@ -344,6 +368,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
     textCp2.Text = $res!cli_cd_ptl
     textNom2.Text = $res!cli_nom
     TextVil2.Text = $res!cli_ville
+    nadr.Clear
   Else
     $res1 = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE num=&1", cleliv) 
     textAdr2.Text = $res1!adr1
@@ -353,8 +378,12 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
     TextVil2.Text = $res1!ville
     textTou.Text = $res1!tourne
     If $res1!tipp Then 
-      Try Texttipp.Text = $res1!tipp
+      Texttipp.Text = $res1!tipp
     Endif
+    If $res1!numagri Then
+      dgnr.Text = $res1!numagri
+    Endif
+    nadr.Text = cleliv
   Endif
   '                                                           Gere la fenetre observation ds le fichier client laurux
   If $res!cli_obs Or Round($res!solde, -2) <> 0 And IsNull(pan) Then
@@ -403,6 +432,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
       $lab.Alignment = Align.Center
     Endif
   Endif
+  
   afficheincid
   
 End
@@ -453,6 +483,8 @@ Private Sub afficheclient()
   Textfixe.Text = co.com.telfixe
   Textport.Text = co.com.telport
   Texttipp.Text = co.com.tipp
+  If co.com.adlivr > -1 Then nadr.Text = co.com.adlivr Else nadr.Clear
+  dgnr.Text = co.com.numdoss
   Select Case co.com.codecoul
     Case Color.Black
       codecoul.Text = codecoul[0].Text
@@ -556,9 +588,6 @@ Public Sub DateChooser1_Activate()
     saisie = New Saisie("ouvrir", DateChooser1.Value, $lNumcom, scrolcam, scroldate)
   Endif
   
- 
-
-  
 End
 
 Public Function existecam(c As Variant, lIdcom As Long) As Boolean
@@ -640,5 +669,26 @@ Public Sub cam_rafraichi()
 
   scrolcam.Refresh
   Wait 0.001
+
+End
+
+Public Sub Vsirecl_MouseDown()
+
+  Dim win As Window
+  
+  win = FMain.vs.afficher(FMain.vs.existante)
+  If Object.IsValid(win) Then
+    win.Raise
+    win.Background = Color.White
+    win.Border = False
+    Vsirecl.Tag = win
+    win.Show
+  Endif
+  
+End
+
+Public Sub Vsirecl_MouseUp()
+
+  Try Vsirecl.Tag.Close
 
 End

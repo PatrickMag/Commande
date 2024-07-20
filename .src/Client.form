@@ -15,12 +15,19 @@
       Arrangement = Arrange.Vertical
       AutoResize = True
       Border = Border.Plain
-      { Label2 Label
-        MoveScaled(13,0,25,3)
-        Font = Font["Bold,+1"]
-        AutoResize = True
-        Text = ("Recherche d'un client")
-        Alignment = Align.Center
+      { Panel20 Panel
+        MoveScaled(1,0,48,4)
+        Arrangement = Arrange.Horizontal
+        { Label2 Label
+          MoveScaled(0,0,28,3)
+          Font = Font["Bold,+1"]
+          Expand = True
+          Text = ("Recherche d'un client")
+          Alignment = Align.Center
+        }
+        { Vsirecl Button
+          MoveScaled(32,0,16,3)
+        }
       }
       { Panel3 Panel
         MoveScaled(1,4,53,5)
@@ -31,12 +38,17 @@
           Text = ("N° Client  :")
         }
         { !TextNumcl TextBox
-          MoveScaled(15,1,11,3)
+          MoveScaled(10,1,11,3)
           #Public = True
           MaxLength = 8
         }
+        { nadr TextBox
+          MoveScaled(22,1,12,3)
+          Enabled = False
+          ToolTip = ("Numéro de l'adresse")
+        }
         { ButRech Button
-          MoveScaled(28,1,13,3)
+          MoveScaled(35,1,13,3)
           NoTabFocus = True
           Text = ("Recherche")
           Picture = Picture["icon:/small/filter"]
@@ -197,21 +209,30 @@
         Arrangement = Arrange.Horizontal
         AutoResize = True
         { Label7 Label
-          MoveScaled(1,0,13,3)
+          MoveScaled(1,0,11,3)
           Text = ("N° tournée :")
         }
         { !TextTou TextBox
-          MoveScaled(12,0,12,3)
+          MoveScaled(11,0,12,3)
           #Public = True
           MaxLength = 15
         }
         { Label20 Label
-          MoveScaled(26,0,9,3)
+          MoveScaled(23,0,5,3)
           Visible = False
-          Text = ("      Tipp :  ")
+          Text = ("Tipp :  ")
         }
         { Texttipp TextBox
-          MoveScaled(36,0,12,3)
+          MoveScaled(28,0,6,3)
+        }
+        { labgnr Label
+          MoveScaled(35,0,5,3)
+          Text = ("GNR :")
+        }
+        { dgnr TextBox
+          MoveScaled(40,0,11,3)
+          Enabled = False
+          ReadOnly = True
         }
         { frfac TextBox
           MoveScaled(49,0,2,3)

@@ -1,0 +1,256 @@
+' Gambas class file
+
+Private $adresse As Integer = -1
+Private $rcli As Result
+
+Public Sub _new(Optional ncli As String)
+
+  Dim ch As Chainage
+  
+  ch = New Chainage([ndossier, region, nattest, dtval])
+  If ncli Then selection(ncli, -1)
+
+End
+
+
+Public Sub brech_Click()
+
+  Dim rcl As Rechclient
+  
+  rcl = New Rechclient(ncli.Text) As "recherche"
+  rcl.Show
+  
+End
+
+Public Sub recherche_trouver(numcli As Integer, numadr As Integer)
+
+  If numadr = -1 Then $adresse = ticpe.Adcli Else $adresse = ticpe.Adlivraison
+  selection(numcli, numadr)
+  
+End
+
+Public Sub ncli_LostFocus()
+
+  If ncli.Text Then
+    $adresse = ticpe.Adcli
+    selection(ncli.Value, -1)
+  Endif
+
+End
+
+Private Sub selection(numcli As Integer, numadr As Integer)
+  
+  Dim req, champ As String
+  Dim res As Result
+  
+  bok.Tag = numadr
+  ncli.Value = numcli
+  ndossier.SetFocus
+  If $adresse = ticpe.Adcli Then 
+    req = connect.cconlaurux.Subst("Fiches_Cli WHERE cli_code=&1 ", numcli) 
+    champ = "cli_rs_soc as rs_soc,cli_nom as nom,cli_pnm as pnm,cli_adr1 as adr1,cli_adr2 as adr2,cli_cd_ptl as cd_ptl,cli_ville as ville,cli_tipp as tipp,numtipp,numagri,dtagri,cli_siret"
+    adr.Text = "Adresse de facturation"
+    adr.Background = Color.DarkYellow
+  Else 
+    req = connect.ccon.Subst("Fiches_AdrlivC JOIN Fiches_Cli ON cli_code=code WHERE num=&1", numadr)
+    champ = "*"
+    adr.Text = "Adresse de livraison"
+    adr.Background = Color.Cyan
+  Endif
+  res = connect.cconlaurux.Exec("SELECT " & champ & " FROM " & req)
+  If res.Available Then
+    Label2.Text = res!rs_soc & " " & res!nom
+    Label3.Text = res!adr1 & "\n" & res!adr2 & "\n" & res!cd_ptl & " " & res!ville
+    ndossier.Text = res!numtipp
+    region.Text = res!tipp
+    nattest.Text = res!numagri
+    dtval.dte.L = LDate(res!dtagri).L
+    siret.Text = res!cli_siret
+  Endif
+  
+End
+
+Private Sub mab()
+  
+  ncli.Clear
+  Label2.Text = ""
+  Label3.Text = ""
+  ndossier.Clear
+  region.Clear
+  nattest.Clear
+  dtval.Clear
+  
+End
+
+Public Sub bok_Click()
+
+  Dim res As Result
+  Dim tab As String
+  
+  If Not ncli.Text Then Return
+  If $adresse = ticpe.Adcli Then 
+    res = connect.cconlaurux.Edit("Fiches_Cli", "cli_code=&1", ncli.Value)
+    If res.Available Then
+      connect.cconlaurux.Begin
+      res!numtipp = ndossier.Text
+      res!cli_tipp = region.Text
+      res!numagri = nattest.Text
+      res!dtagri = dtval.dte.G
+      res.Update
+      connect.cconlaurux.Commit
+      mab()
+    Endif
+  Else
+    res = connect.cconlaurux.Edit("Fiches_AdrlivC", "num=&1", bok.Tag)
+    If res.Available Then
+      connect.cconlaurux.Begin
+      res!numtipp = ndossier.Text
+      res!tipp = region.Text
+      res!numagri = nattest.Text
+      res!dtagri = dtval.dte.G
+      res.Update
+      connect.cconlaurux.Commit
+      mab()
+    Endif
+  Endif
+  
+End
+
+Public Sub bsup_Click()
+
+  Dim res As Result
+  
+  If Not ncli.Text Then Return
+  connect.cconlaurux.Begin
+  If $adresse = ticpe.Adcli Then
+    res = connect.cconlaurux.Edit("Fiches_Cli", "cli_code = &1", ncli.Text)
+  Else
+    res = connect.cconlaurux.Edit("Fiches_AdrlivC", "num = &1", bok.Tag)
+  Endif
+  If res.Available Then
+    res!numagri = ""
+    res.Update
+  Endif
+  connect.cconlaurux.Commit
+
+End
+
+Public Sub bquit_Click()
+
+  Me.Close
+
+End
+
+Public Sub Impcli_Click()
+
+  Dim rep As New Report
+  Dim res As Result
+  
+  res = connect.cconlaurux.Exec("SELECT cli_code as code, cli_rs_soc as soc, cli_nom as nom, cli_adr1 as adr1,cli_adr2 as adr2,cli_cd_ptl as cd, cli_ville as ville, numagri, dtagri, " & ticpe.Adcli & " AS livraison FROM Fiches_Cli WHERE numagri IS NOT NULL UNION ALL SELECT code, rs_soc as soc, nom, adr1, adr2, cd_ptl as cd, ville, numagri, dtagri, " & ticpe.Adlivraison & " AS livraison FROM Fiches_AdrlivC WHERE numagri Is NOT Null ORDER BY code ")
+  cliimp(rep, res)
+
+End
+
+Public Sub Bvalidite_Click()
+
+  Dim rep As New Report
+  Dim res As Result
+  Dim dtinf, dtsup As LDate
+  
+  dtsup = New LDate(DateAdd(Now, 3, gb.Month))
+  dtinf = New LDate(Date(2024, 06, 01))
+  res = connect.cconlaurux.Exec("SELECT cli_code as code, cli_rs_soc as soc, cli_nom as nom, cli_adr1 as adr1,cli_adr2 as adr2,cli_cd_ptl as cd, cli_ville as ville, numagri, dtagri, " & ticpe.Adcli & " AS livraison FROM Fiches_Cli WHERE numagri IS NOT NULL AND dtagri BETWEEN &1 AND &2 UNION ALL SELECT code, rs_soc as soc, nom, adr1, adr2, cd_ptl as cd, ville, numagri, dtagri, " & ticpe.Adlivraison & " AS livraison FROM Fiches_AdrlivC WHERE numagri Is NOT Null  AND dtagri BETWEEN &1 AND &2 ORDER BY code ", dtinf.D, dtsup.D)
+  
+  cliimp(rep, res)
+End
+
+Public Sub Brecap_Click()
+
+  Dim rec As New Recapticpe
+  
+  rec.Show
+
+End
+
+Private Sub cliimp(rep As Report, res As Result)
+  
+  If res.Available Then
+    entete(rep, "Impression des attestations GNR")
+    Repeat
+      lignecli(rep, res)
+    Until res.MoveNext()
+    rep.Preview
+  Endif
+  
+End
+
+Private Sub entete(rep As Report, txt As String)
+  
+  Dim bx As New ReportHBox(rep)
+  Dim lab As ReportLabel
+  
+  bx.Height = "8mm"
+  bx.Font = Font["Serif,Blod,12"]
+  bx.Fixed = True
+  
+  lab = New ReportLabel(bx)
+  lab.Text = txt
+  lab.Alignment = Align.Center
+  lab.Expand = True
+  lab = New ReportLabel(bx)
+  lab.Text = "Le : " & LDate(Now).L
+  lab.Alignment = Align.Right
+  
+End
+
+Private Sub lignecli(rep As Report, res As Result)
+  
+  Dim bx As New ReportHBox(rep)
+  Dim lab As ReportLabel
+  
+  lab = crelab(bx)
+  lab.Text = res!code
+  lab.Width = "16mm"
+  
+  lab = crelab(bx)
+  lab.Text = res!soc & " " & res!nom 
+  lab.Expand = True
+  lab = crelab(bx)
+  lab.Text = " " & res!adr1 
+  lab = crelab(bx)
+  lab.Text = res!adr2 
+  lab = crelab(bx)
+  lab.Text = res!cd & " " & res!ville
+  lab = crelab(bx)
+  lab.Text = res!numagri
+  lab = crelab(bx)
+  lab.Text = LDate(res!dtagri).L
+  lab.Alignment = Align.Center
+  lab.Width = "20mm"
+  lab = crelab(bx)
+  If res!livraison = ticpe.Adlivraison Then
+    lab.Text = "Adresse livraison"
+  Else
+    lab.Text = "Adresse facturation"
+  Endif
+  lab.Border = ReportBorder[""]
+  
+End
+
+Private Sub crelab(bx As ReportHBox) As ReportLabel
+  
+  Dim lab As New ReportLabel(bx)
+  
+  lab.Font = Font["Serif,7"]
+  lab.Height = "4mm"
+  lab.Border = ReportBorder["Right:1pt #000000"]
+  lab.Width = "25mm"
+  Return lab
+  
+End
+
+Public Sub Bsir_Click()
+  
+  connect.cconlaurux.Exec("UPDATE Fiches_Cli SET cli_siret = &1 WHERE cli_code = &2", siret.Text, ncli.Text)
+
+End

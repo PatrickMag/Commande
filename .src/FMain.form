@@ -1,7 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,152,80)
+  MoveScaled(0,0,152,91)
   Font = Font["Serif,9"]
   Icon = Picture["logo.png"]
   Arrangement = Arrange.Row
@@ -16,6 +16,9 @@
     }
     { Evenements Menu
       Text = ("Fiche évenements")
+    }
+    { Menu1 Menu
+      Text = ("Fiche TIPCE")
     }
     { postit Menu
       Text = ("Post it")
@@ -94,8 +97,13 @@
           Text = ("Non attribuées")
         }
         { Radiocomliv CheckBox
-          MoveScaled(27,10,17,2.6667)
+          MoveScaled(27,10,12,3)
           Text = ("Déjà livré")
+        }
+        { credit Label
+          MoveScaled(41,10,13,3)
+          Text = ("Crédit : ")
+          Alignment = Align.Right
         }
       }
       { GridView1 GridView

@@ -1,0 +1,193 @@
+' Gambas class file
+
+Create Static
+
+Private $siret As String
+Private $url As String = Settings["Soc/URL"] 
+Private $soc As String = "/search?nom=" & Settings["Soc/soc"] & "&token={" & Settings["Soc/token"] & "}'"
+Private $credit As Float
+Private $reponse As Collection
+Private $route As Integer
+
+Public Enum NbCredit, existante, info
+Private route As String[] = ["infoclient", "exist", "infoslegales"] 
+
+Property Read credit As Float         ''on lit le nombre de crédit restant
+Property siret As String              ''on renseigne le n° de siret/sire/tva pour la recherche
+Property Read procedure As Boolean      '' si procedure collective
+Property Read denomination As String
+Property Read tva As String
+Property Read status As Boolean
+Property Read insee As Boolean
+Property Read rcs As Boolean
+Property Read bodacc As Boolean
+Property control As Control Use $control      ''le controle sous lequel sera afficher le message d'erreur 
+
+
+Public Sub _New(Optional value As Control)
+
+  $url = "GET --url '" & $url 
+  $control = value
+  Balloon.Delay = 4000
+
+End
+
+Public Sub afficher(route As Integer, Optional parent As Container, x As Integer, y As Integer) As Window   ''affiche les infos dans une fenetre
+  
+  Dim win As Window
+  Dim lab As Label
+  
+  If Not Object.IsValid($reponse) Or $credit = 0 Then Return
+  If IsNull(parent) Then win = New Window As "win" Else win = New Window(parent) As "win"
+  If x <> 0 Or y <> 0 Then
+    win.x = x
+    win.y = y
+  Endif
+  win.Arrangement = Arrange.Vertical
+  win.AutoResize = True
+  Select Case route
+    Case existante
+      lab = crelab(win)
+      lab.Text = $reponse["common"]["deno"]
+      lab = crelab(win)
+      lab.Text = $reponse["common"]["siren"]
+      lab = crelab(win)
+      lab.Text = $reponse["common"]["numtva"]
+      lab = crelab(win)
+      lab.Text = "Status : " & $reponse["common"]["status"]
+      lab = crelab(win)
+      lab.Text = "Insee : " & $reponse["common"]["immatinsee"]
+      lab = crelab(win)
+      lab.Text = "Rcs : " & $reponse["common"]["immatrcs"]
+      lab = crelab(win)
+      lab.Text = "Bodacc :" & convbool($reponse["common"]["immatbodacc"])
+      lab = crelab(win)
+      lab.Text = "Procédure collective : " & convbool($reponse["common"]["pcollencours"])
+  End Select
+  
+  Return win
+  
+End
+
+Public Sub exec(Value As Integer) As Boolean       ''execute la requete 
+  
+  Dim txt As String
+  Dim hfile As File
+
+  $route = value
+  If $credit = 0 Then Return
+  Shell "curl --request " & $url & "entreprise/{" & $siret & "}/" & route[$route] & $soc Wait To txt
+  If txt Match "DOCTYPE HTML" Then
+    hfile = Open User.Home & "/tmp/erreur.html" For Write Create
+    Print #hfile, txt
+    hfile.Close
+    Desktop.Open(User.Home & "/tmp/erreur.html")
+    Return
+  Endif
+  If txt Then 
+    $reponse = JSON.Decode(txt)
+    Return True
+  Else
+    Return False
+  Endif
+  
+  Catch
+    Balloon.Error(Error.Text, $control)
+    Return False
+    
+End
+
+Private Function crelab(win As Window) As Label
+  
+  Dim lab As Label
+  
+  lab = New Label(win)
+  lab.AutoResize = True
+  Return lab
+  
+End
+
+Private Function convbool(value As Boolean) As String
+  
+  If value Then Return "Oui" Else Return "Non"
+  
+End
+
+
+Private Function credit_Read() As Float
+
+  Dim value As Float
+  Dim txt As String
+  Dim reponse As New Collection
+  
+  Shell "curl --request " & $url & route[NbCredit] & $soc Wait To txt
+  reponse = JSON.Decode(txt)
+  $credit = reponse["data"]["creditrestant"]
+  Return reponse["data"]["creditrestant"]
+
+   Catch
+     Balloon.Error(Error.Text, $control)
+    
+End
+
+Private Function siret_Read() As String
+
+  Return $siret
+
+End
+
+Private Sub siret_Write(Value As String)
+  
+  $siret = value
+
+End
+
+Private Function procedure_Read() As Boolean
+
+  If Not Object.IsValid($reponse) Or $credit = 0 Then Return False
+  If $reponse["common"]["pcollencours"] = "true" Then Return True Else Return False
+
+End
+
+
+Private Function denomination_Read() As String
+
+  If Not Object.IsValid($reponse) Or $credit = 0 Then Return Null
+  Return $reponse["common"]["deno"]
+
+End
+
+Private Function tva_Read() As String
+
+  If Not Object.IsValid($reponse) Or $credit = 0 Then Return Null
+  Return $reponse["common"]["numtva"]
+
+End
+
+Private Function status_Read() As Boolean
+
+  If Not Object.IsValid($reponse) Or $credit = 0 Then Return True
+  If $reponse["common"]["status"] = "active" Then Return True Else Return False
+
+End
+
+Private Function insee_Read() As Boolean
+
+  If Not Object.IsValid($reponse) Or $credit = 0 Then Return True
+  If $reponse["common"]["immatinsee"] = "enregistre" Then Return True Else Return False
+
+End
+
+Private Function rcs_Read() As Boolean
+
+  If Not Object.IsValid($reponse) Or $credit = 0 Then Return True
+  If $reponse["common"]["immatrcs"] = "inscrit" Then Return True Else Return False
+
+End
+
+Private Function bodacc_Read() As Boolean
+
+  If Not Object.IsValid($reponse) Or $credit = 0 Then Return True
+  If $reponse["common"]["immatbodacc"] = "true" Then Return True Else Return False
+
+End

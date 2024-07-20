@@ -13,7 +13,15 @@ gb.db.form
 gb.db.mysql
 gb.desktop
 gb.eval
+gb.util
 gb.settings
+gb.net
+gb.net.curl
 gb.mysql
+gb.pcre
 gb.report2
+gb.util.web
+gb.web
+gb.xml
+gb.web.feed
 
