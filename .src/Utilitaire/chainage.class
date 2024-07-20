@@ -1,0 +1,122 @@
+' Gambas class file
+
+Private $text As Object[]
+Private $obs As Observer
+Private $coul As Integer
+
+Property Read tableaux As Object[]
+
+Public Sub _new(Optional value As Object[])
+
+  Dim i As Integer
+  
+  $text = value
+  If IsNull($text) Then $text = New Object[]
+  For i = 0 To $text.Max
+    $obs = New Observer($text[i], True) As "saisie"
+  Next
+
+End
+
+Public Sub saisie_gotfocus()
+
+  Try $coul = Last.background
+  Try Last.background = &HFFFFDF
+
+End
+
+Public Sub saisie_lostfocus()
+
+  Try Last.background = $coul
+
+End
+
+Public Sub saisie_keypress()
+
+  Dim i As Integer
+  Dim kctrl As Boolean = Key.Alt Or Key.Control 
+  
+  If kctrl Then Return
+  
+  Select Case Key.Code
+   
+    Case Key.Up, Key.BackTab
+      i = recherche(Last)
+      If i > -1 Then
+        i = i - 1
+        If i = -1 Then i = $text.Max 
+        $text[i].setfocus
+        Try $text[i].Select
+        If Key.Code = Key.BackTab Then Stop Event
+      Endif
+    
+    Case Key.Down, Key.Enter, Key.Return, Key.Tab
+      i = recherche(Last)
+      If i > -1 Then
+        i = i + 1
+        If i > $text.Max Then i = 0
+        $text[i].setfocus
+        Try $text[i].Select
+        If Key.Code = Key.tab Then Stop Event
+      Endif
+      
+  End Select
+
+End
+
+Private Function recherche(text As Object) As Integer
+  
+  Dim i As Integer
+  
+  Repeat
+    If $text[i] = text Then Return i
+    Inc i
+  Until i = $text.Count
+  
+  Return -1
+  
+End
+
+Public Sub add(value As Object[])
+
+  Dim i As Integer
+  
+  For i = 0 To value.Max
+    $text.Add(value[i])
+    $obs = New Observer($text[$text.Max]) As "saisie"
+  Next
+
+End
+
+Public Sub addintercale(text As Object, value As Object)
+
+  Dim i As Integer
+  
+  i = recherche(text)
+  If i > -1 Then $text.Add(value, i)
+  
+End
+
+Public Sub modif(anc As Object, nouv As Object)
+
+  Dim i As Object
+  
+  i = recherche(anc)
+  $text[i] = nouv
+
+End
+
+Public Sub sup(value As Object, Optional nb As Integer = 1)
+
+   Dim i As Integer
+   
+  i = recherche(value)
+  If i > -1 Then $text.Extract(i, nb)
+  
+End
+
+Private Function tableaux_Read() As Object[]
+
+  Return $text
+
+End

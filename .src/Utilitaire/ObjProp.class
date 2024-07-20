@@ -1,0 +1,234 @@
+' Gambas class file
+
+Create Static
+
+Public Struct elements
+  nom As String       ''nom de la propriete
+  propriete As Variant      '' propriété à appliquer
+  frm As String           ''format de la propriété
+End Struct
+
+Private $elem As New Elements[]
+Private $clef As String
+Private $nom As String
+Private $name As String
+Private $CondFilter As ObjProp
+Private $filter As TextReg
+Private $type As Integer
+Private $h As Integer
+Private $w As Integer
+Private $conf As Settings
+
+Public historique As New String[10]
+Public tri As Boolean = False       ''Indique si on tri sur cette colonne a l'ouverture de la recherche
+Public cle As Boolean = False       '' Si ce champ est une clé de l'enregistrement. Si aucune clé n'est définie la valeur du 1° champ sera retournée sinon on retourne une collection avec le result.field en clé et la valeur cliquée en donnée.
+
+Public Enum TextReg, TextBox, Button, Label, TextLabel, Param        ''Indique quelle classe doit être créé. A completer selon les besoins, param est pour la lecture des parametres dans un fichier conf dans ce cas NomColonne devient le nom du fichier a lire
+
+Property filter As TextReg
+Property Read name As String 
+Property Read NomControl As String
+Property Read TypeClass As Integer
+Property Height As Integer
+Property Width As Integer
+
+Public Sub _new(Clef As Variant, Nom As String, Optional TypeClass As Integer = Me.TextReg)
+
+  If Not IsNull(Clef) Then
+    If TypeOf(Clef) = gb.String Then
+      $clef = Clef
+      $name = Clef
+    Else If TypeOf(Clef) = gb.Object Then
+      If Object.Type(Clef) = "ResultField" Then
+        $clef = Clef.Name
+        $name = Clef.Name
+      Else
+        Message.Error("Object property non supporté")
+      Endif
+    Else
+      Message.Error("Object property non supporté")
+    Endif
+  Endif
+  $nom = Nom
+  If TypeClass = Me.Param Then
+    LecParam($nom)
+  Endif
+
+End
+
+Public Sub AddChamp(nom As String, propriete As Variant, Optional frm As String)      ''Ajout d'une propriété, frm prend les valeurs de format nombres et dates ou le nombre de décimales après la virgule, jusqu'a 3
+  
+  Dim elem As New Elements
+
+  elem.nom = nom
+  Try elem.propriete = propriete.Join
+  If Error Then elem.propriete = propriete
+  elem.frm = frm
+  $elem.Add(elem)
+  
+End
+
+Public Sub ModChamp(nom As String, propriete As Variant, Optional frm As String)     ''Modifie une propriété
+
+  Dim i As Integer
+  
+    For i = 0 To $elem.Max
+      If $elem[i].nom = nom Then
+        Try $elem[i].propriete = propriete.Join
+        If Error Then $elem[i].propriete = propriete
+        $elem[i].frm = frm
+        Return
+      Endif
+    Next
+    AddChamp(nom, propriete, frm)
+
+End
+
+Public Sub AppProp(obj As Object)    ''applique les propriétés et format sur le champ
+  
+  Dim elem As Elements
+  Dim i As Integer
+  
+    For i = 0 To $elem.Max
+      elem = $elem[i]
+      Object.SetProperty(obj, elem.nom, elem.propriete)
+      If elem.frm Then frmt(elem.frm, obj)
+    Next
+  
+End
+
+Public Sub AjoutCondfilter()
+
+  $CondFilter = New ObjProp($clef, $nom)
+
+End
+
+Public Sub CondFilter(nom As String, propriete As String)    ''On passe une propiété a la textreg associée 
+
+  $CondFilter.AddChamp(nom, propriete)
+
+End
+
+Public Sub EcriParam(Nom As String, txt As TextReg)
+
+  Dim elem As Elements
+  Dim i As Integer
+  
+  For i = 0 To $elem.Max
+    elem = $elem[i]
+    $conf["/" & Nom & "/" & elem.nom] = Object.GetProperty(txt, elem.nom)
+  Next
+  If txt.Text Then
+    i = historique.Find(txt.Text)
+    If i > -1 Then historique.Remove(i)
+    historique.Insert([txt.Text], 0)
+    historique.Remove(10, -1)
+    $conf["/" & Nom & "/Historique"] = historique
+    $conf.Save
+  Endif
+
+End
+
+Public Sub LecParam(Nom As String)
+  
+  Dim e As New Elements
+  
+  $conf = New Settings(User.Home & "/.config/gambas3/" & Application.Name & "-AutoParams-" & ".conf")
+  AddChamp("Choirech", $conf["/" & Nom & "/Choirech", 0])
+  If Not IsNull($conf["/" & Nom & "/Historique"]) Then
+    historique = $conf["/" & Nom & "/Historique"]
+  Endif
+  
+End
+
+Private Sub frmt(frm As String, obj As Object)    ''On définit le format du texte, soit date soit numérique
+  
+  Dim dte As LDate
+  
+  If frm Match "dd" Or frm Match "mm" Or frm Match "yy" Or frm Match "yyyy" Then
+    dte = New LDate(obj.text)
+    obj.text = Format(dte.G, frm)
+  Else 
+    If TypeOf(frm) = gb.String Then
+      obj.text = Replace(obj.text, ".", ",")
+      If obj.text Then obj.text = Format(Val(obj.text), frm)
+    Else
+      'If obj.text Then obj.text = Utils.CDec(obj.text, frm)
+    Endif
+  Endif
+  
+  Catch 
+    obj.text = "#Error"
+    
+End
+
+
+
+Private Function name_Read() As String
+
+  Return $name
+
+End
+
+Private Function CondFilter_Read() As ObjProp
+
+  Return $CondFilter
+
+End
+
+Private Function filter_Read() As TextReg
+  
+  Return $filter
+  
+End
+
+Private Sub filter_Write(Value As TextReg)
+  
+  $filter = Value
+  If IsNull($CondFilter) Then $CondFilter = New ObjProp($clef, $nom)
+  $CondFilter.AddChamp("Text", $Nom)
+  $CondFilter.AddChamp("Tag", $Nom)
+  $CondFilter.AddChamp("Alignment", Align.Center)
+  $CondFilter.AddChamp("Tooltip", $Nom & "\n" & Value.Tooltip & "\nFléche du bas : Séléction")
+  $CondFilter.AppProp($filter)
+
+End
+
+Private Function NomControl_Read() As String
+
+  Return $nom
+
+End
+
+Private Function TypeClass_Read() As Integer
+
+  Return $type
+
+End
+
+Private Function Height_Read() As Integer
+
+  
+  Return $h
+
+End
+
+Private Sub Height_Write(Value As Integer)
+
+  ModChamp("H", Value)
+  $h = Value
+
+End
+
+Private Function Width_Read() As Integer
+
+  Return $w
+
+End
+
+Private Sub Width_Write(Value As Integer)
+
+  ModChamp("W", Value)
+  $w = Value
+
+End

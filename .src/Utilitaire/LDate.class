@@ -1,0 +1,576 @@
+' Gambas class file
+
+Export
+Create Static
+Private Dte As Date
+  
+Event change(value As LDate) 'levé quand la valeur change
+
+Property L As String 'Laurux Date String Propery
+Property LT As String 'Laurux DateTime String Propery
+Property G As Date  'Gambas Date Object Propery
+Property GnT As Date  'Gambas Date (without Time) Object Propery
+Property D As String 'Database Date String Propery
+Property DT As String 'Database DateTime String Propery
+Property Read FinMois As LDate 'retourne le dernier jour du mois
+Property Read FinJour As LDate 'retourne la dernière seconde du meme jour
+Property Read Day As Integer 'retourne le jour uniquement
+Property Read WeekDay As String 'retourne le jour en lettre
+Property Read WeekDay3 As String 'retourne le jour sur 3 lettre uniquement
+Property Read Week As Integer 'retourne le numero de semaine
+Property Read Month As Integer 'retourne le mois uniquement
+Property Read MonStr As String 'retourne le mois en lettre
+Property Read MonStr3 As String 'retourne le mois comme 3 caractère uniquement
+Property Read Year As Integer 'retourne l'année uniquement
+Property Read Year2 As Integer 'retourne les deux derniers digit de l'année uniquement
+Property Read F As String 'Filename Date String Propery
+Property Read FT As String 'Filename DateTime String Propery
+
+Property Read PDeb As LDate 'Date Debut Periode comprenant dte (actuellement 1 mois)
+Property Read PFin As LDate 'Date Fin Periode comprenant dte (actuellement 1 mois)
+
+'Property Read Select As LDate 'Affiche un Date selecteur modale et retourne la date
+
+
+'****************
+'METHODE SPECIALE
+'****************
+
+Public Sub _New(Optional DateOrYear As Variant, Optional Month As Integer = 1, Optional Day As Integer = 1, Optional Hour As Integer, Optional Minute As Integer, Optional Second As Integer, Optional Millisecond As Integer)
+  
+  If Not DateOrYear Then
+    Dte = Now
+  Else
+    If TypeOf(DateOrYear) = gb.Date Then
+      Dte = DateOrYear
+    Else If TypeOf(DateOrYear) = gb.String
+      If Param.Count = 0
+        Dte = Parse(DateOrYear) 'on parse la date et le temps lors de la creation de l'objet il faut utiliser les attributs L ou D pour les supprimers
+        If IsNull(Dte) Then
+          Message.Error("Erreur, impossible d'interpréter la date " & DateOrYear)
+        Endif
+      Else
+        Dte = Date(DateOrYear, Month, Day, Hour, Minute, Second, Millisecond)
+      Endif
+    Else If TypeOf(DateOrYear) = gb.Integer
+      Dte = Date(DateOrYear, Month, Day, Hour, Minute, Second, Millisecond)
+    Else 'Probably an objet
+      Dte = Date(DateOrYear)
+    Endif
+  Endif
+  
+  'Print DateOrYear
+  
+End
+
+Public Sub _call(Optional DateOrYear As Variant, Optional Month As Integer = 1, Optional Day As Integer = 1, Optional Hour As Integer, Optional Minute As Integer, Optional Second As Integer, Optional Millisecond As Integer) As LDate
+
+  Dim CLDate As LDate
+  
+  CLdate = New LDate(DateOrYear, Month, Day, Hour, Minute, Second, Millisecond)
+  Return CLdate
+
+End
+
+Public Sub DateFilterDB(Sdate As String, Optional HasTime As Boolean = False) As String
+
+  Dim cvdate As String[]
+  Dim time As String
+  Dim yea As String
+  Dim mon As String
+  Dim jou As String
+  Dim hour As String
+  Dim min As String
+  Dim sec As String
+  Dim timestr As String = ""
+  Dim reg As RegExp
+  Dim reg2 As RegExp
+  
+  If IsNull(sdate) Then
+    Return "%" 'no filter
+  Endif
+  
+  reg = New RegExp
+  reg.Compile("([0-9%*]*)[/.-]*([0-9%*]*)[/.-]*([0-9%*]*)")
+  reg.Exec(Sdate)
+  If reg.Count <= 0 Then
+    Return "%"
+  Endif
+  
+  If HasTime Then
+    reg2 = New RegExp
+    reg2.Compile(" ([0-9%*]*)[:-]*([0-9%*]*)[:-]*([0-9%*]*)")
+    reg2.Exec(Sdate)
+    If reg2.Count > 0 Then
+      If Len(reg2[1].Text) > 0 And Len(reg2[2].Text) > 0 And Len(reg2[3].Text) > 0 Then
+        hour = Right(reg2[1].Text, 2)
+        hour = Replace(hour, "*", "%")
+        min = Right(reg2[2].Text, 2)
+        min = Replace(min, "*", "%")
+        sec = Right(reg2[3].Text, 2)
+        sec = Replace(sec, "*", "%")
+        timestr = " " & hour & ":" & min & ":" & sec
+      Else If Len(reg2[1].Text) > 0 And Len(reg2[2].Text) > 0 Then
+        hour = Right(reg2[1].Text, 2)
+        hour = Replace(hour, "*", "%")
+        min = Right(reg2[2].Text, 2)
+        min = Replace(min, "*", "%")
+        timestr = " " & hour & ":" & min & "%"
+      Else If Len(reg2[1].Text) > 0 
+        hour = Right(reg2[1].Text, 2)
+        hour = Replace(hour, "*", "%")
+        timestr = " " & hour & "%"
+      Else
+        timestr = " %" 
+      Endif
+    Else
+      timestr = "%"
+    Endif
+  Endif
+
+  If Len(reg[1].Text) > 0 And Len(reg[2].Text) > 0 And Len(reg[3].Text) > 0 Then
+    If Len(reg[1].Text) >= 4 Then
+      yea = Right(reg[1].Text, 4)
+      yea = Replace(yea, "*", "%")
+      mon = Right(reg[2].Text, 2)
+      mon = Replace(mon, "*", "%")
+      jou = Right(reg[3].Text, 2)
+      jou = Replace(jou, "*", "%")
+    Else
+      yea = Right(reg[3].Text, 4)
+      yea = Replace(yea, "*", "%")
+      mon = Right(reg[2].Text, 2)
+      mon = Replace(mon, "*", "%")
+      jou = Right(reg[1].Text, 2)
+      jou = Replace(jou, "*", "%")
+    Endif
+    Return yea & "-" & mon & "-" & jou & timestr
+  Else If Len(reg[1].Text) > 0 And Len(reg[2].Text) > 0 Then
+    If Len(reg[1].Text) >= 4 Then
+      yea = Right(reg[1].Text, 4)
+      yea = Replace(yea, "*", "%")
+      mon = Right(reg[2].Text, 2)
+      mon = Replace(mon, "*", "%")
+      jou = "%"
+    Else
+      yea = "%"
+      mon = Right(reg[2].Text, 2)
+      mon = Replace(mon, "*", "%")
+      jou = Right(reg[1].Text, 2)
+      jou = Replace(jou, "*", "%")
+    Endif
+  Else If Len(reg[1].Text) > 0 Then
+    If Len(reg[1].Text) >= 4 Then
+      yea = Right(reg[1].Text, 4)
+      yea = Replace(yea, "*", "%")
+      mon = "%"
+      jou = "%"
+    Else
+      yea = "%"
+      mon = "%"
+      jou = Right(reg[1].Text, 2)
+      jou = Replace(jou, "*", "%")
+    Endif
+  Else
+      Return "%" & timestr
+  Endif
+  
+  'Retour du format de filtrage pour les bases de données
+  Return yea & "-" & mon & "-" & jou & timestr
+
+End
+
+
+'**************
+'METHODE PRIVEE
+'**************
+
+Private Function Parse(Sdate As String, Optional ParseTime As Boolean = True) As Date
+
+  Dim cvdate As String[]
+  Dim time As String
+  Dim hour As Integer
+  Dim min As Integer
+  Dim sec As Integer
+  Dim reg As RegExp
+  Dim reg2 As RegExp
+  Dim anne As String
+  
+  If Sdate = ".." 'special Laurux case
+    If ParseTime Then
+      Return Now
+    Else
+      Return Date(Now)
+    Endif
+  Else If Len(Sdate) = 14 'we expect only format yyyymmddHHMMSS if we have 14 caracters
+    Return Date(Left(Sdate, 4), Mid(Sdate, 5, 2), Mid(Sdate, 7, 2), Mid(Sdate, 9, 2), Mid(Sdate, 11, 2), Right(Sdate, 2))
+  Endif
+  reg = New RegExp
+  reg.Compile("([0-9]+)[/.-]+([0-9]+)[/.-]+([0-9]+)")
+  reg.Exec(Sdate)
+  If reg.Count = -1 Then
+    reg.Compile("([0-9]+)[/.-]+([0-9]+)[/.-]?")
+    reg.Exec(Sdate)
+    If reg.Count = -1 Then
+      reg.Compile("([0-9]+)[ /.-]?")
+      reg.Exec(Sdate)
+    Endif
+  Endif
+  If ParseTime Then
+    reg2 = New RegExp
+    reg2.Compile(" ([0-9]+)[:-]([0-9]+)[:-]([0-9]+)")
+    reg2.Exec(Sdate)
+    If reg2.Count = 3 Then
+      hour = Val(reg2[1].Text)
+      min = Val(reg2[2].Text)
+      sec = Val(reg2[3].Text)
+    Else
+      reg2.Compile(" ([0-9]+)[:-]([0-9]+)")
+      reg2.Exec(Sdate)
+      sec = 0
+      If reg2.Count = 2 Then
+        hour = Val(reg2[1].Text)
+        min = Val(reg2[2].Text)
+      Else
+        hour = 0
+        min = 0
+      Endif
+    Endif
+  Else
+    hour = 0
+    min = 0
+    sec = 0
+  Endif
+  
+  If reg.Count = 3 Then
+    If Len(reg[1].Text) = 4 Then
+      Return Date(Val(reg[1].Text), Val(reg[2].Text), Val(reg[3].Text), hour, min, sec)
+    Else
+      If Len(reg[3].Text) = 4 Then
+        Return Date(Val(reg[3].Text), Val(reg[2].Text), Val(reg[1].Text), hour, min, sec)
+      Else
+        anne = Left(Str(Year(Now)), 4 - Len(reg[3].Text)) & reg[3].Text
+        Return Date(anne, Val(reg[2].Text), Val(reg[1].Text), hour, min, sec)
+      Endif
+    Endif
+  Else If reg.Count = 2 Then
+    If Len(reg[1].Text) = 4 Then
+      Return Date(Val(reg[1].Text), Val(reg[2].Text), Val(Day(Now)), hour, min, sec)
+    Else
+      Return Date(Year(Now), Val(reg[2].Text), Val(reg[1].Text), hour, min, sec)
+    Endif
+  Else If reg.Count = 1 Then
+    If Len(reg[1].Text) = 4 Then
+      Return Date(Val(reg[1].Text), Month(Now), Day(Now), hour, min, sec)
+    Else
+      Return Date(Year(Now), Month(Now), Val(reg[1].Text), hour, min, sec)
+    Endif
+  Else
+    If ParseTime Then
+      Message.Error("Erreur, impossible d'interpréter la date " & Sdate & "!\nLa date suivante sera utilisé : " & LDate(Now).LT)
+      Return Now
+    Else
+      Message.Error("Erreur, impossible d'interpréter la date " & Sdate & "!\nLa date suivante sera utilisé : " & LDate(Now).L)
+      Return Date(Now)
+    Endif
+  Endif
+  
+Catch
+  If Sdate <> "" Then
+    Message.Error("Erreur grave lors de l'interprétation de la date " & Sdate)
+  Endif
+  Return Null
+  
+End
+
+Private Function prd(compdate As LDate) As Integer
+  
+  If DateDiff(compdate.G, Dte, gb.Year) = 0 Then Return gb.Second
+  Return gb.Year
+  
+End
+
+'********
+'PROPERTY
+'********
+
+Sub L_Read() As String
+
+  Return Format(Dte, "dd.mm.yyyy")
+
+End
+
+Sub LT_Read() As String
+
+  Return Format(Dte, "dd.mm.yyyy hh:nn")
+
+End
+
+Sub L_Write(ldate As String)
+
+  Dte = Parse(ldate, False)
+  If Dte <> Null Then
+    Raise change(Me)
+  Endif
+
+End
+
+Sub LT_Write(ldate As String)
+
+  Dte = Parse(ldate)
+  If Dte <> Null Then
+    Raise change(Me)
+  Endif
+
+End
+
+Sub D_Read() As String
+
+  Return Format(Dte, "yyyy-mm-dd")
+  
+End
+
+Sub D_Write(ddate As String)
+
+  Dte = Parse(ddate, False)
+  If Dte <> Null Then
+    Raise change(Me)
+  Endif
+
+End
+
+Sub DT_Read() As String
+
+  'Les base de donnée supporte les deux format
+  Return Format(Dte, "yyyy-mm-dd hh:nn:ss")
+  
+End
+
+Sub DT_Write(ddate As String)
+
+  Dte = Parse(ddate)
+  If Dte <> Null Then
+    Raise change(Me)
+  Endif
+
+End
+
+Sub G_Read() As Date
+
+  Return Dte
+
+End
+
+Sub G_Write(gdate As Date)
+
+  Dte = gdate
+  If Dte <> Null Then
+    Raise change(Me)
+  Endif
+
+End
+
+Sub GnT_Read() As Date
+
+  Return Date(Year(Dte), Month(Dte), Day(Dte), 0, 0, 0)
+
+End
+
+
+Sub GnT_Write(gdate As Date)
+
+  Dte = Date(Year(gdate), Month(gdate), Day(gdate), 0, 0, 0)
+  If Dte <> Null Then
+    Raise change(Me)
+  Endif
+
+End
+
+
+Sub PDeb_Read() As LDate
+
+  Return Periode_Debut(Me)
+
+End
+
+Sub PFin_Read() As LDate
+
+  Return Periode_Fin(Me)
+
+End
+
+Sub FinMois_Read() As LDate
+  
+  Return Fin_Mois()
+  
+End
+
+Sub FinJour_Read() As LDate
+  
+  Return Fin_Jour()
+  
+End
+
+Sub Day_Read() As Integer
+  
+  Return Day(Dte)
+  
+End
+
+Sub WeekDay_Read() As String
+
+  Dim DayNames As String[]
+  DayNames = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"]
+
+  Return DayNames[WeekDay(Dte)]
+
+End
+
+Sub WeekDay3_Read() As String
+
+  Dim DayNames As String[]
+  DayNames = ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"]
+
+  Return DayNames[WeekDay(Dte)]
+
+End
+
+Sub Week_Read() As Integer
+  
+  Return Week(Dte)
+  
+End
+
+Sub Month_Read() As Integer
+  
+  Return Month(Dte)
+  
+End
+
+Sub MonStr_Read() As String
+  
+  Dim Mois As String[] = ["janvier", "fevrier", "mars", "avril", "mai", "jun", "jui", "aou", "sep", "oct", "nov", "dec"]
+  Return Mois[Month(Dte) - 1]
+  
+End
+
+Sub MonStr3_Read() As String
+  
+  Dim Mois3 As String[] = ["jan", "fev", "mar", "avr", "mai", "jun", "jui", "aou", "sep", "oct", "nov", "dec"]
+  Return Mois3[Month(Dte) - 1]
+  
+End
+
+Sub Year_Read() As Integer
+  
+  Return Year(Dte)
+  
+End
+
+Sub Year2_Read() As Integer
+  
+  Return Val(Right(CStr(Year(Dte)), 2))
+  
+End
+
+Sub F_Read() As String
+
+  Return Format(Dte, "yyyymmdd")
+
+End
+
+Sub FT_Read() As String
+
+  Return Format(Dte, "yyyymmdd-hhnnss")
+
+End
+
+'****************
+'METHODE PUBLIQUE
+'****************
+
+Public Sub Apres(compdate As LDate, Optional strict As Boolean) As Boolean
+
+  Dim p As Integer    'indique la période à comparer
+  
+  p = prd(compdate)
+  
+  Select Case strict
+    Case True
+      If DateDiff(compdate.G, Dte, p) > 0 Then
+        Return True
+      Else
+        Return False
+      Endif
+      
+    Case Else
+      If DateDiff(compdate.G, Dte, p) >= 0 Then
+        Return True
+      Else
+        Return False
+    Endif
+  End Select
+  
+End
+
+
+Public Sub Avant(compdate As LDate, Optional strict As Boolean = False) As Boolean
+
+  Dim p As Integer    'indique la période à comparer
+  
+  p = prd(compdate)
+  
+  Select Case strict
+    Case True
+      If DateDiff(compdate.G, Dte, p) < 0 Then
+        Return True
+      Else
+        Return False
+      Endif
+      
+    Case Else
+      If DateDiff(compdate.G, Dte, p) <= 0 Then
+        Return True
+      Else
+        Return False
+      Endif
+    End Select
+  
+End
+
+Public Function Fin_Mois() As LDate
+
+  Dim dt As Date
+  
+  dt = Date(Year(dte), Month(dte), 1)
+  dt = DateAdd(dt, gb.Month, 1)
+  dt = DateAdd(dt, gb.Day, -1)
+  Return LDate(dt)
+
+End
+
+Public Function Fin_Jour() As LDate
+
+  Dim dt As Date
+  
+  dt = Date(Year(dte), Month(dte), Day(dte))
+  dt = DateAdd(dt, gb.Day, 1)
+  dt = DateAdd(dt, gb.Millisecond, -1)
+  Return LDate(dt)
+
+End
+
+
+
+Public Sub Periode_Debut(Optional Mois As LDate = LDate(Now)) As LDate
+
+  Return LDate(Year(Mois.G), Month(Mois.G), 1, 0, 0, 0, 0)  
+
+End
+
+
+Public Sub Periode_Fin(Optional Mois As LDate = LDate(Now)) As LDate
+
+  Return LDate(DateAdd(DateAdd(Mois.PDeb.G, gb.Month, 1), gb.Millisecond, -1))
+
+End
