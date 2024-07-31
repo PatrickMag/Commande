@@ -32,6 +32,7 @@
     }
     { nattest TextReg
       MoveScaled(21,6,22,3)
+      reg = "[0-9]*"
     }
     { Label7 Label
       MoveScaled(3,12,14,3)
@@ -100,8 +101,8 @@
   }
   { siret TextReg
     MoveScaled(37,9,20,3)
-    Type = TextReg.EstNum
     MaxLength = 14
+    reg = "[0-9]*"
   }
   { Bsir Button
     MoveScaled(59,9,5,3)

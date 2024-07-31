@@ -38,6 +38,7 @@ Public Sub afficher(route As Integer, Optional parent As Container, x As Integer
   Dim lab As Label
   
   If Not Object.IsValid($reponse) Or $credit = 0 Then Return
+  If $reponse.Exist("error") Then Return
   If IsNull(parent) Then win = New Window As "win" Else win = New Window(parent) As "win"
   If x <> 0 Or y <> 0 Then
     win.x = x
@@ -86,6 +87,10 @@ Public Sub exec(Value As Integer) As Boolean       ''execute la requete
   Endif
   If txt Then 
     $reponse = JSON.Decode(txt)
+    If $reponse.Exist("error") Then
+      Message.Error("Erreur sur n° de siret")
+      Return False
+    Endif
     Return True
   Else
     Return False
