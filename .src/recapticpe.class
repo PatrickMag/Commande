@@ -10,6 +10,7 @@ Public Sub _new()
   Dim ch As Chainage
 
   ch = New Chainage([dtinf, dtsup, tfam])
+  dtinf.Select
   tfam.connect = connect.cconlaurux
   tfam.Champ = ["Fiches_Fam", "code_fam", "libell_fam"]
   tfam.conteneur = Me
@@ -40,6 +41,7 @@ Public Sub _new()
   GridView1.Columns[livraison].Text = "Ad Liv"
   GridView1.Columns[siret].Alignment = Align.Center
   GridView1.Columns[siret].W = 100
+  somme.nbdec = "3"
   
 End
 
@@ -55,6 +57,7 @@ Public Sub Button1_Click()
     Wait 0.001
     $reslig.MoveFirst()
     Repeat
+      Print somme.Value, $reslig!qte
       somme.Value += $reslig!qte
     Until $reslig.MoveNext()
   Else
@@ -91,11 +94,11 @@ Private Sub constreg()
   
   If Object.IsValid(art) And If art.Count > 0 Then 
     cond = " IN(" & art.Join() & ") "
-    req = "SELECT code_ligbl AS code,fam_ligbl AS fam,REPLACE(qte_ligbl,',','.') AS qte,dte_ligbl AS dte,numagri_ligbl AS numagri,cdclibl AS ncli,numadr_ligbl AS numadr FROM Fiches_Ligbl JOIN Fiches_Bl ON numbl=num_ligbl WHERE code_ligbl " & cond & "  AND dte_ligbl BETWEEN &2 AND &3 AND fam_ligbl = &1 AND type IN('B','F') UNION ALL SELECT code_ligfac AS code,fam_ligfac AS fam,REPLACE(qte_ligfac,',','.') AS qte,dtligbl_ligfac AS dte,numagri_ligfac AS numagri,cdclifac as ncli,numadr_ligfac AS numadr FROM Fiches_HistoLigfac JOIN Fiches_HistoFac ON numfac=num_ligfac WHERE code_ligfac " & cond & "  AND dtligbl_ligfac BETWEEN &2 AND &3 AND fam_ligfac = &1 ORDER BY dte"
+    req = "SELECT code_ligbl AS code,fam_ligbl AS fam,REPLACE(qte_ligbl,',','.') AS qte,dte_ligbl AS dte,numagri_ligbl AS numagri,cdclibl AS ncli,numadr_ligbl AS numadr FROM Fiches_Ligbl LEFT JOIN Fiches_Bl ON numbl=num_ligbl WHERE code_ligbl " & cond & "  AND dte_ligbl BETWEEN &2 AND &3 AND fam_ligbl = &1 AND type IN('B','F') UNION ALL SELECT code_ligfac AS code,fam_ligfac AS fam,REPLACE(qte_ligfac,',','.') AS qte,dtligbl_ligfac AS dte,numagri_ligfac AS numagri,cdclifac as ncli,numadr_ligfac AS numadr FROM Fiches_HistoLigfac LEFT JOIN Fiches_HistoFac ON numfac=num_ligfac WHERE code_ligfac " & cond & "  AND dtligbl_ligfac BETWEEN &2 AND &3 AND fam_ligfac = &1 ORDER BY dte"
     If rsomme.Value Then
-      req = "SELECT SUM(qte) as qte, code,numagri,ncli FROM (" & req & ") as a GROUP BY numagri,ncli,code ORDER BY ncli"
+      req = "SELECT SUM(qte) as qte, code,numagri,ncli,numadr FROM (" & req & ") as a GROUP BY numagri,ncli,code,numadr ORDER BY ncli"
     Endif
-    $reslig = connect.cconlaurux.Exec(req, tfam.Text, dtinf.dte.D, dtsup.dte.D)
+    $reslig = connect.cconlaurux.Exec(req, tfam.Text, dtinf.dte.D, dtsup.dte.FinJour.DT)
   Endif
   
 End
@@ -228,14 +231,20 @@ End
 Private Sub impres()
   
   Dim rep As New Report
+  Dim tot As Float
+  Dim prt As New Printer
   
   $reslig.MoveFirst()
   entete(rep)
   
   Repeat
     ligne(rep)
+    tot += $reslig!qte
   Until $reslig.MoveNext()
-  rep.Preview
+  pied(rep, tot)
+  prt.OutputFile = User.Home & "/tmp/GNR.pdf"
+  rep.Print(prt)
+  Desktop.Open(prt.OutputFile)
   
 End
 
@@ -315,6 +324,26 @@ Private Sub ligne(rep As Report)
   
 End
 
+Private Sub pied(rep As Report, tot As Float)
+
+  Dim bx As New ReportHBox(rep)
+  Dim lab As ReportLabel
+  
+  bx = New ReportHBox(rep)
+  bx.Height = "5mm"
+  bx.Border = ReportBorder["Top:1pt #000000;Bottom:1pt #000000;Left:1pt #000000;Right:1pt #000000"]
+  lab = crelab(bx)
+  lab.Expand = True
+  lab.Font = Font["Serif,7,Blod"]
+  lab.Alignment = Align.Center
+  lab.Text = "TOTAL"
+  lab = crelab(bx)
+  lab.Font = Font["Serif,7,Blod"]
+  lab.Alignment = Align.Right
+  lab.Text = Format(tot, "0.000")
+
+End
+
 Private Sub crelab(bx As ReportHBox) As ReportLabel
   
   Dim lab As New ReportLabel(bx)
@@ -332,6 +361,7 @@ Private Sub csv()
   Dim Hfil As File
   Dim res, tx As Result
   Dim taux As String
+  Dim qte As Float
   
   $reslig.MoveFirst()
   Hfil = Open User.Home & "/GNR" & LDate(Now).D & ".csv" For Write Create
@@ -339,7 +369,8 @@ Private Sub csv()
     res = connect.cconlaurux.Exec("SELECT cli_nom,cli_siret FROM Fiches_Cli WHERE cli_code = &1", $reslig!ncli)
     tx = connect.cconlaurux.Exec("SELECT * FROM Art_Tipp WHERE code=&1 AND ticpe=&2", $reslig!code, ticpe.GnrAgri)
     If tx.Available Then taux = "Taux réduit" Else taux = "Taux plein"
-    Print #Hfil, res!cli_siret & ";" & $reslig!qte & ";" & taux
+    qte = Replace($reslig!qte, ",", ".") * 10
+    Print #Hfil, res!cli_siret & ";" & Format(qte, "0.00") & ";" & taux
   Until $reslig.MoveNext()
   Hfil.Close
   
