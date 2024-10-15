@@ -36,6 +36,7 @@ Public Sub afficher(route As Integer, Optional parent As Container, x As Integer
   
   Dim win As Window
   Dim lab As Label
+  Dim txt As String
   
   If Not Object.IsValid($reponse) Or $credit = 0 Then Return
   If $reponse.Exist("error") Then Return
@@ -112,9 +113,14 @@ Private Function crelab(win As Window) As Label
   
 End
 
-Private Function convbool(value As Boolean) As String
+Private Function convbool(value As Variant) As String
   
-  If value Then Return "Oui" Else Return "Non"
+  If TypeOf(value) = gb.Boolean Then
+    If value Then Return "Oui" Else Return "Non"
+  Else If TypeOf(value) = gb.String Then
+    If UCase(value) = "TRUE" Then Return "Oui"
+    If UCase(value) = "FALSE" Then Return "Non"
+  Endif
   
 End
 
@@ -150,7 +156,7 @@ End
 Private Function procedure_Read() As Boolean
 
   If Not Object.IsValid($reponse) Or $credit = 0 Then Return False
-  If $reponse["common"]["pcollencours"] = "true" Then Return True Else Return False
+  Return $reponse["common"]["pcollencours"]
 
 End
 
@@ -172,27 +178,27 @@ End
 Private Function status_Read() As Boolean
 
   If Not Object.IsValid($reponse) Or $credit = 0 Then Return True
-  If $reponse["common"]["status"] = "active" Then Return True Else Return False
+  If UCase($reponse["common"]["status"]) = "ACTIVE" Then Return True Else Return False
 
 End
 
 Private Function insee_Read() As Boolean
 
   If Not Object.IsValid($reponse) Or $credit = 0 Then Return True
-  If $reponse["common"]["immatinsee"] = "enregistre" Then Return True Else Return False
+  If UCase($reponse["common"]["immatinsee"]) = "ENREGISTRE" Then Return True Else Return False
 
 End
 
 Private Function rcs_Read() As Boolean
 
   If Not Object.IsValid($reponse) Or $credit = 0 Then Return True
-  If $reponse["common"]["immatrcs"] = "inscrit" Then Return True Else Return False
+  If UCase($reponse["common"]["immatrcs"]) = "INSCRIT" Then Return True Else Return False
 
 End
 
 Private Function bodacc_Read() As Boolean
 
   If Not Object.IsValid($reponse) Or $credit = 0 Then Return True
-  If $reponse["common"]["immatbodacc"] = "true" Then Return True Else Return False
+  If UCase($reponse["common"]["immatbodacc"]) = "TRUE" Then Return True Else Return False
 
 End
