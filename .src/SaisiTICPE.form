@@ -44,24 +44,29 @@
       Type = TextReg.EstDate
     }
     { Impcli Button
-      MoveScaled(73,3,32.2222,4)
+      MoveScaled(73,3,32.2222,3)
       Text = ("Impression des clients")
       Picture = Picture["icon:/22/print"]
     }
     { Brecap Button
-      MoveScaled(73,11,32.2222,4)
+      MoveScaled(73,9,32.2222,3)
       Text = ("Impression du récap")
       Picture = Picture["icon:/22/print"]
     }
     { Bvalidite Button
-      MoveScaled(73,7,32.2222,4)
+      MoveScaled(73,6,32.2222,3)
       Text = ("Impression des validitées dépassées")
       Picture = Picture["icon:/22/print"]
     }
     { bsup Button
-      MoveScaled(81,16,16,4)
+      MoveScaled(81,17,16,3)
       Text = ("Supprimer")
       Picture = Picture["icon:/22/delete"]
+    }
+    { control Button
+      MoveScaled(73,12,32,3)
+      Text = ("Control procedures collectives")
+      Picture = Picture["icon:/22/connect"]
     }
   }
   { Label1 Label

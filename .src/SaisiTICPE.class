@@ -151,6 +151,40 @@ Public Sub Impcli_Click()
 
 End
 
+Public Sub control_Click()
+
+  Dim win As Window
+  Dim lab As TextArea
+  Dim res As Result
+  Dim t As Ticpe
+  
+  res = connect.cconlaurux.Exec("SELECT cli_code as code,cli_nom as nom,cli_siret, numagri FROM Fiches_Cli WHERE numagri IS NOT NULL UNION SELECT code, nom, cli_siret, Fiches_AdrlivC.numagri FROM Fiches_AdrlivC JOIN Fiches_Cli on code=cli_code WHERE Fiches_AdrlivC.numagri Is NOT Null ORDER BY code ")
+  If res.Available Then
+    win = New Window
+    win.H = Me.H
+    win.w = Me.W
+    win.Arrangement = Arrange.Horizontal
+    win.Text = "Vérification des procédures judiciaires"
+    lab = New TextArea(win)
+    lab.Expand = True
+    win.Show
+    Repeat
+      FMain.vs.siret = res!cli_siret
+      If FMain.vs.exec(verifsiret.existante) Then
+        If FMain.vs.procedure Then
+          lab.Text &= res!code & " " & res!nom & " " & res!cli_siret & " " & res!numagri & " Procédure en cours"
+        Else 
+          lab.Text &= res!code & " " & res!nom & " " & res!cli_siret & " " & res!numagri & " OK"
+        Endif
+      Else
+        lab.Text &= res!code & " " & res!nom & " En erreur"
+      Endif
+      lab.Text &= "\n"
+    Until res.MoveNext()
+  Endif
+
+End
+
 Public Sub Bvalidite_Click()
 
   Dim rep As New Report
