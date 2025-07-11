@@ -223,7 +223,7 @@ Public Sub butfac_Click()
          
        res!num_ligbl = respart!dnbon
        numlig += 1
-       res!numlig_ligbl = Format(numlig, "000000")
+       res!numlig_ligbl = Format(numlig, "0000")
        res!typel_ligbl = "R"
        res!com_ligbl = resart!art_crst
        res!block_ligbl = bck
