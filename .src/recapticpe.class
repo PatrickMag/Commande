@@ -359,23 +359,40 @@ End
 Private Sub csv()
   
   Dim Hfil As File
-  Dim res, tx As Result
+  Dim res, tx, reslig, ressoc As Result
   Dim taux As String
   Dim qte As Float
+  Dim req, cond, sr As String
+  Dim art As String[]
   
-  $reslig.MoveFirst()
-  Hfil = Open User.Home & "/GNR" & LDate(Now).D & ".csv" For Write Create
-  Repeat
-    res = connect.cconlaurux.Exec("SELECT cli_nom,cli_siret FROM Fiches_Cli WHERE cli_code = &1", $reslig!ncli)
-    tx = connect.cconlaurux.Exec("SELECT * FROM Art_Tipp WHERE code=&1 AND ticpe=&2", $reslig!code, ticpe.GnrAgri)
-    If tx.Available Then taux = "Taux réduit" Else taux = "Taux plein"
-    qte = Replace($reslig!qte, ",", ".") * 10
-    Print #Hfil, res!cli_siret & ";" & Format(qte, "0.00") & ";" & taux
-  Until $reslig.MoveNext()
-  Hfil.Close
+  art = tous()
   
-  Message.Info("Le fichier " & User.Home & "/GNR" & LDate(Now).D & ".csv\n a été créé avec succés")
-  
+  If Object.IsValid(art) And If art.Count > 0 Then 
+    cond = " IN(" & art.Join() & ") "
+    req = "SELECT code_ligbl AS code,fam_ligbl AS fam,REPLACE(qte_ligbl,',','.') AS qte,dte_ligbl AS dte,numagri_ligbl AS numagri,cdclibl AS ncli,numadr_ligbl AS numadr FROM Fiches_Ligbl LEFT JOIN Fiches_Bl ON numbl=num_ligbl WHERE code_ligbl " & cond & "  AND dte_ligbl BETWEEN &2 AND &3 AND fam_ligbl = &1 AND type IN('B','F') UNION ALL SELECT code_ligfac AS code,fam_ligfac AS fam,REPLACE(qte_ligfac,',','.') AS qte,dtligbl_ligfac AS dte,numagri_ligfac AS numagri,cdclifac as ncli,numadr_ligfac AS numadr FROM Fiches_HistoLigfac LEFT JOIN Fiches_HistoFac ON numfac=num_ligfac WHERE code_ligfac " & cond & "  AND dtligbl_ligfac BETWEEN &2 AND &3 AND fam_ligfac = &1 ORDER BY dte"
+    If rsomme.Value Then
+      req = "SELECT SUM(qte) as qte, code,ncli FROM (" & req & ") as a GROUP BY code,ncli ORDER BY ncli"
+    Endif
+    reslig = connect.cconlaurux.Exec(req, tfam.Text, dtinf.dte.D, dtsup.dte.FinJour.DT)
+  Endif
+  If reslig.Available Then
+    ressoc = connect.cconlaurux.Exec("SELECT * FROM Fiches_Societes")
+    reslig.MoveFirst()
+    Hfil = Open User.Home & "/GNR" & LDate(Now).D & ".csv" For Write Create
+    Repeat
+      If reslig!qte <> 0 Then
+        res = connect.cconlaurux.Exec("SELECT cli_nom,cli_siret FROM Fiches_Cli WHERE cli_code = &1", reslig!ncli)
+        tx = connect.cconlaurux.Exec("SELECT * FROM Art_Tipp WHERE code=&1 AND ticpe=&2", reslig!code, ticpe.GnrAgri)
+        If tx.Available Then taux = "3.86" Else taux = "30.80"
+        If res!cli_siret Then sr = res!cli_siret Else sr = "sans objet"
+        qte = reslig!qte * 10
+        Print #Hfil, ressoc!type_sc & " " & ressoc!int_sc & ";" & ressoc!siret_sc & ";" & res!cli_nom & ";" & sr & ";" & Format(qte, "0.00") & ";" & Format(taux, "0.00")
+      Endif
+    Until reslig.MoveNext()
+    Hfil.Close
+    
+    Message.Info("Le fichier " & User.Home & "/GNR" & LDate(Now).D & ".csv\n a été créé avec succés")
+  Endif
 End
 
 

@@ -43,11 +43,11 @@ Public Sub _new(client As String, nadr As String)
 
 End
 
-Public Sub _call(client As Variant) As Ticpe
+Public Sub _call(client As Variant, nadr As String) As Ticpe
 
   Dim t As Ticpe
   
-  t = New Ticpe(client)
+  t = New Ticpe(client, nadr)
   Return t
   
 End
