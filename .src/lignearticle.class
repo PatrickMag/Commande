@@ -563,10 +563,10 @@ Private Sub calcul()
   $ipoid = Round(Utils.totobs(quantite.text) * $resart!art_poids)
   
   If Utils.totobs(pxht.text) < Utils.totobs($resart!art_prvt) Then
-    Balloon.Delay = 3000
-    Try Balloon.Warning("<FONT Color=#212121>" & "Prix de vente inferieur au prix de revient", pxht)
+    'Balloon.Delay = 3000
+    'Try Balloon.Warning("<FONT Color=#212121>" & "Prix de vente inferieur au prix de revient", pxht)
     Try pxht.Background = Color.Red
-    Me.Raise
+    'Me.Raise
   Else
     If Balloon.Visible Then Try Balloon.Hide(pxht)
     Try pxht.Background = $icouleur
