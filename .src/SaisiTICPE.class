@@ -192,7 +192,7 @@ Public Sub Bvalidite_Click()
   Dim dtinf, dtsup As LDate
   
   dtsup = New LDate(DateAdd(Now, 3, gb.Month))
-  dtinf = New LDate(Date(2024, 06, 01))
+  dtinf = New LDate(Date(2024, 6, 1))
   res = connect.cconlaurux.Exec("SELECT cli_code as code, cli_rs_soc as soc, cli_nom as nom, cli_adr1 as adr1,cli_adr2 as adr2,cli_cd_ptl as cd, cli_ville as ville, numagri, dtagri, " & ticpe.Adcli & " AS livraison FROM Fiches_Cli WHERE numagri IS NOT NULL AND dtagri BETWEEN &1 AND &2 UNION ALL SELECT code, rs_soc as soc, nom, adr1, adr2, cd_ptl as cd, ville, numagri, dtagri, " & ticpe.Adlivraison & " AS livraison FROM Fiches_AdrlivC WHERE numagri Is NOT Null  AND dtagri BETWEEN &1 AND &2 ORDER BY code ", dtinf.D, dtsup.D)
   
   cliimp(rep, res)

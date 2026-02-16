@@ -613,3 +613,9 @@ Public Sub Menu1_Click()
   SaisiTICPE.Show
 
 End
+
+Public Sub Citeo_Click()
+
+  vide.Show
+
+End

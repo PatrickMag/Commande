@@ -1,0 +1,49 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,87,64)
+  Text = ("Citeo")
+  { Label1 Label
+    MoveScaled(2,10,13,3)
+    Text = ("Date de début : ")
+  }
+  { Label2 Label
+    MoveScaled(48,10,13,3)
+    Text = ("Date de fin :")
+  }
+  { dtfin TextReg
+    MoveScaled(70,10,13.75,3)
+    Type = TextReg.EstDate
+  }
+  { dtdeb TextReg
+    MoveScaled(19,10,13.75,3)
+    Type = TextReg.EstDate
+  }
+  { fcsv Button
+    MoveScaled(2,58,20,3)
+    Text = ("CSV")
+  }
+  { Label3 Label
+    MoveScaled(2,21,12,3)
+    Text = ("Type client :")
+  }
+  { Type TextReg
+    MoveScaled(14,21,8,3)
+    Text = ("09")
+    Alignment = Align.Center
+    MaxLength = 2
+  }
+  { Label4 Label
+    MoveScaled(25,21,21,3)
+  }
+  { Label5 Label
+    MoveScaled(48,21,14,3)
+    Text = ("N° opérateur :")
+  }
+  { Nop TextReg
+    MoveScaled(64,21,21,3)
+  }
+  { ProgressBar1 ProgressBar
+    MoveScaled(11,39,64,4)
+  }
+}

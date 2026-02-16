@@ -94,7 +94,7 @@ Private Sub constreg()
   
   If Object.IsValid(art) And If art.Count > 0 Then 
     cond = " IN(" & art.Join() & ") "
-    req = "SELECT code_ligbl AS code,fam_ligbl AS fam,REPLACE(qte_ligbl,',','.') AS qte,dte_ligbl AS dte,numagri_ligbl AS numagri,cdclibl AS ncli,numadr_ligbl AS numadr FROM Fiches_Ligbl LEFT JOIN Fiches_Bl ON numbl=num_ligbl WHERE code_ligbl " & cond & "  AND dte_ligbl BETWEEN &2 AND &3 AND fam_ligbl = &1 AND type IN('B','F') UNION ALL SELECT code_ligfac AS code,fam_ligfac AS fam,REPLACE(qte_ligfac,',','.') AS qte,dtligbl_ligfac AS dte,numagri_ligfac AS numagri,cdclifac as ncli,numadr_ligfac AS numadr FROM Fiches_HistoLigfac LEFT JOIN Fiches_HistoFac ON numfac=num_ligfac WHERE code_ligfac " & cond & "  AND dtligbl_ligfac BETWEEN &2 AND &3 AND fam_ligfac = &1 ORDER BY dte"
+    req = "SELECT code_ligbl AS code,fam_ligbl AS fam,REPLACE(qte_ligbl,',','.') AS qte,dte_ligbl AS dte,numagri_ligbl AS numagri,cdclibl AS ncli,numadr_ligbl AS numadr FROM Fiches_Ligbl LEFT JOIN Fiches_Bl ON numbl=num_ligbl WHERE code_ligbl " & cond & "  AND dte_ligbl BETWEEN &2 AND &3 AND fam_ligbl = &1 AND type IN('B','F') UNION ALL SELECT code_ligfac AS code,fam_ligfac AS fam,REPLACE(qte_ligfac,',','.') AS qte,dtligbl_ligfac AS dte,numagri_ligfac AS numagri,cdclifac as ncli,numadr_ligfac AS numadr FROM Fiches_HistoLigfac LEFT JOIN Fiches_HistoFac ON numfac=num_ligfac WHERE code_ligfac " & cond & " AND dtligbl_ligfac BETWEEN &2 AND &3 AND fam_ligfac = &1 ORDER BY dte"
     If rsomme.Value Then
       req = "SELECT SUM(qte) as qte, code,numagri,ncli,numadr FROM (" & req & ") as a GROUP BY numagri,ncli,code,numadr ORDER BY ncli"
     Endif

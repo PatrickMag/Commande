@@ -20,6 +20,9 @@
     { Menu1 Menu
       Text = ("Fiche TIPCE")
     }
+    { Citeo Menu
+      Text = ("Citeo")
+    }
     { postit Menu
       Text = ("Post it")
     }
@@ -93,7 +96,7 @@
           Text = ("ZZZZZ")
         }
         { Checkattrib CheckBox
-          MoveScaled(27,6,20,2.6667)
+          MoveScaled(27,6,20,2.625)
           Text = ("Non attribuées")
         }
         { Radiocomliv CheckBox
@@ -102,8 +105,8 @@
         }
         { credit Label
           MoveScaled(41,10,13,3)
-          Text = ("Crédit : ")
           Alignment = Align.Right
+          Text = ("Crédit : ")
         }
       }
       { GridView1 GridView

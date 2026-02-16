@@ -1,0 +1,82 @@
+' Gambas class file
+
+Private Const $fut As String = "'47','48','49','50','52','75'"
+
+Public Sub _new()
+  
+  Dim ch As Chainage
+  
+  ch = New Chainage([dtdeb, dtfin, type, Nop, fcsv])
+  dtdeb.SetFocus
+  type_LostFocus()
+
+End
+
+Public Sub fcsv_Click()
+
+  Dim hfil As File
+  Dim resent, reslig As Result
+  Dim Bouteilles, futs As Integer
+  
+  resent = connect.cconlaurux.Exec("SELECT numfac,dtefac,cdclibl,nmclibl,adr1bl,adr2bl,cpbl,villebl FROM Fiches_Bl JOIN Fiches_Cli ON cli_code = cdclibl WHERE cli_typec = &3 AND dtefac BETWEEN &1 AND &2 UNION SELECT numfac,datefac AS dtefac,cdclifac AS cdclibl,nmclifac AS nmclibl,adr1fac AS adr1bl,adr2fac AS adr2bl,cpfac AS cpbl,villefac AS villebl FROM Fiches_HistoFac JOIN Fiches_Cli ON cdclifac = cli_code WHERE cli_typec = &3 AND datefac BETWEEN &1 AND &2", dtdeb.dte.DT, dtfin.dte.FinJour.DT, type.Text)
+  If resent.Available Then 
+    Hfil = Open User.Home & "/Citeo" & dtdeb.dte.D & " _ " & dtfin.dte.D & ".csv" For Write Create
+    Repeat 
+      ProgressBar1.Value = resent.Index / resent.Count
+      Wait 0.001
+      reslig = connect.cconlaurux.Exec("SELECT SUM(nb) * -1 AS nb,'Bouteilles' AS type FROM Fiches_ligcons JOIN Fiches_consigne ON Fiches_consigne.code = codecons WHERE numlig = 'D' AND Fiches_consigne.type = 'B' AND num = &1 GROUP BY type", resent!numfac)
+      If reslig.Available Then 
+        ligdet(resent, reslig, hfil)
+        Bouteilles += reslig!nb
+      Endif 
+      reslig = connect.cconlaurux.Exec("SELECT SUM(nb) * -1 AS nb,'futs' AS type FROM Fiches_ligcons JOIN Fiches_consigne ON Fiches_consigne.code = codecons WHERE numlig = 'D' AND Fiches_ligcons.codecons IN(" & $fut & ") AND num = &1 GROUP BY type", resent!numfac)
+       If reslig.Available Then 
+        ligdet(resent, reslig, hfil)
+        futs += reslig!nb
+      Endif 
+    Until resent.MoveNext()
+    ProgressBar1.Value = 1
+    Message.Info("Nb Bouteilles : " & Bouteilles & "\nNb futs : " & futs)
+  Endif
+  
+End
+
+Private Sub ligdet(resent As Result, reslig As Result, hfil As File)
+  
+  Dim rescli, ressoc As Result
+  Dim txt As New String[]
+  
+  rescli = connect.cconlaurux.Exec("SELECT cli_siret FROM Fiches_Cli WHERE cli_code = &1", resent!cdclibl)
+  ressoc = connect.cconlaurux.Exec("SELECT int_sc, siret_sc,cp_sc,burdis_sc FROM Fiches_Societes")
+  txt.Add(Nop.Text)
+  txt.Add(Format(dtdeb.dte.G, "mmm-yy"))
+  txt.Add(Format(resent!dtefac, "dd/mm/yyyy"))
+  txt.Add(resent!nmclibl)
+  txt.Add(rescli!cli_siret)
+  txt.Add(reslig!nb)
+  txt.Add(reslig!type)
+  txt.Add("")
+  txt.Add("")
+  txt.Add(ressoc!int_sc & " " & ressoc!cp_sc & " " & ressoc!burdis_sc)
+  txt.Add(ressoc!siret_sc)
+  txt.Add("En propre")
+  txt.Add("")
+  txt.Add("")
+  
+  Print #hfil, txt.Join(";")
+  
+End
+
+Public Sub type_LostFocus()
+
+  Dim res As Result
+  
+  res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Typec WHERE code = &1", type.Text)
+  If res.Available Then 
+    Label4.Text = res!libelle
+  Else 
+    Message.Error("Type client innexistant")
+    type.SetFocus
+  Endif
+
+End
