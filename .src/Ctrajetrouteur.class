@@ -72,7 +72,7 @@ End
 ' Calculer un segment entre deux points
 Private Sub CalculerUnSegment(pointsOptimises As Collection, keys As String[], index As Integer, allRoutePoints As MapPoint[])
   Dim currentPoint, nextPoint As MapPoint
-  Dim segmentRoute As Collection
+  Dim segmentRoute As MapPoint[]
   
   currentPoint = pointsOptimises[keys[index]]
   nextPoint = pointsOptimises[keys[index + 1]]
@@ -103,42 +103,20 @@ Private Sub CalculerUnSegment(pointsOptimises As Collection, keys As String[], i
 End
 
 ' Ajouter les points d'un segment à la collection complète
-Private Sub AjouterPointsSegment(segmentRoute As Collection, allRoutePoints As MapPoint[])
-  Dim pt As Variant
+Private Sub AjouterPointsSegment(segmentRoute As MapPoint[], allRoutePoints As MapPoint[])
+  Dim pt As MapPoint
   
   For Each pt In segmentRoute
     allRoutePoints.Add(pt)
   Next
 End
 
-' Afficher le trajet sur la carte
+' Afficher le trajet sur la carte (SANS SIMPLIFICATION)
 Private Sub AfficherTrajetSurCarte(mapView As MapView, allRoutePoints As MapPoint[])
   If allRoutePoints.Count >= 2 Then
     Try mapView.Map!trajet.AddPolyLine("ligne_tournee", allRoutePoints, Color.Blue, 3)
     If Error Then
       Print "⚠️ Erreur tracé polyline : " & Error.Text
-      Print "  → Tentative avec moins de points..."
-      Try mapView.Map!trajet.AddPolyLine("ligne_tournee", SimplifierTrajet(allRoutePoints), Color.Blue, 3)
     Endif
   Endif
-End
-
-' Simplifier le trajet en ne gardant qu'un point sur 5
-Private Function SimplifierTrajet(points As MapPoint[]) As MapPoint[]
-  Dim simplifie As New MapPoint[]
-  Dim i As Integer
-  
-  ' Garder le premier point
-  simplifie.Add(points[0])
-  
-  ' Garder 1 point sur 5
-  For i = 5 To points.Max Step 5
-    simplifie.Add(points[i])
-  Next
-  
-  ' Garder le dernier point
-  If points.Max > 0 Then simplifie.Add(points[points.Max])
-  
-  Print "  → Trajet simplifié : " & points.Count & " → " & simplifie.Count & " points"
-  Return simplifie
 End

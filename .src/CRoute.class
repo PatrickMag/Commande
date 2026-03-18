@@ -9,17 +9,16 @@ Public Sub _new()
   h.Async = False
 End
 
-Public Function GetRoute(p1 As MapPoint, p2 As MapPoint) As Collection
+Public Function GetRoute(p1 As MapPoint, p2 As MapPoint) As MapPoint[]
   Dim url As String
   Dim jsonBody As String
   Dim contenu As String
   Dim json1 As Variant
-  Dim routePoints As New Collection
+  Dim routePoints As New MapPoint[]
   
   baseUrl = "https://api.openrouteservice.org/v2/directions/driving-car"
-  apiKey = "" ''a rajouter
+  apiKey = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjQ5ZGE0MTkwNjE0NjRkMGQ5MjY0NmNjYWRiYmYzNmNmIiwiaCI6Im11cm11cjY0In0="
   url = baseUrl
-
   jsonBody = "{ \"coordinates\": [[" & p1.Lon & ", " & p1.Lat & "], [" & p2.Lon & ", " & p2.Lat & "]] }"
   
   h.URL = url
@@ -28,8 +27,8 @@ Public Function GetRoute(p1 As MapPoint, p2 As MapPoint) As Collection
   
   If Left(contenu, 10) = "<!DOCTYPE " Or Left(contenu, 5) = "<html" Then
     Print "⚠ API erreur (HTML)"
-    routePoints.Add(p1, "start")
-    routePoints.Add(p2, "end")
+    routePoints.Add(p1)
+    routePoints.Add(p2)
     Return routePoints
   Endif
   
@@ -37,8 +36,8 @@ Public Function GetRoute(p1 As MapPoint, p2 As MapPoint) As Collection
   
   If IsNull(json1) Or IsNull(json1["routes"]) Then
     Print " Erreur API"
-    routePoints.Add(p1, "start")
-    routePoints.Add(p2, "end")
+    routePoints.Add(p1)
+    routePoints.Add(p2)
     Return routePoints
   Endif
   
@@ -50,9 +49,8 @@ Public Function GetRoute(p1 As MapPoint, p2 As MapPoint) As Collection
   Return routePoints
 End
 
-' ✅ CORRECTION : Algorithme polyline correct pour nombres signés
-Private Function DecodePolyline(encoded As String) As Collection
-  Dim points As New Collection
+Private Function DecodePolyline(encoded As String) As MapPoint[]
+  Dim points As New MapPoint[]
   Dim index As Integer = 0
   Dim lat As Integer = 0
   Dim lng As Integer = 0
@@ -78,7 +76,6 @@ Private Function DecodePolyline(encoded As String) As Collection
       shift += 5
     Loop While b >= 32
     
-    ' ✅ CORRECTION : Gestion correcte du signe
     If (result And 1) = 1 Then
       lat = lat - ((result + 1) / 2)
     Else
@@ -99,7 +96,6 @@ Private Function DecodePolyline(encoded As String) As Collection
       shift += 5
     Loop While b >= 32
     
-
     If (result And 1) = 1 Then
       lng = lng - ((result + 1) / 2)
     Else
@@ -107,7 +103,7 @@ Private Function DecodePolyline(encoded As String) As Collection
     Endif
     
     pt = New MapPoint(lat / 100000.0, lng / 100000.0)
-    points.Add(pt, "pt" & CStr(index))
+    points.Add(pt)
   Wend
   
   Print " Décodé : " & points.Count & " points"
