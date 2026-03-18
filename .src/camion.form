@@ -32,7 +32,7 @@
       MoveScaled(1,1,30,6)
       { Panel8 Panel
         MoveScaled(0,0,28,3)
-        Foreground = &H6F7A7F&
+        Foreground = &H6F7A7F
         Expand = True
         Border = Border.Plain
         { Labelmatam Label
@@ -60,11 +60,11 @@
         MoveScaled(1,1,19,16)
         Arrangement = Arrange.Horizontal
         { ListBox1 GridView
-          MoveScaled(0,0,12,15.8889)
+          MoveScaled(0,0,12,15.875)
           Drop = True
         }
         { ListBox2 ListBox
-          MoveScaled(12,0,7,15.8889)
+          MoveScaled(12,0,7,15.875)
           Enabled = False
         }
       }
@@ -91,7 +91,7 @@
         }
         { Panelcouleur Panel
           MoveScaled(0,11,9,6)
-          Background = &H7FFF00&
+          Background = &H7FFF00
         }
       }
     }
@@ -100,14 +100,18 @@
       Expand = True
       AutoResize = True
       { Butplus Button
-        MoveScaled(0,0,15,4)
+        MoveScaled(0,0,9,4)
         Expand = True
         Picture = Picture["icon:/medium/add"]
       }
       { Butmoins Button
-        MoveScaled(15,0,14,4)
+        MoveScaled(9,0,10,4)
         Expand = True
         Picture = Picture["icon:/medium/delete"]
+      }
+      { btnAfficherTournee Button
+        MoveScaled(19,0,9,4)
+        Picture = Picture["icon:/medium/marker"]
       }
     }
   }

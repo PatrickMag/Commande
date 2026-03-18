@@ -1,0 +1,24 @@
+' Gambas class file
+
+' CAdresseUtils.class - Utilitaires pour les adresses
+
+' Construction intelligente d'adresse
+Static Public Function ConstruireAdresse(adr As String, adr1 As String) As String
+  Dim premierCarAdr As String
+  Dim premierCarAdr1 As String
+  
+  adr = Trim(adr)
+  If Not IsNull(adr1) Then adr1 = Trim(adr1) Else adr1 = ""
+  
+  If adr = "" And adr1 = "" Then Return ""
+  If adr = "" Then Return adr1
+  If adr1 = "" Then Return adr
+  
+  premierCarAdr = Left(adr, 1)
+  premierCarAdr1 = Left(adr1, 1)
+  
+  If premierCarAdr >= "0" And premierCarAdr <= "9" Then Return adr
+  If premierCarAdr1 >= "0" And premierCarAdr1 <= "9" Then Return adr1
+  
+  Return adr
+End

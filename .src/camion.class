@@ -627,3 +627,27 @@ Public Sub edit_Click()
   Desktop.Open(User.Home & "/tmp/tourne.pdf")
 
 End
+
+Public Sub btnAfficherTournee_Click()
+  Dim formCarte As FCarteTournee
+  Dim numTour As String
+  Dim dateLivr As Date
+  
+  If ListBox2.Count = 0 Then
+    Message.Info("Aucune tournée sur ce camion")
+    Return
+  Endif
+  
+  If ListBox2.Index >= 0 Then
+    numTour = ListBox2[ListBox2.Index].Text
+  Else
+    numTour = ListBox2[0].Text
+  Endif
+  
+  dateLivr = ca.datecam
+  
+  formCarte = New FCarteTournee(numTour, dateLivr)
+  formCarte.DefinirClientActuel($lnumcom)
+  formCarte.Show()
+  formCarte.ChargerCarte()
+End

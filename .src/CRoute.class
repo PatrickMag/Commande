@@ -1,0 +1,117 @@
+' Gambas class file
+
+Private baseUrl As String
+Private apiKey As String
+Private h As HttpClient
+
+Public Sub _new()
+  h = New HttpClient
+  h.Async = False
+End
+
+Public Function GetRoute(p1 As MapPoint, p2 As MapPoint) As Collection
+  Dim url As String
+  Dim jsonBody As String
+  Dim contenu As String
+  Dim json1 As Variant
+  Dim routePoints As New Collection
+  
+  baseUrl = "https://api.openrouteservice.org/v2/directions/driving-car"
+  apiKey = "" ''a rajouter
+  url = baseUrl
+
+  jsonBody = "{ \"coordinates\": [[" & p1.Lon & ", " & p1.Lat & "], [" & p2.Lon & ", " & p2.Lat & "]] }"
+  
+  h.URL = url
+  h.Post("application/json", jsonBody, ["Authorization: Bearer " & apiKey])
+  contenu = h.Peek()
+  
+  If Left(contenu, 10) = "<!DOCTYPE " Or Left(contenu, 5) = "<html" Then
+    Print "⚠ API erreur (HTML)"
+    routePoints.Add(p1, "start")
+    routePoints.Add(p2, "end")
+    Return routePoints
+  Endif
+  
+  json1 = JSON.Decode(contenu)
+  
+  If IsNull(json1) Or IsNull(json1["routes"]) Then
+    Print " Erreur API"
+    routePoints.Add(p1, "start")
+    routePoints.Add(p2, "end")
+    Return routePoints
+  Endif
+  
+  Dim polyline As String = json1["routes"][0]["geometry"]
+  routePoints = DecodePolyline(polyline)
+  
+  Print "✅ Trajet : " & routePoints.Count & " points"
+  
+  Return routePoints
+End
+
+' ✅ CORRECTION : Algorithme polyline correct pour nombres signés
+Private Function DecodePolyline(encoded As String) As Collection
+  Dim points As New Collection
+  Dim index As Integer = 0
+  Dim lat As Integer = 0
+  Dim lng As Integer = 0
+  Dim shift As Integer
+  Dim result As Integer
+  Dim b As Integer
+  Dim pt As MapPoint
+  Dim power As Integer
+  Dim i As Integer
+  
+  While index < Len(encoded)
+    ' Décoder latitude
+    shift = 0
+    result = 0
+    Do
+      b = Asc(Mid(encoded, index + 1, 1)) - 63
+      index += 1
+      power = 1
+      For i = 1 To shift
+        power = power * 2
+      Next
+      result = result Or ((b And 31) * power)
+      shift += 5
+    Loop While b >= 32
+    
+    ' ✅ CORRECTION : Gestion correcte du signe
+    If (result And 1) = 1 Then
+      lat = lat - ((result + 1) / 2)
+    Else
+      lat = lat + (result / 2)
+    Endif
+    
+    ' Décoder longitude
+    shift = 0
+    result = 0
+    Do
+      b = Asc(Mid(encoded, index + 1, 1)) - 63
+      index += 1
+      power = 1
+      For i = 1 To shift
+        power = power * 2
+      Next
+      result = result Or ((b And 31) * power)
+      shift += 5
+    Loop While b >= 32
+    
+
+    If (result And 1) = 1 Then
+      lng = lng - ((result + 1) / 2)
+    Else
+      lng = lng + (result / 2)
+    Endif
+    
+    pt = New MapPoint(lat / 100000.0, lng / 100000.0)
+    points.Add(pt, "pt" & CStr(index))
+  Wend
+  
+  Print " Décodé : " & points.Count & " points"
+  
+  Return points
+End
+

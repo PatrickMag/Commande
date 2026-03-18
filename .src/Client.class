@@ -2,34 +2,37 @@
 
 Public co As Commande
 
-Private $lNumcom As Long            'id commande
-Private $bDch As Boolean = True  'Affiche ou non les fenetres camions et date apres click sur validation 
-Private $cli As Rechclient        'recherche client
+Private $lNumcom As Long
+Private $bDch As Boolean = True
+Private $cli As Rechclient
 Private $sncli As String
 Private $inadliv As Integer
 Private $vancval As Variant
 Private $obs As Observer
 
-Private pan As Panel        'pour afficher les commentaires de la fiche client
+Private pan As Panel
 Private but As Button
 Private txt As TextArea
 Private $win As Window
 Private $lab As Label
+Private carte As CCarteClient
+Private carteInitialisee As Boolean = False
 
-Private urlsoc As String      'renseignement societe.com url + mdp
+Private urlsoc As String
 Private token As String
 
 Private DateChooser1 As DateChooser
-                                          'scrolview pour affichage des camions et des dates de livraison souhaitées
 Private scrolcam As New ScrollView(Me)
 Private scroldate As New ScrollView(Me)
 
-Public Sub _new(id As Long)
+Public Sub _new(idCom As Integer, autreParam As Variant)
   
-  co = New Commande(id)
+  ' Stocker l'ID
+  $lNumcom = idCom
+  btnRafraichirCarte.Raise
+  co = New Commande(idCom)
   textnumcl.SetFocus
   If Not co.bCreer Then
-    $lNumcom = id
     affichenb
     afficheclient
     Panel3.Enabled = False
@@ -42,6 +45,7 @@ Public Sub _new(id As Long)
   TabStrip1[0].Text = "Facturation"
   TabStrip1[1].Text = "Livraison"
   Butart.Enabled = False
+  
   'tabstrip 0
   $obs = New Observer(textnumcl) As "saisie"
   $obs = New Observer(textNom) As "saisie"
@@ -55,11 +59,11 @@ Public Sub _new(id As Long)
   textAdr11.Tag = [textAdr, textcp]
   textcp.Tag = [textAdr11, TextVil]
   TextVil.Tag = [textcp, textTou]
+  
   'tabstrip 1
   $obs = New Observer(textNom2) As "saisie"
   $obs = New Observer(textadr2) As "saisie"
   $obs = New Observer(textadr21) As "saisie"
-  $obs = New Observer(textNom2) As "saisie"
   $obs = New Observer(textcp2) As "saisie"
   $obs = New Observer(TextVil2) As "saisie"
   textNom2.tag = [textnom2, textAdr2]
@@ -67,6 +71,7 @@ Public Sub _new(id As Long)
   textAdr21.Tag = [textAdr2, textcp2]
   textcp2.Tag = [textAdr21, TextVil2]
   TextVil2.Tag = [textcp2, textTou]
+  
   'tronc comun
   $obs = New Observer(textTou) As "saisie"
   $obs = New Observer(Texttipp) As "saisie"
@@ -82,15 +87,106 @@ Public Sub _new(id As Long)
   
 End
 
-Public Sub Form_Close()
+Public Sub Form_Open()
+  
+  ' ✅ Protection contre appels multiples
+  If carteInitialisee Then Return
+  
+  ' Initialiser la carte
+  carte = New CCarteClient
+  
+  If Not IsNull(MapView1) Then
+    MapView1.Map.AddTile("OpenStreet", "https://tile.openstreetmap.org/{z}/{x}/{y}.png")
+    MapView1.Map.Center = MapPoint(45.4167, 0.9167)
+    MapView1.Map.Zoom = 8
+    
+    ' Afficher le client si ID valide
+    If $lNumcom > 0 Then
+      carte.AfficherClient(MapView1, $lNumcom, Connect.ccon)
+    Endif
+  Endif
+  
+  ' ✅ Marquer comme initialisé
+  carteInitialisee = True
+  
+End
 
+Public Sub Form_Close()
   connect.ccon.Commit
   Try $win.Close
-   
+End
+
+' Rafraîchir la carte après modification d'adresse
+Private Sub RafraichirCarte()
+  
+  If IsNull(MapView1) Or $lNumcom <= 0 Then Return
+  
+  SauvegarderAdresse()
+  Wait 1
+  carte.AfficherClient(MapView1, $lNumcom, Connect.ccon)
+  
+End
+
+' Sauvegarder l'adresse en base
+Private Sub SauvegarderAdresse()
+  Dim res As Result
+  
+  If $lNumcom <= 0 Then Return
+  
+  res = Connect.ccon.Edit("commande", "idcom=&1", $lNumcom)
+  res!adresse = textAdr.Text
+  res!adresse1 = textAdr11.Text
+  res!cp = textCp.Text
+  res!ville = TextVil.Text
+  res!nom = textNom.Text
+  res!adressel = textAdr2.Text
+  res!adressel1 = textAdr21.Text
+  res!cpl = textCp2.Text
+  res!villel = TextVil2.Text
+  res!noml = textNom2.Text
+  res.Update
+  Connect.ccon.Commit
+  
+End
+
+' Méthode publique pour rafraîchir la carte manuellement
+Public Sub RafraichirCarteManuel()
+  
+  If IsNull(MapView1) Or IsNull(carte) Or $lNumcom <= 0 Then 
+    Print "⚠️ Impossible de rafraîchir"
+    Return
+  Endif
+  
+  Print "🔄 Rafraîchissement de la carte..."
+  
+  ' Afficher le client avec les nouvelles données
+  carte.AfficherClient(MapView1, $lNumcom, Connect.ccon)
+  
+End
+
+Public Sub btnRafraichirCarte_Click()
+  RafraichirCarteManuel()
+End
+
+' Événements sur adresse de facturation
+Public Sub textCp_LostFocus()
+  RafraichirCarte()
+End
+
+Public Sub TextVil_LostFocus()
+  RafraichirCarte()
+End
+
+' Événements sur adresse de livraison  
+Public Sub textCp2_LostFocus()
+  RafraichirCarte()
+End
+
+Public Sub TextVil2_LostFocus()
+  RafraichirCarte()
 End
 
 Public Sub codecoul_Click()
-
   Select Case codecoul.Index
     Case 0
       codecoul.Foreground = Color.Black
@@ -103,11 +199,9 @@ Public Sub codecoul_Click()
     Case 4
       codecoul.Foreground = Color.Green
   End Select
-
 End
 
 Public Sub saisie_keypress()
-
   If Key.code = Key.Enter Or Key.code = Key.Return Or Key.code = Key.Tab Or Key.Code = Key.Down Then
     Last.tag[1].SetFocus
     Try Last.tag[1].Select
@@ -121,42 +215,31 @@ Public Sub saisie_keypress()
     Try Last.text = $vancval
     Try Last.value = $vancval
   Endif
-  
 End
 
 Public Sub saisie_gotfocus()
-
   Try $vancval = Last.text
   Try $vancval = Last.Value
-
 End
 
 Public Sub textnumcl_GotFocus() 
-  
   $sncli = textnumcl.Text
-
 End
 
 Public Sub textnumcl_LostFocus()
-
   If textnumcl.Text Then 
     afflaurux(Val(textnumcl.Text), -1)
   Endif
-  
 End
 
 Public Sub Calc_Click()
-
   Dim c As Calc
-  
   c = New Calc
   C.Show
   c.Raise
-
 End
 
 Public Sub ButVal_Click()
-
   Dim lab As New Label(Panel8)
   
   Butart.Enabled = True
@@ -167,6 +250,7 @@ Public Sub ButVal_Click()
     textTou.SetFocus
     Return
   Endif
+  
   co.com.adresse = textAdr.Text
   co.com.adresse1 = textAdr11.Text
   co.com.adressel = textAdr2.Text
@@ -214,9 +298,31 @@ Public Sub ButVal_Click()
   Endif
   
   affichenb
+  
+  ' Vérifier et mettre à jour les coordonnées
+  If $lNumcom > 0 Then
+    If IsNull(carte) Then
+      carte = New CCarteClient
+    Endif
+    carte.VerifierEtMettreAJourCoordonnees($lNumcom, Connect.ccon)
+    
+    ' ✅ AFFICHER le message immédiatement ICI
+    Dim msg As String = CCarteClient.RecupererMessage()
+    If msg <> "" Then
+      Message.Info(msg)
+    Endif
+  Endif
+  
+  ' Rafraîchir la carte en vert
+  If Not IsNull(MapView1) And $lNumcom > 0 Then
+    If IsNull(carte) Then
+      carte = New CCarteClient
+    Endif
+    carte.AfficherClient(MapView1, $lNumcom, Connect.ccon, Color.Green)
+  Endif
+  
   If $bDch Then
     $bDch = False
-    
     Me.Width = Screen.AvailableWidth  
     Me.Height = Screen.AvailableHeight
     listedescamions($lNumcom)
@@ -229,33 +335,23 @@ Public Sub ButVal_Click()
     scroldate.Height = 200
     scroldate.Width = Screen.AvailableWidth
     listedesdates($lNumcom)
-  
   Endif
   Panel3.Enabled = False
-  
 End
 
 Public Sub Butart_Click()
-
   Dim saisie As Saisiearticle
-  
   saisie = New Saisiearticle($lNumcom, CLong(textnumcl.text), nadr.Text)
   saisie.Raise
-  
 End
 
 Public Sub Buttonqte_Click()
-
   Me.Close
-  
 End
 
 Public Sub ButRech_Click()
-
-Dim rcl As Rechclient
-  
+  Dim rcl As Rechclient
   Try pan.Delete
-  
   rcl = New Rechclient(textnumcl.Text) As "recherche"
   rcl.ShowModal
   $sncli = ""
@@ -263,13 +359,10 @@ Dim rcl As Rechclient
 End
 
 Public Sub recherche_trouver(numcli As Integer, numadr As Integer)
-
   afflaurux(numcli, numadr)
-  
 End
 
 Private Sub afficheincid()
-  
   Dim res As Result
   Dim i As Integer
   Dim scr As ScrollView
@@ -277,7 +370,6 @@ Private Sub afficheincid()
   Dim lab As Label
   Dim txt As TextArea
 
-      'recherche et affichage des incidents de livraison
   res = connect.ccon.Exec("SELECT * FROM commande WHERE siprobleme IS NOT NULL AND numclient=&1", textnumcl.Text)
   If res.Available And $sncli <> textnumcl.Text Then
     res.MoveFirst
@@ -319,13 +411,10 @@ Private Sub afficheincid()
     Next
     $win.Show  
     $sncli = textnumcl.Text
-    
   Endif
-  
 End
 
 Private Sub afflaurux(cle As Integer, cleliv As Integer)
-  
   Dim $res, $res1 As Result
   
   $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_Cli JOIN Fiches_Comptes ON cli_code=compte_cc WHERE cli_code=&1", cle)
@@ -340,7 +429,6 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
       Vsirecl.Background = Color.Green
       If Not FMain.vs.insee Then Vsirecl.Text = "Insee"
       If Not FMain.vs.rcs Then Vsirecl.Text = "RCS"
-      'If Not FMain.vs.bodacc Then Vsirecl.Text = "Bodacc"
       If Not FMain.vs.status Then Vsirecl.Text = "Non active"
       If FMain.vs.procedure Then Vsirecl.Text = "Procedure en cours"
       If Vsirecl.Text Then Vsirecl.Background = Color.Red
@@ -349,6 +437,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
     Vsirecl.Text = ""
     Vsirecl.Background = Color.ButtonBackground
   Endif
+  
   textAdr.Text = $res!cli_adr1
   textAdr11.Text = $res!cli_adr2
   textCp.Text = $res!cli_cd_ptl
@@ -385,7 +474,7 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
     Endif
     nadr.Text = cleliv
   Endif
-  '                                                           Gere la fenetre observation ds le fichier client laurux
+  
   If $res!cli_obs Or Round($res!solde, -2) <> 0 And IsNull(pan) Then
     pan = New Panel(Panel1)
     pan.NoTabFocus = False
@@ -434,37 +523,28 @@ Private Sub afflaurux(cle As Integer, cleliv As Integer)
   Endif
   
   afficheincid
-  
 End
 
 Public Sub but_Click()
-
   pan.Delete
-
 End
 
 Public Sub cop_Click()
-
   textAcom.Text = txt.Text
   pan.Delete
- 
 End
+
 Private Sub affichelivlaurux(cle As Integer)
-  
   Dim $res As Result
-  
   $res = connect.cconlaurux.Exec("SELECT * FROM Fiches_AdrlivC WHERE num=&1", cle)
-  
   TextAdr2.Text = $res!adr1
   textadr21.Text = $res!adr2
   textCp2.Text = $res!cd_ptl
   textNom2.Text = $res!nom
   TextVil2.Text = $res!ville
-  
 End
 
 Private Sub afficheclient()
-    
   textAdr.Text = co.com.adresse
   textAdr11.Text = co.com.adresse1
   TextAdr2.Text = co.com.adressel
@@ -499,26 +579,22 @@ Private Sub afficheclient()
   End Select
   codecoul_Click()
   afficheincid
-  
 End
 
 Private Sub affichenb()
   Dim res As Result
-  
- Label8.Text = "Nb de camion sur la tournée    : " & co.Nbcamionpartourne
- Label9.Text = "Nb de commande sur la tournée  : " & co.Nbclientpartourne
- Label10.Text = "Nb de commande total          : " & co.Nbtotaldecommande
- Label11.Text = "Nb de commande pour ce client : " & co.Nbcommandeancienne
- res = connect.cconlaurux.Exec("SELECT solde FROM Fiches_Comptes WHERE compte_cc=&1", Val(textnumcl.Text))
- If res.Available Then
-   Label14.Text = "Solde du compte :  " & Format(res!solde, "0.00 €")
-   If res!solde > 0 Then Label14.Background = Color.Green Else Label14.Background = Color.Background
- Endif
-
+  Label8.Text = "Nb de camion sur la tournée    : " & co.Nbcamionpartourne
+  Label9.Text = "Nb de commande sur la tournée  : " & co.Nbclientpartourne
+  Label10.Text = "Nb de commande total          : " & co.Nbtotaldecommande
+  Label11.Text = "Nb de commande pour ce client : " & co.Nbcommandeancienne
+  res = connect.cconlaurux.Exec("SELECT solde FROM Fiches_Comptes WHERE compte_cc=&1", Val(textnumcl.Text))
+  If res.Available Then
+    Label14.Text = "Solde du compte :  " & Format(res!solde, "0.00 €")
+    If res!solde > 0 Then Label14.Background = Color.Green Else Label14.Background = Color.Background
+  Endif
 End
 
 Private Sub listedescamions(lNumcom As Long)
-  
   Dim res As Result
   Dim i As Integer
   Dim moncamion As Camion
@@ -537,16 +613,13 @@ Private Sub listedescamions(lNumcom As Long)
     moncamion.Tag = res!idcpc
     res.MoveNext
   Next
-  
 End
 
 Private Sub listedesdates(lNumcom As Long)
-  
   Dim res As Result
   Dim i As Integer
-  
   Dim madate As Saisie
-                           'recherche et affichage des dates de livraison possible pour ce client
+  
   res = Utils.RecCom("datelivraison", True, lNumcom)
   If Not res.Available Then Return
   res.MoveFirst
@@ -554,19 +627,15 @@ Private Sub listedesdates(lNumcom As Long)
     madate = New Saisie("ouvrir", res!datelivr, lNumcom, scrolcam, scroldate)
     res.MoveNext
   Next
-  
 End
 
-
 Public Sub DateChooser1_Activate()
-
   Dim saisie As Saisie
   Dim mescamions As Variant
   Dim moncamion As Camion
-  
   Dim res As Result
   Dim i As Integer
-  '                       recherche et affichage des camions existants à cette date et test si ils ne sont pas déja affiché
+  
   scrolcam.Enabled = True
   mescamions = scrolcam.Children
   res = Utils.RecCom("date", True, DateChooser1.Value)
@@ -580,30 +649,25 @@ Public Sub DateChooser1_Activate()
      res.MoveNext
     Next
   Endif
-                      'création de la dates de livraison pour ce client si elle n'existe pas
+  
   res = Utils.RecCom("dtexist", True, DateChooser1.Value, Str($lNumcom))
   If Not res.Available Then
     saisie = New Saisie("creer", DateChooser1.Value, $lNumcom, scrolcam, scroldate)
   Else
     saisie = New Saisie("ouvrir", DateChooser1.Value, $lNumcom, scrolcam, scroldate)
   Endif
-  
 End
 
 Public Function existecam(c As Variant, lIdcom As Long) As Boolean
-  
   Dim i As Integer
-  
   If c.count = 0 Then Return False
   For i = 0 To c.count - 1 
     If c[i].tag = lIdcom Then Return True
   Next
   Return False
-  
 End
 
 Public Sub Butext_Click()
-
   Dim win As Window
   Dim grdv As GridView
   Dim res As Result
@@ -662,20 +726,15 @@ Public Sub Butext_Click()
      lab.Text = Format(cre, "0.00")
   Endif
   win.ShowModal
-
 End
 
 Public Sub cam_rafraichi()
-
   scrolcam.Refresh
   Wait 0.001
-
 End
 
 Public Sub Vsirecl_MouseDown()
-
   Dim win As Window
-  
   win = FMain.vs.afficher(FMain.vs.existante)
   If Object.IsValid(win) Then
     win.Raise
@@ -684,11 +743,8 @@ Public Sub Vsirecl_MouseDown()
     Vsirecl.Tag = win
     win.Show
   Endif
-  
 End
 
 Public Sub Vsirecl_MouseUp()
-
   Try Vsirecl.Tag.Close
-
 End

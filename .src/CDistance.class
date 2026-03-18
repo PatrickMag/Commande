@@ -1,0 +1,24 @@
+' Gambas class file
+
+' CDistance.class
+' Calcule la distance entre 2 points GPS (en km)
+
+Public Function Calculer(p1 As MapPoint, p2 As MapPoint) As Float
+  Dim lat1, lat2, lon1, lon2 As Float
+  Dim dLat, dLon As Float
+  Dim a, c, R As Float
+
+  lat1 = p1.Lat * Pi / 180
+  lat2 = p2.Lat * Pi / 180
+  lon1 = p1.Lon * Pi / 180
+  lon2 = p2.Lon * Pi / 180
+  
+  dLat = lat2 - lat1
+  dLon = lon2 - lon1
+
+  a = Sin(dLat / 2) ^ 2 + Cos(lat1) * Cos(lat2) * Sin(dLon / 2) ^ 2
+  c = 2 * ASin(Sqr(a))  ' ✅ CORRECTION : Sqr() au lieu de Sqrt()
+  R = 6371  ' Rayon Terre en km
+  
+  Return R * c
+End

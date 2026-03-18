@@ -256,6 +256,8 @@ Public Sub Button4_Click()
     Try connect.ccon.Exec("ALTER TABLE commande ADD numdoss CHAR(14) COLLATE utf8mb4_general_ci")
     Try connect.ccon.Exec("ALTER TABLE commande ADD adlivr INTEGER DEFAULT -1")
     
+    Try Connect.ccon.Exec("ALTER TABLE commande ADD lat DECIMAL(10,7) NULL")
+    Try Connect.ccon.Exec("ALTER TABLE commande ADD lon DECIMAL(10,7) NULL")
     Print Error.Text
 
 End

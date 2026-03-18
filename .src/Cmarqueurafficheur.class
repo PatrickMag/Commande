@@ -1,0 +1,221 @@
+' Gambas class file
+
+' CMarqueurAfficheur.class - Responsable de l'affichage des marqueurs
+
+' Afficher tous les marqueurs sur la carte
+Public Sub AfficherTous(mapView As MapView, pointsOptimises As Collection, idClientActuel As Long)
+  Dim iconVert As Image
+  
+  iconVert = CreerIconeVerte()
+  
+  AfficherMarqueursClients(mapView, pointsOptimises, idClientActuel, iconVert)
+  AfficherClientHorsTournee(mapView, pointsOptimises, idClientActuel, iconVert)
+End
+
+' Afficher les marqueurs des clients de la tournée
+Private Sub AfficherMarqueursClients(mapView As MapView, pointsOptimises As Collection, idClientActuel As Long, iconVert As Image)
+  Dim i As Integer = 0
+  Dim clientKey As String
+  
+  For Each clientKey In pointsOptimises.Keys
+    If EstUnClient(clientKey) Then
+      AfficherUnMarqueur(mapView, pointsOptimises[clientKey], clientKey, i, idClientActuel, iconVert)
+      i += 1
+    Endif
+  Next
+End
+
+' Vérifier si la clé correspond à un client
+Private Function EstUnClient(clientKey As String) As Boolean
+  Return clientKey <> "depot_depart" And clientKey <> "depot_retour"
+End
+
+' Afficher un marqueur individuel
+Private Sub AfficherUnMarqueur(mapView As MapView, point As MapPoint, clientKey As String, index As Integer, idClientActuel As Long, iconVert As Image)
+  Dim nomClient As String
+  Dim estClientActuel As Boolean
+  Dim pointFinal As MapPoint
+  Dim resultat As Variant[]
+  
+  nomClient = ExtraireNomDeCle(clientKey)
+  resultat = ObtenirPointClient(point, clientKey, idClientActuel)
+  
+  If resultat.Count = 2 Then
+    pointFinal = resultat[0]
+    estClientActuel = resultat[1]
+    
+    Print "  🔍 Après ObtenirPointClient: estClientActuel=" & estClientActuel & " pour " & clientKey
+    
+    AfficherPoint(mapView, pointFinal, index, estClientActuel, iconVert)
+    AfficherNom(mapView, pointFinal, nomClient, index, estClientActuel)
+  Endif
+End
+
+' Obtenir le point du client - Retourne [point, estClientActuel]
+Private Function ObtenirPointClient(point As MapPoint, clientKey As String, idClientActuel As Long) As Variant[]
+  Dim resultat As New Variant[]
+  Dim estClientActuel As Boolean = False
+  
+  ' Vérifier si c'est le client actuel (simple vérification de l'ID dans la clé)
+  If idClientActuel > 0 And InStr(clientKey, "client_" & idClientActuel & "_") > 0 Then
+    estClientActuel = True
+    Print "🟢 CLIENT ACTUEL DÉTECTÉ : " & clientKey & " (ID=" & idClientActuel & ")"
+  Endif
+  
+  resultat.Add(point)
+  resultat.Add(estClientActuel)
+  
+  Return resultat
+End
+
+' Afficher le point sur la carte
+Private Sub AfficherPoint(mapView As MapView, point As MapPoint, index As Integer, estClientActuel As Boolean, iconVert As Image)
+  If estClientActuel Then
+    Print "  🎨 Affichage point VERT index=" & index
+    mapView.Map!tournee.AddPoint("point_" & index, point, Color.Green, iconVert)
+  Else
+    mapView.Map!tournee.AddPoint("point_" & index, point, Color.Red)
+  Endif
+End
+
+' Afficher le nom au-dessus du point
+Private Sub AfficherNom(mapView As MapView, point As MapPoint, nom As String, index As Integer, estClientActuel As Boolean)
+  Dim imgNom As Image
+  Dim pointTexte As MapPoint
+  Dim couleur As Integer
+  
+  couleur = If(estClientActuel, Color.Green, Color.Red)
+  imgNom = CreerImageTexte(nom, couleur)
+  pointTexte = New MapPoint(point.Lat + 0.003, point.Lon)
+  mapView.Map!tournee.AddPoint("nom_" & index, pointTexte,, imgNom)
+End
+
+' Extraire le nom depuis la clé
+Private Function ExtraireNomDeCle(clientKey As String) As String
+  Dim parties As String[]
+  Dim nom As String
+  Dim j As Integer
+  
+  parties = Split(clientKey, "_")
+  
+  If parties.Count >= 3 Then
+    nom = parties[2]
+    If parties.Count > 3 Then
+      For j = 3 To parties.Max
+        nom &= " " & parties[j]
+      Next
+    Endif
+  Else
+    nom = "Client"
+  Endif
+  
+  Return nom
+End
+
+' Afficher le client hors tournée (s'il n'est pas dans la liste)
+Private Sub AfficherClientHorsTournee(mapView As MapView, pointsOptimises As Collection, idClientActuel As Long, iconVert As Image)
+  Dim pointClient As MapPoint
+  
+  If idClientActuel <= 0 Then Return
+  If EstClientDansTournee(pointsOptimises, idClientActuel) Then Return
+  
+  pointClient = CCarteClient.GetDernierPoint()
+  
+  If Not IsNull(pointClient) And CCarteClient.GetDernierIdClient() = idClientActuel Then
+    CreerShapeClientActuel(mapView)
+    AfficherPointClientActuel(mapView, pointClient, iconVert)
+    AfficherNomClientActuel(mapView, pointClient)
+  Endif
+End
+
+' Vérifier si le client est dans la tournée
+Private Function EstClientDansTournee(pointsOptimises As Collection, idClientActuel As Long) As Boolean
+  Dim clientKey As String
+  
+  For Each clientKey In pointsOptimises.Keys
+    If InStr(clientKey, "client_" & idClientActuel & "_") > 0 Then
+      Return True
+    Endif
+  Next
+  
+  Return False
+End
+
+' Créer la shape pour le client actuel
+Private Sub CreerShapeClientActuel(mapView As MapView)
+  If IsNull(mapView.Map!client_actuel) Then
+    mapView.Map.AddShape("client_actuel")
+  Else
+    mapView.Map!client_actuel.Clear()
+  Endif
+End
+
+' Afficher le point du client actuel
+Private Sub AfficherPointClientActuel(mapView As MapView, point As MapPoint, iconVert As Image)
+  mapView.Map!client_actuel.AddPoint("client_actuel", point,, iconVert)
+End
+
+' Afficher le nom du client actuel
+Private Sub AfficherNomClientActuel(mapView As MapView, point As MapPoint)
+  Dim imgNom As Image
+  Dim pointTexte As MapPoint
+  
+  imgNom = CreerImageTexte(CCarteClient.GetDernierNom(), Color.Green)
+  pointTexte = New MapPoint(point.Lat + 0.003, point.Lon)
+  mapView.Map!client_actuel.AddPoint("nom_client_actuel", pointTexte,, imgNom)
+End
+
+' Créer une icône verte
+Private Function CreerIconeVerte() As Image
+  Dim img As Image
+  
+  img = New Image(24, 24, Color.Transparent)
+  Paint.Begin(img)
+  Paint.Brush = Paint.Color(Color.Green)
+  Paint.Arc(12, 12, 12)
+  Paint.Fill()
+  Paint.End()
+  
+  Return img
+End
+
+' Créer une image de texte pour le nom
+Private Function CreerImageTexte(texte As String, couleurFond As Integer) As Image
+  Dim img As Image
+  Dim largeur, hauteur As Integer
+  
+  largeur = Len(texte) * 8 + 10
+  hauteur = 30
+  
+  img = New Image(largeur, hauteur, Color.Transparent)
+  
+  Paint.Begin(img)
+  DessinerFond(largeur, hauteur)
+  DessinerBordure(largeur, hauteur, couleurFond)
+  DessinerTexte(texte)
+  Paint.End()
+  
+  Return img
+End
+
+' Dessiner le fond de l'image
+Private Sub DessinerFond(largeur As Integer, hauteur As Integer)
+  Paint.Brush = Paint.Color(Color.SetAlpha(Color.White, 200))
+  Paint.Rectangle(0, 0, largeur, hauteur)
+  Paint.Fill()
+End
+
+' Dessiner la bordure
+Private Sub DessinerBordure(largeur As Integer, hauteur As Integer, couleur As Integer)
+  Paint.Brush = Paint.Color(couleur)
+  Paint.LineWidth = 0
+  Paint.Rectangle(0, 0, largeur, hauteur)
+  Paint.Stroke()
+End
+
+' Dessiner le texte
+Private Sub DessinerTexte(texte As String)
+  Paint.Brush = Paint.Color(Color.Black)
+  Paint.Font.Size = 10
+  Paint.DrawText(texte, 5, 10)
+End

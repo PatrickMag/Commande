@@ -22,8 +22,8 @@
           MoveScaled(0,0,28,3)
           Font = Font["Bold,+1"]
           Expand = True
-          Text = ("Recherche d'un client")
           Alignment = Align.Center
+          Text = ("Recherche d'un client")
         }
         { Vsirecl Button
           MoveScaled(32,0,16,3)
@@ -249,6 +249,7 @@
         { RadioButton1 RadioButton
           MoveScaled(0,0,25,3)
           Text = ("En cours de livraison")
+          Value = True
         }
       }
       { Panel18 Panel
@@ -287,7 +288,7 @@
           Picture = Picture["icon:/medium/open"]
         }
         { Butext Button
-          MoveScaled(16,1,18.7778,3)
+          MoveScaled(16,1,18.75,3)
           Text = ("Extrait de compte")
           Picture = Picture["icon:/medium/archive"]
         }
@@ -300,6 +301,9 @@
         }
       }
     }
+    { MapView1 MapView
+      MoveScaled(53,27,35,24)
+    }
     { Panel11 Panel
       MoveScaled(53,0,35,27)
       Arrangement = Arrange.Vertical
@@ -308,14 +312,13 @@
       { Label13 Label
         MoveScaled(0,1,35,2)
         AutoResize = True
-        Text = ("COMMENTAIRE")
         Alignment = Align.Center
         Border = Border.Plain
+        Text = ("COMMENTAIRE")
       }
       { !TextAcom TextArea
         MoveScaled(0,4,35,23)
         #Public = True
-        Drop = True
         Expand = True
       }
     }
@@ -352,9 +355,14 @@
       }
     }
     { Calc Button
-      MoveScaled(102,38,9,3)
+      MoveScaled(110,38,9,3)
       Ignore = True
       Picture = Picture["icon:/22/computer"]
+    }
+    { btnRafraichirCarte Button
+      MoveScaled(94,38,9,3)
+      Ignore = True
+      Picture = Picture["icon:/medium/marker"]
     }
   }
 }

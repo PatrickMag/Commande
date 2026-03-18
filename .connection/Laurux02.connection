@@ -1,11 +1,13 @@
+# Gambas Connection File 3.0
 [Connection]
 Type="mysql"
-User="maguer"
+Host="localhost"
+Port="3306"
+User="gambas"
+NoPassword=False
 RememberPassword=False
 IgnoreCharset=False
 DisplayMetadata=False
 RememberTemplate=False
 Database="Laurux02"
-Requests=["SELECT * FROM Fiches_Mvt where compte='41104663' and validee = true ORDER BY dte\n"]
-NoPassword=False
 

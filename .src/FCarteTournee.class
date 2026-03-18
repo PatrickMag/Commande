@@ -1,0 +1,107 @@
+' Gambas class file
+
+' FCarteTournee.class - Formulaire tournée
+
+Private carte As CCarteTournee
+Private numTournee As String
+Private dateDelivraison As Date
+Private idClientActuel As Long = 0
+Private dejaCharge As Boolean = False
+Private timerMessage As Timer
+Private zoomPrecedent As Integer = 8
+Private obsMapView As Observer  ' Observer pour bloquer la molette
+
+Public Sub _new(numTour As String, dateLivr As Date)
+  numTournee = numTour
+  dateDelivraison = dateLivr
+End
+
+Public Sub DefinirClientActuel(idClient As Long)
+  idClientActuel = idClient
+End
+
+Public Sub Form_Open()
+  
+  If dejaCharge Then Return
+  
+  If Not IsNull(MapView1) Then
+    MapView1.Map.AddTile("OSM", "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png")
+    MapView1.Map.Center = MapPoint(45.4167, 0.9167)
+    MapView1.Map.Zoom = 8
+    Me.Text = "Tournée " & numTournee & " - " & Format(dateDelivraison, "dd/mm/yyyy")
+    
+    Dim obj As Object
+    Try obj = MapView1.Children[0]
+    If Not Error Then
+      Try obj = obj.Children[0]
+      If Not Error Then
+        obsMapView = New Observer(obj) As "MapViewInternal"
+      Endif
+    Endif
+  Endif
+  
+  dejaCharge = True
+End
+
+Public Sub ChargerCarte()
+  Dim infos As Variant[]
+  Dim chauffeur As String
+  Dim distance As Float
+  
+  If IsNull(MapView1) Then Return
+  
+  Me.Text = "⏳ Chargement tournée " & numTournee & "..."
+  
+  ' Nettoyer les shapes
+  If Not IsNull(MapView1.Map!tournee) Then MapView1.Map!tournee.Clear()
+  If Not IsNull(MapView1.Map!trajet) Then MapView1.Map!trajet.Clear()
+  If Not IsNull(MapView1.Map!depot) Then MapView1.Map!depot.Clear()
+  
+  carte = New CCarteTournee
+  infos = carte.AfficherTournee(MapView1, numTournee, dateDelivraison, Connect.ccon, idClientActuel)
+  
+  ' Récupérer et afficher les infos dans les Labels
+  If infos.Count = 2 Then
+    chauffeur = infos[0]
+    distance = infos[1]
+    
+    LabelChauffeur.Text = "👤 Chauffeur : " & chauffeur
+    LabelDistance.Text = "📏 Distance : " & Format(distance, "0.0") & " km"
+  Else
+    LabelChauffeur.Text = "👤 Chauffeur : Non défini"
+    LabelDistance.Text = "📏 Distance : 0.0 km"
+  Endif
+  
+  Me.Text = "Tournée " & numTournee & " - " & Format(dateDelivraison, "dd/mm/yyyy")
+  
+  ' Vider le message sans l'afficher (déjà affiché sur Client.class)
+  CCarteClient.RecupererMessage()
+  
+End
+
+Public Sub Form_Close()
+End
+
+Public Sub MapViewInternal_MouseWheel()
+  Stop Event
+End
+
+' Limiter les niveaux de zoom
+Public Sub MapView1_Zoom()
+  
+  ' Limiter le zoom entre 9 et 14
+  If MapView1.Map.Zoom < 9 Then
+    MapView1.Map.Zoom = 9
+  Endif
+  
+  If MapView1.Map.Zoom > 14 Then
+    MapView1.Map.Zoom = 14
+  Endif
+  
+  ' Mémoriser le zoom
+  zoomPrecedent = MapView1.Map.Zoom
+  
+  ' Rafraîchir
+  MapView1.Map.Update()
+  MapView1.Refresh()
+End

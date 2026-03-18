@@ -1,0 +1,16 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,67)
+  { MapView1 MapView
+    MoveScaled(0,4,64,63)
+  }
+  { LabelChauffeur Label
+    MoveScaled(1,-1,33,6)
+    Font = Font["+1"]
+  }
+  { LabelDistance Label
+    MoveScaled(34,-1,30,6)
+    Font = Font["+1"]
+  }
+}

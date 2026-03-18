@@ -1,0 +1,141 @@
+' Gambas class file
+
+' CCarteTournee.class - Orchestrateur de l'affichage des tournées (REFACTORISÉ)
+
+Private depotManager As New CDepotManager
+Private shapeManager As New CCarteShapeManager
+Private clientGeocodeur As New CClientGeocodeur
+Private trajetOptimiseur As New CTrajetOptimiseur
+Private marqueurAfficheur As New CMarqueurAfficheur
+Private trajetRouteur As New CTrajetRouteur
+Private depotAfficheur As New CDepotAfficheur
+
+' Variables pour les infos de la tournée
+Private distanceTotale As Float = 0
+Private nomChauffeur As String = ""
+
+' Méthode principale : afficher une tournée complète et retourner les infos
+Public Function AfficherTournee(mapView As MapView, numTournee As String, dateDelivraison As Date, db As Connection, Optional idClientActuel As Long = 0) As Variant[]
+  Dim tousLesPoints As Collection
+  Dim pointsOptimises As Collection
+  Dim infos As New Variant[]
+  
+  Print "🚚 Chargement tournée " & numTournee & " du " & Format(dateDelivraison, "dd/mm/yyyy")
+  
+  If idClientActuel > 0 Then
+    Print "👤 Client actuel : ID " & idClientActuel
+  Endif
+  
+  ' Initialisation
+  depotManager.Initialiser()
+  shapeManager.Initialiser(mapView)
+  
+  ' Récupérer le chauffeur
+  nomChauffeur = RecupererChauffeur(numTournee, dateDelivraison, db)
+  
+  ' Récupération et géocodage des clients
+  tousLesPoints = clientGeocodeur.RecupererClients(numTournee, dateDelivraison, db)
+  
+  If tousLesPoints.Count = 0 Then
+    Print "❌ Aucun client géocodé"
+    infos.Add(nomChauffeur)
+    infos.Add(0.0)
+    Return infos
+  Endif
+  
+  ' Optimisation du trajet
+  pointsOptimises = trajetOptimiseur.Optimiser(tousLesPoints, depotManager.ObtenirPoint())
+  
+  ' Calculer la distance totale
+  distanceTotale = CalculerDistanceTotale(pointsOptimises)
+  
+  ' Affichage sur la carte
+  marqueurAfficheur.AfficherTous(mapView, pointsOptimises, idClientActuel)
+  trajetRouteur.Tracer(mapView, pointsOptimises)
+  depotAfficheur.Afficher(mapView, depotManager.ObtenirPoint())
+  
+  ' Centrer la carte
+  CentrerCarte(mapView)
+  
+  Print "✅ Tournée affichée : " & tousLesPoints.Count & " clients"
+  Print "📏 Distance totale : " & Format(distanceTotale, "0.0") & " km"
+  Print "👤 Chauffeur : " & nomChauffeur
+  
+  ' Retourner les infos
+  infos.Add(nomChauffeur)
+  infos.Add(distanceTotale)
+  Return infos
+End
+
+' Centrer la carte sur le dépôt
+Private Sub CentrerCarte(mapView As MapView)
+  mapView.Map.Center = depotManager.ObtenirPoint()
+  mapView.Map.Zoom = 10
+End
+
+' Récupérer le nom du chauffeur de la tournée
+Private Function RecupererChauffeur(numTournee As String, dateDelivraison As Date, db As Connection) As String
+  Dim rs As Result
+  Dim chauffeur As String = "Non défini"
+  Dim dateStr As String
+  
+  dateStr = Format(dateDelivraison, "yyyy-mm-dd")
+  
+  Print "🔍 DEBUG Chauffeur - Tournée : " & numTournee & ", Date : " & dateStr
+  
+  ' Récupérer depuis commandeparcamion via lignetournepcam
+  Try rs = db.Exec("SELECT cpc.cnumchauf, c.nom, c.prenom, cam.nomducamion " &
+                   "FROM lignetournepcam ltpc " &
+                   "INNER JOIN commandeparcamion cpc ON ltpc.idcpc = cpc.idncomcam " &
+                   "LEFT JOIN chauffeur c ON cpc.cnumchauf = c.idchauffeur " &
+                   "LEFT JOIN camion cam ON cpc.comnumcam = cam.idimat " &
+                   "WHERE ltpc.idnumtourne = &1 AND cpc.datecam = &2 " &
+                   "LIMIT 1", numTournee, dateStr)
+  
+  If Error Then
+    Print "⚠️ Erreur SQL : " & Error.Text
+    Return chauffeur
+  Endif
+  
+  If rs.Available Then
+    Print "  ✅ Chauffeur trouvé !"
+    Print "    - cnumchauf : " & rs["cnumchauf"]
+    Print "    - nom : " & rs["nom"]
+    Print "    - prenom : " & rs["prenom"]
+    
+    ' Récupérer le chauffeur
+    If Not IsNull(rs["prenom"]) And Not IsNull(rs["nom"]) Then
+      chauffeur = rs["prenom"] & " " & rs["nom"]
+    Else If Not IsNull(rs["nom"]) And Trim(rs["nom"]) <> "" Then
+      chauffeur = rs["nom"]
+    Else If Not IsNull(rs["nomducamion"]) Then
+      chauffeur = rs["nomducamion"]
+    Endif
+  Else
+    Print "  ❌ Aucun chauffeur trouvé"
+  Endif
+  
+  Return chauffeur
+End
+
+' Calculer la distance totale de la tournée
+Private Function CalculerDistanceTotale(pointsOptimises As Collection) As Float
+  Dim keys As String[]
+  Dim i As Integer
+  Dim total As Float = 0
+  Dim currentPoint, nextPoint As MapPoint
+  Dim dist As New CDistance
+  
+  keys = pointsOptimises.Keys
+  
+  If keys.Count < 2 Then Return 0
+  
+  ' Calculer la distance de chaque segment
+  For i = 0 To keys.Count - 2
+    currentPoint = pointsOptimises[keys[i]]
+    nextPoint = pointsOptimises[keys[i + 1]]
+    total += dist.Calculer(currentPoint, nextPoint)
+  Next
+  
+  Return total
+End

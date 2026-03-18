@@ -1,0 +1,31 @@
+' Gambas class file
+
+' CDepotAfficheur.class - Responsable de l'affichage du dépôt
+
+' Afficher le dépôt sur la carte
+Public Sub Afficher(mapView As MapView, depot As MapPoint)
+  PreparerShape(mapView)
+  AjouterIconeDepot(mapView, depot)
+End
+
+' Préparer la shape pour le dépôt
+Private Sub PreparerShape(mapView As MapView)
+  If IsNull(mapView.Map!depot) Then
+    mapView.Map.AddShape("depot")
+  Else
+    mapView.Map!depot.Clear()
+  Endif
+End
+
+' Ajouter l'icône du dépôt
+Private Sub AjouterIconeDepot(mapView As MapView, depot As MapPoint)
+  Dim depotIcon As Image
+  
+  depotIcon = ObtenirIconeDepot()
+  mapView.Map!depot.AddPoint("depot_marker", depot,, depotIcon)
+End
+
+' Obtenir l'icône du dépôt
+Private Function ObtenirIconeDepot() As Image
+  Return Picture["icon:/medium/car"].Image
+End

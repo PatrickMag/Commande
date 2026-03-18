@@ -1,0 +1,127 @@
+' Gambas class file
+
+' CTrajetOptimiseur.class - Responsable de l'optimisation du trajet
+
+Private distance As New CDistance
+
+' Optimiser le trajet depuis un dépôt
+Public Function Optimiser(pointsSource As Collection, depot As MapPoint) As Collection
+  Dim visite As New Collection
+  Dim aFaire As Collection
+  
+  Print "🔄 Optimisation du trajet depuis le dépôt..."
+  
+  aFaire = CopierPoints(pointsSource)
+  visite = AlgorithmePlusProcheVoisin(aFaire, depot)
+  AjouterRetourDepot(visite, depot)
+  
+  Print "✅ Trajet optimisé : " & visite.Count & " étapes"
+  
+  Return visite
+End
+
+' Copier les points dans une nouvelle collection
+Private Function CopierPoints(pointsSource As Collection) As Collection
+  Dim copie As New Collection
+  Dim key As String
+  
+  For Each key In pointsSource.Keys
+    copie.Add(pointsSource[key], key)
+  Next
+  
+  Return copie
+End
+
+' Algorithme du plus proche voisin
+Private Function AlgorithmePlusProcheVoisin(aFaire As Collection, depot As MapPoint) As Collection
+  Dim visite As New Collection
+  Dim current As MapPoint
+  Dim compteur As Integer = 0
+  Dim maxIterations As Integer = 100
+  
+  If IsNull(depot) Then
+    Print "❌ ERREUR : Dépôt null !"
+    Return visite
+  Endif
+  
+  current = depot
+  visite.Add(current, "depot_depart")
+  
+  While aFaire.Count > 0
+    compteur += 1
+    
+    ' Protection contre boucle infinie
+    If compteur > maxIterations Then
+      Print "❌ ERREUR : Trop d'itérations, arrêt forcé"
+      Break
+    Endif
+    
+    current = AjouterPlusProcheVoisin(visite, aFaire, current)
+    
+    If IsNull(current) Then
+      Print "❌ ERREUR : Current est devenu null !"
+      Break
+    Endif
+  Wend
+  
+  Return visite
+End
+
+' Trouver et ajouter le plus proche voisin
+Private Function AjouterPlusProcheVoisin(visite As Collection, aFaire As Collection, current As MapPoint) As MapPoint
+  Dim resultat As Variant[]
+  Dim nearest As MapPoint
+  Dim nearestKey As String
+  Dim minDist As Float
+  
+  resultat = TrouverPlusProche(aFaire, current)
+  
+  If resultat.Count = 3 Then
+    nearest = resultat[0]
+    nearestKey = resultat[1]
+    minDist = resultat[2]
+    
+    If Not IsNull(nearest) Then
+      visite.Add(nearest, nearestKey)
+      aFaire.Remove(nearestKey)
+      Return nearest
+    Endif
+  Endif
+  
+  ' Si aucun point trouvé, forcer l'arrêt
+  Print "⚠️ Aucun point trouvé, arrêt de l'optimisation"
+  aFaire.Clear()
+  Return current
+End
+
+' Trouver le point le plus proche - Retourne [nearest, nearestKey, minDist]
+Private Function TrouverPlusProche(aFaire As Collection, current As MapPoint) As Variant[]
+  Dim key As String
+  Dim dist As Float
+  Dim minDist As Float = 999999
+  Dim nearest As MapPoint = Null
+  Dim nearestKey As String = ""
+  Dim resultat As New Variant[]
+  
+  For Each key In aFaire.Keys
+    dist = distance.Calculer(current, aFaire[key])
+    If dist < minDist Then
+      minDist = dist
+      nearest = aFaire[key]
+      nearestKey = key
+    Endif
+  Next
+  
+  If Not IsNull(nearest) Then
+    resultat.Add(nearest)
+    resultat.Add(nearestKey)
+    resultat.Add(minDist)
+  Endif
+  
+  Return resultat
+End
+
+' Ajouter le retour au dépôt
+Private Sub AjouterRetourDepot(visite As Collection, depot As MapPoint)
+  visite.Add(depot, "depot_retour")
+End

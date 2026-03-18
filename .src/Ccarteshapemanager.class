@@ -1,0 +1,34 @@
+' Gambas class file
+
+' CCarteShapeManager.class - Responsable de la gestion des shapes de la carte
+
+' Initialiser toutes les shapes nécessaires
+Public Sub Initialiser(mapView As MapView)
+  InitialiserShape(mapView, "tournee")
+  InitialiserShape(mapView, "trajet")
+  InitialiserShape(mapView, "depot")
+End
+
+' Initialiser une shape spécifique
+Private Sub InitialiserShape(mapView As MapView, shapeName As String)
+  If IsNull(mapView.Map[shapeName]) Then
+    mapView.Map.AddShape(shapeName)
+  Else
+    mapView.Map[shapeName].Clear()
+  Endif
+End
+
+' Nettoyer toutes les shapes
+Public Sub Nettoyer(mapView As MapView)
+  NettoyerShape(mapView, "tournee")
+  NettoyerShape(mapView, "trajet")
+  NettoyerShape(mapView, "depot")
+  NettoyerShape(mapView, "client_actuel")
+End
+
+' Nettoyer une shape spécifique
+Private Sub NettoyerShape(mapView As MapView, shapeName As String)
+  If Not IsNull(mapView.Map[shapeName]) Then
+    mapView.Map[shapeName].Clear()
+  Endif
+End

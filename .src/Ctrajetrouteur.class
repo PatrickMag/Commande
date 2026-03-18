@@ -1,0 +1,144 @@
+' Gambas class file
+
+' CTrajetRouteur.class - Responsable du traçage du trajet routier
+
+Private route As New CRoute
+
+' Tracer le trajet routier complet
+Public Sub Tracer(mapView As MapView, pointsOptimises As Collection)
+  Dim allRoutePoints As MapPoint[]
+  
+  Print "🛣️ Calcul du trajet routier (avec fallback)..."
+  
+  ' Essayer le routing réel avec protection
+  Try allRoutePoints = CalculerTousLesSegments(pointsOptimises)
+  
+  If Error Or IsNull(allRoutePoints) Or allRoutePoints.Count = 0 Then
+    Print "  ⚠️ Routing API échoué, utilisation lignes droites"
+    allRoutePoints = TracerLignesDroites(pointsOptimises)
+  Endif
+  
+  AfficherTrajetSurCarte(mapView, allRoutePoints)
+  Print "✅ Trajet tracé"
+End
+
+' Tracer des lignes droites si l'API échoue
+Private Function TracerLignesDroites(pointsOptimises As Collection) As MapPoint[]
+  Dim keys As String[]
+  Dim allPoints As New MapPoint[]
+  Dim i As Integer
+  
+  If IsNull(pointsOptimises) Or pointsOptimises.Count = 0 Then
+    Print "⚠️ Aucun point à tracer"
+    Return allPoints
+  Endif
+  
+  keys = pointsOptimises.Keys
+  
+  For i = 0 To keys.Max
+    allPoints.Add(pointsOptimises[keys[i]])
+  Next
+  
+  Return allPoints
+End
+
+' Calculer tous les segments du trajet
+Private Function CalculerTousLesSegments(pointsOptimises As Collection) As MapPoint[]
+  Dim keys As String[]
+  Dim allRoutePoints As New MapPoint[]
+  Dim i As Integer
+  
+  keys = pointsOptimises.Keys
+  
+  If keys.Count < 2 Then
+    Print "  ⚠️ Pas assez de points pour calculer un trajet"
+    Return allRoutePoints
+  Endif
+  
+  Print "  🔍 Tentative routing API pour " & (keys.Count - 1) & " segments..."
+  
+  For i = 0 To keys.Count - 2
+    Try CalculerUnSegment(pointsOptimises, keys, i, allRoutePoints)
+    If Error Then
+      Print "  ❌ Erreur segment " & (i + 1) & " : " & Error.Text
+    Endif
+  Next
+  
+  Print "  ✅ Routing terminé : " & allRoutePoints.Count & " points calculés"
+  
+  Return allRoutePoints
+End
+
+' Calculer un segment entre deux points
+Private Sub CalculerUnSegment(pointsOptimises As Collection, keys As String[], index As Integer, allRoutePoints As MapPoint[])
+  Dim currentPoint, nextPoint As MapPoint
+  Dim segmentRoute As Collection
+  
+  currentPoint = pointsOptimises[keys[index]]
+  nextPoint = pointsOptimises[keys[index + 1]]
+  
+  Print "    📍 Segment " & (index + 1) & " : " & Format(currentPoint.Lat, "0.00") & "," & Format(currentPoint.Lon, "0.00") & " → " & Format(nextPoint.Lat, "0.00") & "," & Format(nextPoint.Lon, "0.00")
+  
+  ' Protection complète : timeout + erreur
+  Try segmentRoute = route.GetRoute(currentPoint, nextPoint)
+  
+  If Error Then
+    Print "      ❌ Erreur API : " & Error.Text
+    allRoutePoints.Add(currentPoint)
+    allRoutePoints.Add(nextPoint)
+    Print "      ➡️ Ligne droite utilisée"
+  Else If IsNull(segmentRoute) Or segmentRoute.Count = 0 Then
+    Print "      ⚠️ API retourne vide"
+    allRoutePoints.Add(currentPoint)
+    allRoutePoints.Add(nextPoint)
+    Print "      ➡️ Ligne droite utilisée"
+  Else
+    ' API a fonctionné, ajouter les points du routing réel
+    AjouterPointsSegment(segmentRoute, allRoutePoints)
+    Print "      ✅ Routing OK : " & segmentRoute.Count & " points"
+  Endif
+  
+  ' Laisser respirer l'interface
+  Wait 0.1
+End
+
+' Ajouter les points d'un segment à la collection complète
+Private Sub AjouterPointsSegment(segmentRoute As Collection, allRoutePoints As MapPoint[])
+  Dim pt As Variant
+  
+  For Each pt In segmentRoute
+    allRoutePoints.Add(pt)
+  Next
+End
+
+' Afficher le trajet sur la carte
+Private Sub AfficherTrajetSurCarte(mapView As MapView, allRoutePoints As MapPoint[])
+  If allRoutePoints.Count >= 2 Then
+    Try mapView.Map!trajet.AddPolyLine("ligne_tournee", allRoutePoints, Color.Blue, 3)
+    If Error Then
+      Print "⚠️ Erreur tracé polyline : " & Error.Text
+      Print "  → Tentative avec moins de points..."
+      Try mapView.Map!trajet.AddPolyLine("ligne_tournee", SimplifierTrajet(allRoutePoints), Color.Blue, 3)
+    Endif
+  Endif
+End
+
+' Simplifier le trajet en ne gardant qu'un point sur 5
+Private Function SimplifierTrajet(points As MapPoint[]) As MapPoint[]
+  Dim simplifie As New MapPoint[]
+  Dim i As Integer
+  
+  ' Garder le premier point
+  simplifie.Add(points[0])
+  
+  ' Garder 1 point sur 5
+  For i = 5 To points.Max Step 5
+    simplifie.Add(points[i])
+  Next
+  
+  ' Garder le dernier point
+  If points.Max > 0 Then simplifie.Add(points[points.Max])
+  
+  Print "  → Trajet simplifié : " & points.Count & " → " & simplifie.Count & " points"
+  Return simplifie
+End

@@ -1,0 +1,270 @@
+' Gambas class file
+
+' CCarteClient.class - Affichage client sur carte
+
+Private geo As New CGeocode
+
+' Variables statiques pour partage entre instances
+Static Private dernierIdClient As Long = 0
+Static Private dernierPoint As MapPoint = Null
+Static Private dernierNom As String = ""
+Static Private messageEnAttente As String = ""
+
+' Méthodes statiques pour récupération
+Static Public Function GetDernierPoint() As MapPoint
+  Return dernierPoint
+End
+
+Static Public Function GetDernierIdClient() As Long
+  Return dernierIdClient
+End
+
+Static Public Function GetDernierNom() As String
+  Return dernierNom
+End
+
+Static Public Function RecupererMessage() As String
+  Dim msg As String = messageEnAttente
+  messageEnAttente = ""
+  Return msg
+End
+
+Public Sub AfficherClient(mapView As MapView, idcom As Integer, db As Connection, Optional couleur As Integer = Color.Red)
+  Dim rs As Result
+  Dim nom, adresse, adresse1, cp, ville As String
+  Dim nomL, adresseL, adresseL1, cpL, villeL As String
+  Dim nomF, adresseF, adresseF1, cpF, villeF As String
+  Dim point As MapPoint
+  Dim adresseComplete As String
+  
+  rs = Connect.ccon.Exec("SELECT nom, adresse, adresse1, cp, ville, noml, adressel, adressel1, cpl, villel FROM commande WHERE idcom = &1", idcom)
+  
+  If Not rs.Available Then
+    Print "❌ Commande introuvable"
+    Return
+  Endif
+  
+  ' Sauvegarder adresse facturation
+  nomF = rs["nom"]
+  adresseF = rs["adresse"]
+  adresseF1 = rs["adresse1"]
+  cpF = rs["cp"]
+  villeF = rs["ville"]
+  
+  nom = nomF
+  adresse = adresseF
+  adresse1 = adresseF1
+  cp = cpF
+  ville = villeF
+  
+  nomL = rs["noml"]
+  adresseL = rs["adressel"]
+  adresseL1 = rs["adressel1"]
+  cpL = rs["cpl"]
+  villeL = rs["villel"]
+  
+  ' Utiliser adresse livraison si disponible
+  If Not IsNull(nomL) And Trim(nomL) <> "" Then
+    nom = nomL
+    adresse = adresseL
+    adresse1 = adresseL1
+    cp = cpL
+    ville = villeL
+  Endif
+  
+  Print "📍 " & nom & " - " & ville
+  
+  ' Tentative 1 : Adresse intelligente
+  adresseComplete = CAdresseUtils.ConstruireAdresse(adresse, adresse1)
+  point = geo.GetCoordinates(adresseComplete & " " & ville, cp)
+  
+  ' Tentative 2 : Facturation si livraison échoue
+  If IsNull(point) And Not IsNull(nomL) And Trim(nomL) <> "" Then
+    Print "⚠️ Livraison échouée, essai facturation..."
+    adresseComplete = CAdresseUtils.ConstruireAdresse(adresseF, adresseF1)
+    point = geo.GetCoordinates(adresseComplete & " " & villeF, cpF)
+    If Not IsNull(point) Then
+      nom = nomF
+      cp = cpF
+      ville = villeF
+    Endif
+  Endif
+  
+  ' Tentative 3 : Ville seule
+  If IsNull(point) Then
+    Print "⚠️ Adresse échouée, essai ville seule..."
+    point = geo.GetCoordinates(ville, cp)
+  Endif
+  
+  If IsNull(point) Then
+    Print "❌ Géocodage impossible"
+    Return
+  Endif
+  
+  Print "✅ Coordonnées : " & Format(point.Lat, "0.0000") & ", " & Format(point.Lon, "0.0000")
+  
+  ' Sauvegarder pour réutilisation
+  dernierIdClient = idcom
+  dernierPoint = point
+  dernierNom = nom
+  
+  ' Sauvegarder dans la BDD
+  SauvegarderCoordonnees(db, idcom, point)
+  
+  AfficherPointSurCarte(mapView, point, nom, couleur)
+End
+
+Private Sub AfficherPointSurCarte(mapView As MapView, point As MapPoint, nom As String, couleur As Integer)
+  Dim shapeName As String = "marker"
+  
+  If IsNull(mapView.Map!marker) Then
+    mapView.Map.AddShape(shapeName)
+  Else
+    mapView.Map!marker.Clear()
+  Endif
+  
+  mapView.Map!marker.AddPoint("point", point, couleur)
+  
+  mapView.Map.Center = point
+  mapView.Map.Zoom = 14
+  
+  Print "✅ " & nom & " affiché"
+End
+
+' Sauvegarder les coordonnées dans la BDD
+Private Sub SauvegarderCoordonnees(db As Connection, idcom As Integer, point As MapPoint)
+  Try db.Begin
+  Try db.Exec("UPDATE commande SET lat = &1, lon = &2 WHERE idcom = &3", point.Lat, point.Lon, idcom)
+  Try db.Commit
+  
+  If Error Then
+    Print "⚠️ Erreur sauvegarde coordonnées : " & Error.Text
+    Try db.Rollback
+  Else
+    Print "💾 Coordonnées sauvegardées pour client " & idcom
+  Endif
+End
+
+' Vérifier et mettre à jour les coordonnées
+Public Function VerifierEtMettreAJourCoordonnees(idcom As Integer, db As Connection) As Boolean
+  Dim rs As Result
+  Dim nom, adresse, adresse1, cp, ville As String
+  Dim nomL, adresseL, adresseL1, cpL, villeL As String
+  Dim nomF, adresseF, adresseF1, cpF, villeF As String
+  Dim point As MapPoint
+  Dim anciennesCoord As MapPoint
+  Dim adresseComplete As String
+  Dim typeFallback As String = ""
+  Dim coordonneesChangees As Boolean = False
+  
+  rs = Connect.ccon.Exec("SELECT nom, adresse, adresse1, cp, ville, noml, adressel, adressel1, cpl, villel, lat, lon FROM commande WHERE idcom = &1", idcom)
+  
+  If Not rs.Available Then Return False
+  
+  ' Sauvegarder anciennes coordonnées
+  If Not IsNull(rs["lat"]) And Not IsNull(rs["lon"]) Then
+    anciennesCoord = New MapPoint(rs["lat"], rs["lon"])
+  Endif
+  
+  ' Adresse facturation
+  nomF = rs["nom"]
+  adresseF = rs["adresse"]
+  adresseF1 = rs["adresse1"]
+  cpF = rs["cp"]
+  villeF = rs["ville"]
+  
+  nom = nomF
+  adresse = adresseF
+  adresse1 = adresseF1
+  cp = cpF
+  ville = villeF
+  
+  nomL = rs["noml"]
+  adresseL = rs["adressel"]
+  adresseL1 = rs["adressel1"]
+  cpL = rs["cpl"]
+  villeL = rs["villel"]
+  
+  ' Utiliser adresse livraison si disponible
+  If Not IsNull(nomL) And Trim(nomL) <> "" Then
+    nom = nomL
+    adresse = adresseL
+    adresse1 = adresseL1
+    cp = cpL
+    ville = villeL
+  Endif
+  
+  Print "🔍 Vérification géocodage pour " & nom
+  
+  ' TENTATIVE 1 : Adresse intelligente
+  adresseComplete = CAdresseUtils.ConstruireAdresse(adresse, adresse1)
+  point = geo.GetCoordinates(adresseComplete & " " & ville, cp)
+  
+  ' TENTATIVE 2 : Facturation si livraison échoue
+  If IsNull(point) And Not IsNull(nomL) And Trim(nomL) <> "" Then
+    Print "⚠️ Livraison échouée, essai facturation..."
+    adresseComplete = CAdresseUtils.ConstruireAdresse(adresseF, adresseF1)
+    point = geo.GetCoordinates(adresseComplete & " " & villeF, cpF)
+    If Not IsNull(point) Then
+      typeFallback = "facturation"
+      nom = nomF
+      cp = cpF
+      ville = villeF
+    Endif
+  Endif
+  
+  ' TENTATIVE 3 : Ville seule
+  If IsNull(point) Then
+    Print "⚠️ Adresse échouée, essai ville seule..."
+    point = geo.GetCoordinates(ville, cp)
+    If Not IsNull(point) Then
+      typeFallback = "ville"
+    Endif
+  Endif
+  
+  ' Si échec complet
+  If IsNull(point) Then
+    messageEnAttente = "GEOCODAGE IMPOSSIBLE" & Chr(10) & Chr(10)
+    messageEnAttente &= "Client : " & nom & Chr(10) & Chr(10)
+    messageEnAttente &= "Impossible de localiser cette adresse." & Chr(10) & Chr(10)
+    messageEnAttente &= "Verifiez l'adresse, le code postal et la ville."
+    Return False
+  Endif
+  
+  ' Vérifier si coordonnées ont changé
+  If Not IsNull(anciennesCoord) Then
+    If Abs(point.Lat - anciennesCoord.Lat) > 0.0001 Or Abs(point.Lon - anciennesCoord.Lon) > 0.0001 Then
+      coordonneesChangees = True
+      Print "📍 Coordonnées mises à jour"
+    Else
+      Print "✅ Coordonnées inchangées"
+    Endif
+  Endif
+  
+  ' Sauvegarder dans BDD
+  SauvegarderCoordonnees(db, idcom, point)
+  
+  ' Sauvegarder pour réutilisation
+  dernierIdClient = idcom
+  dernierPoint = point
+  dernierNom = nom
+  
+  ' STOCKER les messages (affichage plus tard)
+  If typeFallback = "facturation" Then
+    messageEnAttente = "ADRESSE DE LIVRAISON INTROUVABLE" & Chr(10) & Chr(10)
+    messageEnAttente &= "Client : " & nom & Chr(10) & Chr(10)
+    messageEnAttente &= "L'adresse de facturation a ete utilisee pour la geolocalisation." & Chr(10) & Chr(10)
+    messageEnAttente &= "Verifiez l'adresse de livraison saisie."
+    
+  Else If typeFallback = "ville" Then
+    messageEnAttente = "ADRESSE PRECISE INTROUVABLE" & Chr(10) & Chr(10)
+    messageEnAttente &= "Client : " & nom & Chr(10) & Chr(10)
+    messageEnAttente &= "Seule la ville a pu etre geolocalisee." & Chr(10) & Chr(10)
+    messageEnAttente &= "Verifiez que le numero de rue est bien renseigne."
+    
+  Else If coordonneesChangees Then
+    messageEnAttente = "Localisation mise a jour pour " & nom
+  Endif
+  
+  Return True
+End

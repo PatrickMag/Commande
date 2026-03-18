@@ -1,0 +1,21 @@
+' Gambas class file
+
+' CDepotManager.class - Responsable de la gestion du dépôt
+
+Private depot As MapPoint
+
+' Initialiser le dépôt
+Public Sub Initialiser()
+  depot = CreerDepot()
+  Print "✅ Dépôt défini : Thiviers"
+End
+
+' Créer le point du dépôt
+Private Function CreerDepot() As MapPoint
+  Return New MapPoint(45.4167, 0.9167)  ' Thiviers
+End
+
+' Obtenir le point du dépôt
+Public Function ObtenirPoint() As MapPoint
+  Return depot
+End

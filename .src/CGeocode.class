@@ -1,0 +1,41 @@
+' Gambas class file
+
+Private baseUrl As String = "https://nominatim.openstreetmap.org/search?format=json&q="
+
+Public Function GetCoordinates(adresse As String, code_postal As String) As MapPoint
+  Dim h As New HttpClient
+  Dim contenu As String
+  Dim json1 As Variant
+  Dim requete As String
+  
+  ' Configuration
+  h.Async = False
+  requete = Replace(adresse, " ", "+") & "+" & code_postal & "+France"
+  h.URL = baseUrl & requete
+  
+  ' Requête
+  h.Get(["User-Agent: GambasRoutingApp/1.0", "Accept: application/json"])
+  
+  ' Lecture réponse
+  contenu = h.Peek()
+  
+  ' Debug
+  If Left(contenu, 1) <> "[" Then
+    Print "⚠️ Réponse API inattendue : " & Left(contenu, 100)
+    Return Null
+  Endif
+  
+  ' JSON
+  json1 = JSON.Decode(contenu)
+  
+  ' ✅ Vérifier que le tableau existe ET contient des éléments
+  If Not IsNull(json1) Then
+    If json1.Count > 0 Then  ' ← Vérifier la taille du tableau
+      Print "✅ Géocodage réussi : " & json1[0]["display_name"]
+      Return New MapPoint(CFloat(json1[0]["lat"]), CFloat(json1[0]["lon"]))
+    Endif
+  Endif
+  
+  Print "❌ Aucun résultat pour : " & requete
+  Return Null
+End
