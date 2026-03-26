@@ -1,7 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,64,70)
+  MoveScaled(0,0,64,86)
   Text = ("Base")
   { Label1 Label
     MoveScaled(3,7,16,3)
@@ -42,30 +42,30 @@
     Text = ("3306")
   }
   { Button1 Button
-    MoveScaled(2,59,14,5)
+    MoveScaled(2,77,14,5)
     Text = ("Valider")
     Picture = Picture["icon:/32/apply"]
   }
   { Button2 Button
-    MoveScaled(48,59,14,5)
+    MoveScaled(48,77,14,5)
     Text = ("Quitter")
     Picture = Picture["icon:/32/close"]
   }
   { pp CheckBox
-    MoveScaled(6,51,21,3)
+    MoveScaled(6,69,21,3)
     Text = ("Produits petroliers")
   }
   { bois CheckBox
-    MoveScaled(45,51,13,2)
+    MoveScaled(45,70,13,2)
     Text = ("Boissons")
   }
   { Button3 Button
-    MoveScaled(18,59,14,5)
+    MoveScaled(18,77,14,5)
     Text = ("Création")
     Picture = Picture["icon:/32/add"]
   }
   { Button4 Button
-    MoveScaled(33,59,14,5)
+    MoveScaled(33,77,14,5)
     Text = ("Mise à jour")
     Picture = Picture["icon:/32/apply"]
   }
@@ -92,6 +92,24 @@
     }
     { nsoc TextReg
       MoveScaled(10,14,47,3)
+    }
+  }
+  { Frame2 Frame
+    MoveScaled(2,52,58,16)
+    Text = ("OpenStreetView")
+    { Label9 Label
+      MoveScaled(1,3,7,3)
+      Text = ("URL :")
+    }
+    { Label10 Label
+      MoveScaled(1,10,6,3)
+      Text = ("Clef  : ")
+    }
+    { urlstreet TextReg
+      MoveScaled(10,3,47,3)
+    }
+    { keystreet TextReg
+      MoveScaled(10,10,47,3)
     }
   }
 }

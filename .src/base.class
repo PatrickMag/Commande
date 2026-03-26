@@ -18,7 +18,9 @@ Public Sub Form_Open()
   Try urlsoc.Text = Settings["Soc/URL"]
   Try token.Text = Settings["Soc/token"]
   Try nsoc.Text = Settings["Soc/soc"]
-
+  Try keystreet.Text = Settings["Street/token"] 
+  Try urlstreet.Text = Settings["Street/url"] 
+  
 End
 
 Public Sub Button2_Click()
@@ -61,6 +63,8 @@ Public Sub Button1_Click()
   Settings["Soc/URL"] = urlsoc.Text
   Settings["Soc/token"] = token.Text
   Settings["Soc/soc"] = nsoc.Text
+  Settings["Street/token"] = keystreet.Text
+  Settings["Street/url"] = urlstreet.Text
   
   Settings.Save
   Me.Close

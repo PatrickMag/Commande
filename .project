@@ -15,6 +15,7 @@ Component=gb.util
 Component=gb.settings
 Component=gb.net
 Component=gb.net.curl
+Component=gb.map
 Component=gb.mysql
 Component=gb.pcre
 Component=gb.report2
