@@ -646,7 +646,7 @@ Public Sub btnAfficherTournee_Click()
   
   dateLivr = ca.datecam
   
-  formCarte = New FCarteTournee(numTour, dateLivr)
+  formCarte = New FCarteTournee($lNumcam, dateLivr, ca.comnumcam)
   formCarte.DefinirClientActuel($lnumcom)
   formCarte.Show()
   formCarte.ChargerCarte()

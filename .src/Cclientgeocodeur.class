@@ -4,13 +4,13 @@
 
 Private geo As New CGeocode
 
-' Récupérer et géocoder tous les clients d'une tournée
-Public Function RecupererClients(numTournee As String, dateDelivraison As Date, db As Connection) As Collection
+' ✅ MODIFICATION : idcpc au lieu de numTournee
+Public Function RecupererClients(idcpc As Integer, db As Connection) As Collection
   Dim rs As Result
   Dim clients As New Collection
   Dim i As Integer
   
-  rs = ExecuterRequeteClients(numTournee, dateDelivraison, db)
+  rs = ExecuterRequeteClients(idcpc, db)
   
   If Not rs.Available Then
     Print "❌ Aucun client sur cette tournée"
@@ -28,19 +28,18 @@ Public Function RecupererClients(numTournee As String, dateDelivraison As Date, 
   Return clients
 End
 
-' Exécuter la requête SQL pour récupérer les clients
-Private Function ExecuterRequeteClients(numTournee As String, dateDelivraison As Date, db As Connection) As Result
-  Return Connect.ccon.Exec("SELECT DISTINCT c.idcom, c.nom, c.adresse, c.adresse1, c.cp, c.ville, " &
+' ✅ TA REQUÊTE SIMPLIFIÉE (basée sur ton schéma)
+Private Function ExecuterRequeteClients(idcpc As Integer, db As Connection) As Result
+  Print "🔍 DEBUG SQL - idcpc: " & idcpc
+  
+  Return db.Exec("SELECT DISTINCT c.idcom, c.nom, c.adresse, c.adresse1, c.cp, c.ville, " &
                  "c.noml, c.adressel, c.adressel1, c.cpl, c.villel, c.lat, c.lon " &
                  "FROM commande c " &
                  "INNER JOIN lignecomparcamion lcc ON c.idcom = lcc.idcomcl " &
-                 "INNER JOIN commandeparcamion cpc ON lcc.idcpc = cpc.idncomcam " &
-                 "INNER JOIN lignetournepcam ltpc ON cpc.idncomcam = ltpc.idcpc " &
-                 "WHERE ltpc.idnumtourne = &1 AND cpc.datecam = &2 " &
-                 "ORDER BY c.idcom", numTournee, dateDelivraison)
+                 "WHERE lcc.idcpc = &1 " &
+                 "ORDER BY c.idcom", idcpc)
 End
 
-' Géocoder un client et l'ajouter à la collection
 Private Sub GeocoderEtAjouterClient(rs As Result, clients As Collection, db As Connection)
   Dim point As MapPoint
   Dim nom, adresse, adresse1, ville, cp As String
@@ -49,7 +48,6 @@ Private Sub GeocoderEtAjouterClient(rs As Result, clients As Collection, db As C
   Dim idcom As Integer = rs["idcom"]
   Dim geocodagePrecis As Boolean = False
   
-  ' Extraire les données
   nom = rs["nom"]
   adresse = rs["adresse"]
   adresse1 = rs["adresse1"]
@@ -58,42 +56,40 @@ Private Sub GeocoderEtAjouterClient(rs As Result, clients As Collection, db As C
   
   nomL = rs["noml"]
   
-  ' Utiliser adresse livraison si disponible
-  If Not IsNull(nomL) And Trim(nomL) <> "" Then
-    nom = nomL
-    adresseL = rs["adressel"]
-    adresseL1 = rs["adressel1"]
-    adresse = CAdresseUtils.ConstruireAdresse(adresseL, adresseL1)
-    ville = rs["villel"]
-    cp = rs["cpl"]
+  If Not IsNull(nomL) Then
+    If Trim(nomL) <> "" Then
+      nom = nomL
+      adresseL = rs["adressel"]
+      adresseL1 = rs["adressel1"]
+      adresse = CAdresseUtils.ConstruireAdresse(adresseL, adresseL1)
+      ville = rs["villel"]
+      cp = rs["cpl"]
+    Else
+      adresse = CAdresseUtils.ConstruireAdresse(adresse, adresse1)
+    Endif
   Else
     adresse = CAdresseUtils.ConstruireAdresse(adresse, adresse1)
   Endif
   
-  ' Géocoder avec détection de précision
   point = GeocoderAvecCache(idcom, nom, adresse, ville, cp, rs, db, geocodagePrecis)
   
-  ' Ajouter si point valide (précis OU ville seule)
   If Not IsNull(point) Then
     clientKey = "client_" & idcom & "_" & nom
     clients.Add(point, clientKey)
   Endif
 End
 
-' Géocoder avec cache BDD - Retourne [point, estPrecis]
 Private Function GeocoderAvecCache(idcom As Integer, nom As String, adresse As String, ville As String, cp As String, rs As Result, db As Connection, ByRef geocodagePrecis As Boolean) As MapPoint
   Dim point As MapPoint
   Dim lat, lon As Float
   Dim resultat As Variant[]
   
-  geocodagePrecis = True  ' Par défaut, cache = précis
+  geocodagePrecis = True
   
-  ' Vérifier cache BDD avec validation
   If Not IsNull(rs["lat"]) And Not IsNull(rs["lon"]) Then
     lat = rs["lat"]
     lon = rs["lon"]
     
-    ' Vérifier que les coordonnées sont valides (pas 0,0)
     If lat <> 0 And lon <> 0 And Abs(lat) > 0.0001 And Abs(lon) > 0.0001 Then
       point = New MapPoint(lat, lon)
       Print "💾 " & nom & " (depuis cache)"
@@ -103,7 +99,6 @@ Private Function GeocoderAvecCache(idcom As Integer, nom As String, adresse As S
     Endif
   Endif
   
-  ' Géocoder via API avec détection de précision
   resultat = GeocoderViaAPIAvecPrecision(adresse, ville, cp)
   
   If resultat.Count = 2 Then
@@ -111,7 +106,6 @@ Private Function GeocoderAvecCache(idcom As Integer, nom As String, adresse As S
     geocodagePrecis = resultat[1]
     
     If Not IsNull(point) Then
-      ' Sauvegarder SEULEMENT si géocodage précis
       If geocodagePrecis Then
         SauvegarderDansCache(idcom, point, db)
         Print "✅ " & nom & " (adresse précise)"
@@ -127,19 +121,16 @@ Private Function GeocoderAvecCache(idcom As Integer, nom As String, adresse As S
   Return point
 End
 
-' Géocoder via l'API Nominatim avec détection de précision - Retourne [point, estPrecis]
 Private Function GeocoderViaAPIAvecPrecision(adresse As String, ville As String, cp As String) As Variant[]
   Dim point As MapPoint
   Dim estPrecis As Boolean = False
   Dim resultat As New Variant[]
   
-  ' Tentative 1 : Adresse complète (PRÉCIS)
   point = geo.GetCoordinates(adresse & " " & ville, cp)
   
   If Not IsNull(point) Then
     estPrecis = True
   Else
-    ' Tentative 2 : Ville seule (IMPRÉCIS)
     point = geo.GetCoordinates(ville, cp)
     estPrecis = False
   Endif
@@ -150,7 +141,6 @@ Private Function GeocoderViaAPIAvecPrecision(adresse As String, ville As String,
   Return resultat
 End
 
-' Sauvegarder les coordonnées dans la BDD
 Private Sub SauvegarderDansCache(idcom As Integer, point As MapPoint, db As Connection)
-  Try Connect.ccon.Exec("UPDATE commande SET lat = &1, lon = &2 WHERE idcom = &3", point.Lat, point.Lon, idcom)
+  Try db.Exec("UPDATE commande SET lat = &1, lon = &2 WHERE idcom = &3", point.Lat, point.Lon, idcom)
 End

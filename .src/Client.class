@@ -84,7 +84,8 @@ Public Sub _new(idCom As Integer, autreParam As Variant)
   Textfixe.Tag = [RadioButton1, Textport]
   Textport.Tag = [Textfixe, butval]
   FMain.vs.control = textnumcl
-  
+  RadioButton1.Value = False
+
 End
 
 Public Sub Form_Open()

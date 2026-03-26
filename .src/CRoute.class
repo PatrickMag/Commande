@@ -17,7 +17,7 @@ Public Function GetRoute(p1 As MapPoint, p2 As MapPoint) As MapPoint[]
   Dim routePoints As New MapPoint[]
   
   baseUrl = "https://api.openrouteservice.org/v2/directions/driving-car"
-  apiKey = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjQ5ZGE0MTkwNjE0NjRkMGQ5MjY0NmNjYWRiYmYzNmNmIiwiaCI6Im11cm11cjY0In0="
+  apiKey = "" ' A faire
   url = baseUrl
   jsonBody = "{ \"coordinates\": [[" & p1.Lon & ", " & p1.Lat & "], [" & p2.Lon & ", " & p2.Lat & "]] }"
   
